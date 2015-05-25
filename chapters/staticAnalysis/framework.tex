@@ -106,19 +106,23 @@ Let $s : \syn{statement}$ be a statement, then there are nine different graphs, 
 For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $global$, node which takes the variable names $v_1,\cdots v_n$ as argument. For $s =$ \texttt{return $e$} statement there are three possible graphs. If the return statement is empty, i.e. does not contain an expression, then this is equivalent of returning \texttt{null}
 
 
+
 \begin{figure}
-\ContinuedFloat
 \hspace*{\fill}
-\subcaptionbox{\label{fig:floweret}}{\begin{adjustbox}{max size={.25\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{\label{fig:flowwhile}}{\begin{adjustbox}{max size={.25\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
-    \node [node, below of=en] (rc) {}
-    \node [node, right of=rc] (exit) {}
-    \node [emptynode, below of=rc] (end) {}
+    \node [node, below of=en, label={135:$const_r(null, t_{tar})$}] (const) {};
+    \node [node, right of=const, label={-90:$exit(\cdots, t_{tar}, \cdots)$}] (exitn) {};
+    \node [emptynode, below of=const ] (end) {};
     \node [exit, below of=end] (ex) {};
-
+      % Draw edges
+    \path[line] (en) -> (const);
+    \path[line] (const) -> (exitn);
+    \path[line] (end) -> (ex);
+    
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{\label{fig:flowrret}}{\begin{adjustbox}{max size={.25\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{\label{fig:flowfor}}{\begin{adjustbox}{max size={.25\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     
     \node [entry] (en) {};
@@ -141,7 +145,7 @@ For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $g
     \path [line] (e3) |- (e2);
     \path [line] (if) -- (-3, -6) |- (end);
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{\label{fig:flowret}}{\begin{adjustbox}{max size={.25\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{\label{fig:flowifelse}}{\begin{adjustbox}{max size={.25\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree,below of=en] (e1) {$E(t)$};
@@ -161,6 +165,7 @@ For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $g
 \end{tikzpicture}\end{adjustbox}}
 \hspace*{\fill}
 \end{figure}
+
 
 The fifth graph is the empty graph, the sixth is the graph of the expression, and the ninth graph is the graph of the block statement, which is the consisting of each statement in the block connected by edges in the right order.
 
