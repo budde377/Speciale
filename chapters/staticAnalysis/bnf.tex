@@ -1,0 +1,64 @@
+\begin{grammar}
+<program> ::= (<function-definition> | <statement>)*
+\end{grammar}
+\begin{grammar}
+<function-definition> ::= `function' `&'?<function-name> `(' (`&'? <var> ( `,' `&'? <var>)* ) | $\epsilon$`)' <block>
+\end{grammar}
+\begin{grammar}
+<statement> ::= `while (' <expr> `)' <statement>
+%\alt `foreach (' <expr> `as' <opt-arrow-var> `)' <statement>
+\alt `for (' <expr>?`;'<expr>?`;'<expr>? `)' <statement>
+\alt `if('<expr>`)' <statement>
+\alt `if('<expr>`)' <statement> `else' <statement>
+\alt `;'
+\alt <expr>`;'
+\alt `global' <var> (`,' <var>)*`;'
+\alt `return' (<expr>|<rexpr>)?`;'
+\alt <block>
+\end{grammar}
+\begin{grammar}
+<expr> ::= <expr> $\oplus$ <expr>
+\alt `!' <expr>
+\alt `-' <expr>
+\alt `(' <expr> `)'
+\alt <var-expr>`+ +'
+\alt <var-expr>`- -'
+\alt `+ +'<var-expr>
+\alt `- -'<var-expr>
+\alt <var>
+\alt <expr> `['<expr> `]'
+\alt <function-reference>
+\alt <const>
+\alt <assignment>
+\alt `[' ($\epsilon$ | <array-init-entry> (`,' <array-init-entry>)*) `]'
+\alt `array(' ($\epsilon$ | <array-init-entry> (`,' <array-init-entry>)*) `)'
+\end{grammar}
+\begin{grammar}
+<function-reference> ::= <function-name>`(' (<function-arg> (`,' <function-arg>)* | $\epsilon$ ) `)'
+\end{grammar}
+\begin{grammar}
+<function-arg> ::= <expr> 
+\alt <rexpr> 
+\end{grammar}
+\begin{grammar}
+<rexpr> ::= <var> 
+\alt <function-reference>
+\alt <rexpr>`[]'
+\alt <rexpr>`[' <expr> `]'
+\end{grammar}
+\begin{grammar}
+<var-expr> ::= <var> 
+\alt <rexpr>`[]'
+\alt <rexpr>`[' <expr> `]'
+\end{grammar}
+\begin{grammar}
+<array-init-entry> ::= <expr> `=>' <expr> 
+\alt <expr>
+\end{grammar}
+\begin{grammar}
+<assignment> ::= <var-expr> `=' <rexpr>`;'
+\alt <var-expr> `=' `&'<rexpr>`;'
+\end{grammar}
+\begin{grammar}
+<block> ::= `{' <statement>* `}'
+\end{grammar}

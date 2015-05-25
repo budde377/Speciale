@@ -1,0 +1,82 @@
+\section{Dynamic features}
+In this thesis a lot of the dynamic features of PHP have not been covered. \todo{describe related work that cover dynamic features}.
+
+\section{Evolution of Dynamic Feature Usage in PHP}
+Purpose: examine dynamic feature usage in WordPress and MediaWiki.
+
+Method: static analysis of occurences relative to total lines of code
+
+Important points: Differentiating between test code, maintenance code and actual end-user visible code. E.g. test code use more dynamic features in MediaWiki.
+
+Conclusion: A decrease in eval and create\_function usage as language features are added that can replace typical use cases for those features. Increase in magic methods use and variable property use.
+\citeA{dynamicfeatures15}
+
+\section{Type Analysis for JavaScript}
+\todo{write summary}
+\citeA{tajs09}
+
+\section{WeVerca}
+\todo{write summary}
+Using PHP 4
+\citeA{weverca14}
+
+\section{A static analyser for finding dynamic programming errors}
+Purpose: finding pointer errors, memory leaks and resource leaks
+
+Method: Simulating paths and modelling functions with guards and constraints
+
+Important points: keeping exact values as much as possible, using predicates when exact values are unknown
+\citeA{bush00}
+
+\section{Static Approximation of Dynamically Generated Web Pages}
+\todo{write summary}
+\citeA{minamide05}
+
+\section{Static Detection of Cross-Site Scripting Vulnerabilities}
+\todo{write summary}
+\citeA{wassermann08}
+
+\section{Static Detection of Security Vulnerabilities in Scripting Languages}
+\todo{write summary}
+\citeA{xie06}
+
+\section{Finding Bugs in Web Applications Using Dynamic Test Generation and Explicit-State Model Checking}
+\todo{write summary}
+\citeB{artzi10}
+
+\section{Sound and Precise Analysis of Web Applications for Injection Vulnerabilities}
+\todo{write summary}
+\citeA{wassermann07}
+
+\section{Pixy: A Static Analysis Tool for Detecting Web Application Vulnerabilities}
+\todo{write summary}
+Using PHP 4
+\citeA{pixy06}
+
+\section{An Empirical Study of PHP Feature Usage}
+Purpose: which features are used in real applications
+
+Method: corpus of most popular PHP applications (framework, e-commerce, learning platform, forum software), analyse feature usage and distribution
+
+Conclusions: eval is used in real contexts
+
+Application release dates range from 2010 to 2012. The analyser code is available so it might be interesting to run the analysis on newer versions of the same applications see how results have changed.
+\citeA{featureusage13}
+
+\section{Alias Analysis for Object-Oriented Programs}
+\todo{write summary}
+\citeA{sridharan13}
+
+\section{Two Approaches to Interprocedural Data Flow Analysis}
+\todo{write summary}
+\citeA{interprocedural}
+
+\section{Practical Blended Taint Analysis for JavaScript}
+Method: Use JSBAF to make a blended taint analysis
+
+Important points: static analyses are slow (> 10 minutes), blended analysis is much faster since impossible or unused paths can be pruned. More problems can be identified. Fewer false alarms
+\citeA{blendedtaint}
+
+\section{Blended Analysis for Performance Understanding of Framework-based Applications}
+Important points: blended analysis is good when you have a limited amount of possible inputs.
+\citeA{blendedanalysis}

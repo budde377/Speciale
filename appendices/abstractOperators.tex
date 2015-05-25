@@ -1,0 +1,319 @@
+The following definitions are used for all tables in this appendix.
+
+\begin{align*}
+x, y &\in \mathbb{Z} \wedge x, y > 0 \\
+a, b &\in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})
+\end{align*}
+
+Furthermore the shortshand $f$ is used for the boolean \texttt{false} value.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l| c c c c c c c}
+$+$     & $\bot$& $0$       & $y$   & uInt  & $b$   & notUInt   & $\top$ \\
+\hline
+$\bot$  & $\bot$& $\bot$    & $\bot$& $\bot$& $\bot$& $\bot$    & $\bot$ \\
+$0$     & $\bot$& $0$       & $y$   & uInt  & $b$   & notUInt   & $\top$ \\
+$x$     & $\bot$& $x$       & $x+y$ & uInt  & $x+b$ & $\top$    & $\top$ \\
+uInt    & $\bot$& uInt      & uInt  & uInt  & $\top$& $\top$    & $\top$ \\
+$a$     & $\bot$& $a$       & $a+y$ & $\top$& $a+b$ & $\top$    & $\top$ \\
+notUInt & $\bot$& notUInt   & $\top$& $\top$& $\top$& $\top$    & $\top$ \\
+$\top$  & $\bot$& $\top$    & $\top$& $\top$& $\top$& $\top$    & $\top$ \\
+\end{tabular}
+\caption{Abstract Addition}
+\label{tab:abstract_addition}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|cccccccc}
+$-$                             & $\bot$ & $0$     & $y$     & uInt    & $b < 0 \wedge b \in \mathbb{Z}$ & $b$     & notUInt & $\top$ \\\hline
+$\bot$                          & $\bot$ & $\bot$  & $\bot$  & $\bot$  & $\bot$                          & $\bot$  & $\bot$  & $\bot$ \\
+$0$                             & $\bot$ & $0$     & $y$     & $\top$  & $-b$                            & $-b$    & $\top$  & $\top$ \\
+$x$                             & $\bot$ & $x$     & $x-y$   & $\top$  & $x-b$                           & $x-b$   & $\top$  & $\top$ \\
+uInt                            & $\bot$ & uInt    & $\top$  & $\top$  & uInt                            & notUInt & $\top$  & $\top$ \\
+$a < 0 \wedge a \in \mathbb{Z}$ & $\bot$ & $a$     & $a-y$   & notUInt & $a-b$                           & $a-b$   & $\top$  & $\top$ \\
+$a$                             & $\bot$ & $a$     & $a-y$   & notUInt & $a-b$                           & $a-b$   & $\top$  & $\top$ \\
+notUInt                         & $\bot$ & notUInt & notUInt & notUInt & $\top$                          & $\top$  & $\top$  & $\top$ \\
+$\top$                          & $\bot$ & $\top$  & $\top$  & $\top$  & $\top$                          & $\top$  & $\top$  & $\top$
+\end{tabular}
+}
+\caption{Abstract Subtraction}
+\label{tab:abstract_subtraction}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|cccccccc}
+$\cdot$ & $\bot$ & $0$    & $y$         & uInt    & $b < 0$     & $b$         & notUInt & $\top$ \\\hline
+$\bot$  & $\bot$ & $\bot$ & $\bot$      & $\bot$  & $\bot$      & $\bot$      & $\bot$  & $\bot$ \\
+$0$     & $\bot$ & $0$    & $0$         & $0$     & $0$         & $0$         & $0$     & $0$    \\
+$x$     & $\bot$ & $0$    & $x\cdot y$  & uInt    & $x\cdot b$  & $x\cdot b$  & $\top$  & $\top$ \\
+uInt    & $\bot$ & $0$    & uInt        & uInt    & notUInt     & $\top$      & $\top$  & $\top$ \\
+$a < 0$ & $\bot$ & $0$    & $a\cdot y$  & notUInt & $\top$      & $a\cdot b$  & $\top$  & $\top$ \\
+$a$     & $\bot$ & $0$    & $a \cdot y$ & $\top$  & $a \cdot b$ & $a \cdot b$ & $\top$  & $\top$ \\
+notUInt & $\bot$ & $0$    & $\top$      & $\top$  & $\top$      & $\top$      & $\top$  & $\top$ \\
+$\top$  & $\bot$ & $0$    & $\top$      & $\top$  & $\top$      & $\top$      & $\top$  & $\top$
+\end{tabular}
+\caption{Abstract Multiplication}
+\label{tab:abstract_multiplication}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|cccccccc}
+$/$     & $\bot$ & $0$    & $y$             & uInt                     & $b < 0$       & $b$           & notUInt & $\top$          \\\hline
+$\bot$  & $\bot$ & $\bot$ & $\bot$          & $\bot$                   & $\bot$        & $\bot$        & $\bot$  & $\bot$          \\
+$0$     & $\bot$ & $f$    & $0$             & $0\sqcup f$              & $0$           & $0$           & $0$     & $0\sqcup f$     \\
+$x$     & $\bot$ & $f$    & $\frac{x}{y}$   & $\top \sqcup f$          & $\frac{x}{b}$ & $\frac{x}{b}$ & $\top$  & $\top \sqcup f$ \\
+uInt    & $\bot$ & $f$    & $\top$          & $\top \sqcup f$          & notUInt       & $\top$        & $\top$  & $\top \sqcup f$ \\
+$a < 0$ & $\bot$ & $f$    & $\frac{a}{y}$    & $\text{notUInt}\sqcup f$ & $\frac{a}{b}$ & $\frac{a}{b}$ & $\top$  & $\top \sqcup f$ \\
+$a$     & $\bot$ & $f$    & $\frac{a}{y}$    & $\top \sqcup f$          & $\frac{a}{b}$ & $\frac{a}{b}$ & $\top$  & $\top \sqcup f$ \\
+notUInt & $\bot$ & $f$    & $\top$          & $\top \sqcup f$          & $\top$        & $\top$        & $\top$  & $\top \sqcup f$ \\
+$\top$  & $\bot$ & $f$    & $\top \sqcup f$ & $\top \sqcup f$          & $\top$        & $\top$        & $\top$  & $\top \sqcup f$
+\end{tabular}
+\caption{Abstract Division}
+\label{tab:abstract_division}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|cccccccc}
+$\%$     & $\bot$ & $0$    & $y$      & uInt                     & $b > -1$               & $b$      & notUInt                   & $\top$                    \\\hline
+$\bot$   & $\bot$ & $\bot$ & $\bot$   & $\bot$                   & $\bot$                 & $\bot$   & $\bot$                    & $\bot$                    \\
+$0$      & $\bot$ & $f$    & $0$      & $0\sqcup f$              & $0 \sqcup f$           & $0$      & $0\sqcup f$               & $0\sqcup f$               \\
+$x$      & $\bot$ & $f$    & $x \% y$ & $\text{uInt} \sqcup f$   & $x \% b$               & $x \% b$ & $\text{uInt}\sqcup f$     & $\text{uInt} \sqcup f$    \\
+uInt     & $\bot$ & $f$    & uInt     & $\text{uInt} \sqcup f$   & $\text{uInt} \sqcup f$ & uInt     & $\text{uInt}\sqcup f$     & $\text{uInt} \sqcup f$    \\
+$a > -1$ & $\bot$ & $f$    & $a \% y$ & $\text{uInt}\sqcup f$ & $a \% b$               & $a \% b$ & $\text{uInt} \sqcup f$    & $\text{uInt} \sqcup f$    \\
+$a$      & $\bot$ & $f$    & $a \% y$ & $\text{notUInt} \sqcup f$   & $a \% b$               & $a \% b$ & $\text{notUInt} \sqcup f$ & $\text{notUInt} \sqcup f$ \\
+notUInt  & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f$         & $\top$   & $\top\sqcup f$            & $\top \sqcup f$           \\
+$\top$   & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f$         & $\top$   & $\top\sqcup f$            & $\top \sqcup f$         
+\end{tabular}
+}
+\caption{Abstract Modulus}
+\label{tab:abstract_modulus}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|cccccccc}
+$**$    & $\bot$ & $0$    & $y$    & uInt   & $b$    & notUInt & $\top$ \\\hline
+$\bot$  & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$  & $\bot$ \\
+$0$     & $\bot$ & $1$    & $0$    & uInt   & $0$    & $0$     & uInt   \\
+$x$     & $\bot$ & $1$    & $x^y$  & uInt   & $\top$ & $\top$  & $\top$ \\
+uInt    & $\bot$ & $1$    & uInt   & uInt   & $\top$ & $\top$  & $\top$ \\
+$a$     & $\bot$ & $1$    & $a^y$  & $\top$ & $a^b$  & $\top$  & $\top$ \\
+notUInt & $\bot$ & $1$    & $\top$ & $\top$ & $\top$ & $\top$  & $\top$ \\
+$\top$  & $\bot$ & $1$    & $\top$ & $\top$ & $\top$ & $\top$  & $\top$    
+\end{tabular}
+\caption{Abstract Exponentiation}
+\label{tab:abstract_exponentiation}
+\end{table}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{cc}
+\subcaptionbox{Equality
+\label{tab:abstract_equal_bool}}{
+\begin{tabular}{l|cccc}
+$==$   & $\bot$ & t      & f      & $\top$ \\\hline
+$\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+t      & $\bot$ & t      & f      & $\top$ \\
+f      & $\bot$ & f      & t      & $\top$ \\
+$\top$ & $\bot$ & $\top$ & $\top$ & $\top$
+\end{tabular}
+} &
+\subcaptionbox{Not Equality
+\label{tab:abstract_equal_bool}}{
+\begin{tabular}{l|cccc}
+$!=$   & $\bot$ & t      & f      & $\top$ \\\hline
+$\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+t      & $\bot$ & f      & t      & $\top$ \\
+f      & $\bot$ & t      & f      & $\top$ \\
+$\top$ & $\bot$ & $\top$ & $\top$ & $\top$
+\end{tabular}
+} \\
+\subcaptionbox{Less Than\label{tab:abstract_less_than_bool}}{
+\begin{tabular}{l|cccc}
+$<$    & $\bot$ & t      & f      & $\top$ \\\hline
+$\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+t      & $\bot$ & f      & f      & f \\
+f      & $\bot$ & t      & f      & $\top$ \\
+$\top$ & $\bot$ & $\top$ & f      & $\top$
+\end{tabular}
+} &
+\subcaptionbox{Less Than/Equal\label{tab:abstract_less_than_equal_bool}}{
+\begin{tabular}{l|cccc}
+$<=$   & $\bot$ & t      & f      & $\top$ \\\hline
+$\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+t      & $\bot$ & t      & f      & $\top$ \\
+f      & $\bot$ & t      & t      & t \\
+$\top$ & $\bot$ & t      & $\top$ & $\top$
+\end{tabular}
+} \\
+\subcaptionbox{Greater Than\label{tab:abstract_greater_than_bool}}{
+\begin{tabular}{l|cccc}
+$>$    & $\bot$ & t      & f      & $\top$ \\\hline
+$\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+t      & $\bot$ & f      & t      & $\top$ \\
+f      & $\bot$ & f      & f      & f \\
+$\top$ & $\bot$ & f      & $\top$ & $\top$
+\end{tabular}
+} &
+\subcaptionbox{Greater Than/Equal\label{tab:abstract_greater_than_equal_bool}}{
+\begin{tabular}{l|cccc}
+$<=$   & $\bot$ & t      & f      & $\top$ \\\hline
+$\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+t      & $\bot$ & t      & t      & t \\
+f      & $\bot$ & f      & t      & $\top$ \\
+$\top$ & $\bot$ & $\top$ & t & $\top$
+\end{tabular}
+}
+\end{tabular}
+\caption{Abstract operators for Booleans}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|cccccc}
+$==$          & $\bot$ & y      & uIntString & s      & notUIntString & $\top$ \\\hline
+$\bot$        & $\bot$ & $\bot$ & $\bot$     & $\bot$ & $\bot$        & $\bot$ \\
+x             & $\bot$ & x==y   & $\top$     & f      & f             & $\top$ \\
+uIntString    & $\bot$ & $\top$ & $\top$     & f      & f             & $\top$ \\
+r             & $\bot$ & f      & f          & r==s   & $\top$        & $\top$ \\
+notUIntString & $\bot$ & f      & f          & $\top$ & $\top$        & $\top$ \\
+$\top$        & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$
+\end{tabular}
+\caption{Abstract Equal for Strings}
+\label{tab:abstract_equal_string}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|cccccc}
+$!=$          & $\bot$ & y      & uIntString & s      & notUIntString & $\top$ \\\hline
+$\bot$        & $\bot$ & $\bot$ & $\bot$     & $\bot$ & $\bot$        & $\bot$ \\
+x             & $\bot$ & x!=y   & $\top$     & t      & t             & $\top$ \\
+uIntString    & $\bot$ & $\top$ & $\top$     & t      & t             & $\top$ \\
+r             & $\bot$ & t      & t          & r!=s   & $\top$        & $\top$ \\
+notUIntString & $\bot$ & t      & t          & $\top$ & $\top$        & $\top$ \\
+$\top$        & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$
+\end{tabular}
+\caption{Abstract Not Equal for Strings}
+\label{tab:abstract_not_equal_string}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|cccccc}
+$\oplus$           & $\bot$ & y      & uIntString & s      & notUIntString & $\top$ \\\hline
+$\bot$        & $\bot$ & $\bot$ & $\bot$     & $\bot$ & $\bot$        & $\bot$ \\
+x             & $\bot$ & $x\oplus y$ & $\top$     & $x\oplus s$    & $\top$        & $\top$ \\
+uIntString    & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$ \\
+r             & $\bot$ & $r\oplus y$    & $\top$     & $r\oplus s$    & $\top$        & $\top$ \\
+notUIntString & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$ \\
+$\top$        & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$
+\end{tabular}
+\caption{Abstract Less Than (Equal) and Greater Than (Equal) for Strings, replace $\oplus$ with the respective operators}
+\label{tab:abstract_less_than_string}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|cccccc}
+$==$    & $\bot$ & y      & uInt   & b      & notUInt & $\top$ \\\hline
+$\bot$  & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$  & $\bot$ \\
+x       & $\bot$ & $x==y$ & $\top$ & f      & f       & $\top$ \\
+uInt    & $\bot$ & $\top$ & $\top$ & f      & f       & $\top$ \\
+a       & $\bot$ & f      & f      & $a==b$ & $\top$  & $\top$ \\
+notUInt & $\bot$ & f      & f      & $\top$ & $\top$  & $\top$ \\
+$\top$  & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$
+\end{tabular}
+\caption{Abstract Equal for Numbers}
+\label{tab:abstract_equal_number}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|cccccc}
+$!=$    & $\bot$ & y      & uInt   & b      & notUInt & $\top$ \\\hline
+$\bot$  & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$  & $\bot$ \\
+x       & $\bot$ & x!=y   & $\top$ & t      & t       & $\top$ \\
+uInt    & $\bot$ & $\top$ & $\top$ & t      & t       & $\top$ \\
+a       & $\bot$ & t      & t      & a!=b   & $\top$  & $\top$ \\
+notUInt & $\bot$ & t      & t      & $\top$ & $\top$  & $\top$ \\
+$\top$  & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$
+\end{tabular}
+\caption{Abstract Not Equal for Numbers}
+\label{tab:abstract_not_equal_number}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|ccccccc}
+$<$     & $\bot$ & y      & uInt   & b < 0  & b      & notUInt & $\top$ \\\hline
+$\bot$  & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$  & $\bot$ \\
+x       & $\bot$ & x < y  & $\top$ & f      & x < b  & $\top$  & $\top$ \\
+uInt    & $\bot$ & $\top$ & $\top$ & f      & $\top$ & $\top$  & $\top$ \\
+a < 0   & $\bot$ & t      & t      & a < b  & a < b  & $\top$  & $\top$ \\
+a       & $\bot$ & a < y  & $\top$ & a < b  & a < b  & $\top$  & $\top$ \\
+notUInt & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$ \\
+$\top$  & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$
+\end{tabular}
+\caption{Abstract Less Than for Numbers, the table for Less Than/Equal corresponds to this one}
+\label{tab:abstract_less_than_equal_number}
+\end{table}
+
+\clearpage
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|ccccccc}
+$>$     & $\bot$ & y      & uInt   & b < 0  & b      & notUInt & $\top$ \\\hline
+$\bot$  & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$  & $\bot$ \\
+x       & $\bot$ & x > y  & $\top$ & t      & x > b  & $\top$  & $\top$ \\
+uInt    & $\bot$ & $\top$ & $\top$ & t      & $\top$ & $\top$  & $\top$ \\
+a < 0   & $\bot$ & f      & f      & a > b  & a > b  & $\top$  & $\top$ \\
+a       & $\bot$ & a > y  & $\top$ & a > b  & a > b  & $\top$  & $\top$ \\
+notUInt & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$ \\
+$\top$  & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$
+\end{tabular}
+\caption{Abstract Greater Than for Numbers, the table for Greater Than/Equal corresponds to this one}
+\label{tab:abstract_greater_than_equal_number}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{cc}
+\subcaptionbox{\texttt{AND}\label{tab:abstract_and}}{
+\begin{tabular}{l|cccc}
+\texttt{\&\&} & $\bot$ & t      & f      & $\top$ \\\hline
+$\bot$          & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+t               & $\bot$ & t      & f      & $\top$ \\
+f               & $\bot$ & f      & f      & f      \\
+$\top$          & $\bot$ & $\top$ & f      & $\top$
+\end{tabular}
+} &
+\subcaptionbox{\texttt{OR}\label{tab:abstract_or}}{
+\begin{tabular}{l|cccc}
+\texttt{||} & $\bot$ & t      & f      & $\top$ \\\hline
+$\bot$          & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+t               & $\bot$ & t      & t      & t      \\
+f               & $\bot$ & t      & f      & $\top$ \\
+$\top$          & $\bot$ & t      & $\top$ & $\top$
+\end{tabular}
+} \\
+\subcaptionbox{\texttt{XOR}\label{tab:abstract_xor}}{
+\begin{tabular}{l|cccc}
+\texttt{XOR} & $\bot$ & t      & f      & $\top$ \\\hline
+$\bot$          & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+t               & $\bot$ & f      & t      & $\top$ \\
+f               & $\bot$ & t      & f      & $\top$ \\
+$\top$          & $\bot$ & $\top$ & $\top$ & $\top$
+\end{tabular}
+} &
+\end{tabular}
+\caption{Abstract Logical Operators for Booleans}
+\label{tab:abstract_logical}
+\end{table}

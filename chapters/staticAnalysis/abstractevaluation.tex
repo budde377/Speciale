@@ -1,0 +1,253 @@
+\section{Coercion}
+\todo{description first, definition afterwards. More description of interesting cases of coercion}
+In order to mimic the ability of coercing values the following functions
+\begin{align*}
+c_{\alpha, \beta} : \alpha \rightarrow \beta
+\end{align*}
+where $\alpha \in \{ \text{Value}, \text{Array}, \text{Number}, \text{String}, \text{Null}, \text{Boolean}\}$ and {
+\def\OldComma{,}
+    \catcode`\,=13
+    \def,{%
+      \ifmmode%
+        \OldComma\discretionary{}{}{}%
+      \else%
+        \OldComma%
+      \fi%
+    }% 
+$\beta \in \{\text{Number}, \text{Value}, \text{String}, \text{Index}, \text{Boolean}\}$ } are defined as 
+\begin{align*}
+c_{\alpha,\text{Value}}(v) &=   \begin{cases} 
+       (v, \bot, \bot, \bot, \bot) & \text{ if $\alpha = $ Array} \\
+       (\bot, v, \bot, \bot, \bot) & \text{ if $\alpha = $ String} \\
+       ( \bot, \bot, v, \bot, \bot) & \text{ if $\alpha = $ Number} \\
+       (\bot, \bot, \bot,v,  \bot) & \text{ if $\alpha = $ Boolean} \\
+       (\bot, \bot, \bot, \bot, v) & \text{ if $\alpha = $ Null} \\
+  \end{cases}\\
+  c_{\text{Value}, \alpha}((v_1, v_2, v_3, v_4, v_5)) &= 
+  c_{\text{Array}, \alpha}(v_1) \sqcup c_{\text{String}, \alpha}(v_2) \\ 
+  &\sqcup c_{\text{Number}, \alpha}(v_3) \sqcup c_{\text{Boolean},\alpha }(v_4) \sqcup c_{\text{Null}, \alpha}(v_5)\\
+\end{align*}
+
+{\tiny
+\begin{align*}
+c_{\text{Array},\text{String}}(v) &= \begin{cases}
+"Array" & \text{if $v \neq \bot$}\\
+\bot & \text{else}
+\end{cases} & 
+c_{\text{Null},\text{String}}(v) &=\begin{cases} 
+       "" & \text{if $v = \top$}\\
+       \bot & \text{else}
+  \end{cases}\\
+c_{\text{Number},\text{String}}(v) &=\begin{cases} 
+       uIntStr & \text{if $v = uInt$ }\\
+       notUIntStr & \text{if $v = notUInt$  }\\
+       \top & \text{if $v = \top$  }\\
+       \bot & \text{if $v = \bot$  }\\
+       string(v) & \text{else}\\
+  \end{cases} &
+c_{\text{Bool},\text{String}}(v) &=\begin{cases} 
+       "" & \text{if $v = false$}\\
+       "1" & \text{if $v = true$}\\
+       v & \text{else}
+  \end{cases}\\
+c_{\text{Array}, \text{Bool}}(v) &= \begin{cases} 
+       false & \text{if $v = emptyArray$ }\\
+       \bot & \text{ if $v = \bot$}\\
+       \top & \text{else}\\
+  \end{cases} &
+c_{\text{Null}, \text{Bool}}(v) &= \begin{cases} 
+       false & \text{if $v = \top$}\\
+       \bot & \text{else}
+  \end{cases}\\
+c_{\text{Number}, \text{Bool}}(v) &=\begin{cases} 
+       false & \text{ if $v = 0$} \\
+       \bot & \text{ if $v = \bot$}\\
+       \top & \text{ if $v = uInt \vee v = \top$}\\
+       true & \text{else}
+  \end{cases} &
+c_{\text{String}, \text{Bool}}(v) &= \begin{cases} 
+       false & \text{ if $v = "" \vee v = "0"$} \\
+       \bot & \text{ if $v = \bot$}\\
+       \top & \text{ if $v = uIntString \vee v = \top$}\\
+       true & \text{else}
+  \end{cases}\\
+c_{\text{Null}, \text{Number}}(v) &= \begin{cases} 
+       0 & \text{if $v = \top$}\\
+       \bot & \text{else}
+  \end{cases} &
+  c_{\text{Array}, \text{Number}}(v) &= \bot \\
+c_{\text{Bool}, \text{Number}}(v) &=\begin{cases} 
+       1 & \text{if $v = true$}\\
+       0 & \text{if $v = false$}\\
+       uInt & \text{if $v = \top$}\\
+       \bot & \text{if $v = \bot$}
+  \end{cases} &
+c_{\text{String}, \text{Number}}(v) &=\begin{cases} 
+       num(v) & \text{if $isNumber(v)$}\\
+       uInt & \text{if $v = uIntString$ }\\
+       \top & \text{if $v = notUIntString$  }\\
+       \top & \text{if $v = \top$}\\
+       \bot & \text{if $v = \bot$}\\
+       0 & \text{else}
+  \end{cases}\\
+  c_{\text{Array}, \text{Index}}(v) &= \bot &
+c_{\text{Bool}, \text{Index}}(v) &= c_{\text{Bool}, \text{Number}}(v)\\
+c_{\text{Number}, \text{Index}}(v) &= \begin{cases} 
+        int(v) & \text{if $isInteger(v)$}\\
+        \bot & \text{if $v = \bot $}\\
+        \top & \text{else} 
+  \end{cases} &
+c_{\text{String}, \text{Index}}(v) &= \begin{cases} 
+       int(v) & \text{if $isInteger(v)$}\\
+       v & \text{if $isString(v)$}\\
+       \top & \text{else}
+\end{cases}\\
+c_{\text{Null}, \text{Index}}(v) &= \begin{cases} 
+       "" & \text{if $v = \top$}\\
+       \bot & \text{else}
+      \end{cases} &
+c_{\alpha, \alpha} (v) &= v
+\end{align*}
+}
+Here $int$, $num$, and $string$ are creating an integer, number, and string respectively.
+
+A few things are worth noticing about coercion in PHP. 
+\begin{itemize}
+\item Any array coerced to a string will result in the string literal ``Array''
+\item Null is coerced to the empty string
+\item Both the empty string and the string literal ``0'' are coerced to boolean \texttt{false}
+\item Boolean \texttt{false} is coerced to the empty string
+\item An empty array is coerced to boolean \texttt{false}
+\end{itemize}. 
+
+\section{Abstract evaluation}
+\label{sec:abseval}
+This section lists the supported binary and unary operators and the abstract evaluation of those operators for the analysis lattice. Insight on the abstract evaluation can be found in this section. Appendix \ref{app:abstract_operators} provides definition tables for all abstract operators for reference.
+
+The binary and unary operations supported are listed in table \ref{tab:binop} and \ref{tab:unop} respectively. Numeric, boolean and string operators can be generalized to values by using the coercion function from the previous section. E.g. given values $x$ and $y$
+\begin{align*}
+    x \oplus y =  c_{\beta, \text{Value}}(c_{\text{Value}, \alpha}(x) \oplus c_{\text{Value},\alpha}(y))
+\end{align*}
+where $\oplus : \alpha \times \alpha \rightarrow \beta$. Likewise can the unary operation be generalized to values 
+\begin{align*}
+    \circ x = c_{\alpha, \text{Value}}(\circ (c_{\text{Value}, \alpha}(x)))
+\end{align*}
+where $\circ : \alpha \rightarrow \alpha $.
+
+\todo{examples}
+
+In table \ref{tab:binop} logical \texttt{AND} and \texttt{OR} operations have two different notations. This is due to PHP specifying different precedence for the two notations. The textual operators bind weaker than assignments whereas the symbol operators bind stronger than assignments. Since the AST for the analysis is provided this difference have no direct impact on the analysis implementation.
+
+\begin{table}
+\centering
+\begin{tabular}{c|l |c}\hline
+Operator & Name & Signature\\
+\hline\hline
+
+\texttt{x + y} & Addition & \multirow{4}{*}{$ \text{Number} \times \text{Number} \rightarrow \text{Number}$} \\
+\texttt{x - y} & Subtraction & \\
+\texttt{x * y} & Multiplication & \\
+\texttt{x ** y} & Exponentiation & \\\hline
+\texttt{x / y} & Division &  \multirow{2}{*}{$ \text{Number} \times \text{Number} \rightarrow \text{Value}$}\\
+\texttt{x \% y} & Modulo & \\\hline
+\texttt{x == y} & Equal & \multirow{8}{*}{$ \text{Value} \times \text{Value} \rightarrow \text{Boolean}$} \\
+\texttt{x != y} & Not equal & \\
+\texttt{x === y} & Identical & \\
+\texttt{x !== y} & Not identical & \\
+\texttt{x < y} & Less than &\\
+\texttt{x <= y} & Less than or equal & \\
+\texttt{x > y} & Greater than & \\
+\texttt{x >= y} & Greater than or equal &\\\hline
+\texttt{x \&\& y} & \multirow{2}{*}{Logical and } & \multirow{5}{*}{ $ \text{Boolean} \times \text{Boolean} \rightarrow \text{Boolean}$} \\
+\texttt{x AND y} & \\
+\texttt{x || y} &  \multirow{2}{*}{Logical or } & \\
+\texttt{x OR y} & \\
+\texttt{x XOR y} & Exclusive or & \\\hline
+\texttt{x . y} & String concatenation & $ \text{String} \times \text{String} \rightarrow \text{String}$ \\\hline
+\end{tabular}
+\caption{Binary operations\label{tab:binop}}
+\end{table}
+
+\begin{table}
+\centering
+\begin{tabular}{c|l |c}\hline
+Operator & Name & Signature\\
+\hline\hline
+\texttt{! x} & Negation & $\text{Boolean} \rightarrow \text{Boolean}$\\\hline
+\texttt{-- x} & Decrement & \multirow{5}{*}{ $\text{Number} \rightarrow \text{Number}$}\\
+\texttt{+ + x} & Increment &\\
+\texttt{x - -} & Decrement & \\
+\texttt{x + + } & Increment & \\
+\texttt{- x} & Unary Minus & \\\hline
+\end{tabular}
+\caption{Unary operations\label{tab:unop}}
+\end{table}
+
+For numeric operators the definitions use the following variables:
+
+\begin{align*}
+x, y &\in \mathbb{Z} \wedge x, y > 0 \\
+a, b &\in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})
+\end{align*}
+
+Table \ref{tab:abstract_subtraction1} defines abstract subtraction. Numbers in uInt are split into 0 and all other numbers while numbers in notUInt are split into negative and positive numbers. These splits are made to heighten the precision of the operator. 0 is the right-identity of subtraction which is used in the 0-column of table \ref{tab:abstract_subtraction1} to get uInt instead of $\top$. Subtracting negative numbers correspond to adding the absolute value of the number. For uInt this means that adding negative integers results in uInt instead of $\top$.
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|cccccccc}
+$-$                             & $\bot$ & $0$     & $y$     & uInt    & $b \in \mathbb{Z}$ & $b$     & notUInt & $\top$ \\\hline
+$\bot$                          & $\bot$ & $\bot$  & $\bot$  & $\bot$  & $\bot$                          & $\bot$  & $\bot$  & $\bot$ \\
+$0$                             & $\bot$ & $0$     & $y$     & $\top$  & $-b$                            & $-b$    & $\top$  & $\top$ \\
+$x$                             & $\bot$ & $x$     & $x-y$   & $\top$  & $x-b$                           & $x-b$   & $\top$  & $\top$ \\
+uInt                            & $\bot$ & uInt    & $\top$  & $\top$  & uInt                            & notUInt & $\top$  & $\top$ \\
+$a \in \mathbb{Z}$ & $\bot$ & $a$     & $a-y$   & notUInt & $a-b$                           & $a-b$   & $\top$  & $\top$ \\
+$a$                             & $\bot$ & $a$     & $a-y$   & notUInt & $a-b$                           & $a-b$   & $\top$  & $\top$ \\
+notUInt                         & $\bot$ & notUInt & notUInt & notUInt & $\top$                          & $\top$  & $\top$  & $\top$ \\
+$\top$                          & $\bot$ & $\top$  & $\top$  & $\top$  & $\top$                          & $\top$  & $\top$  & $\top$
+\end{tabular}
+}
+\caption{Abstract Subtraction}
+\label{tab:abstract_subtraction1}
+\end{table}
+
+For division and modulo operations an error can occur trying to divide by 0. PHP handles division by 0 by returning the boolean \texttt{false} value instead of a number. This is the reason that division and modulo operators are functions from numbers to a value as opposed to the rest of the numeric operators. The shorthand $f$ is used for the boolean \texttt{false} value to keep the table smaller. Only the uInt part of the number lattice can contain 0 which restricts the amount of possible \texttt{false} returns for division. However as seen in table \ref{tab:abstract_modulus1} the amount of possible \texttt{false} values are high for the modulus operator. This is because PHP handles modulus for decimal numbers by removing the decimal part which means $-0.5 \Rightarrow 0$ and $0.8 \Rightarrow 0$. The result of the modulus operator is always an integer and the sign is dictated by the sign of the left-hand operand which can be seen in the table by the $\top$-element column not consisting solely of $\top$-element results.
+
+\begin{table}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|cccccccc}
+$\%$     & $\bot$ & $0$    & $y$      & uInt                     & $1 > b > -1$               & $b$      & notUInt                   & $\top$                    \\\hline
+$\bot$   & $\bot$ & $\bot$ & $\bot$   & $\bot$                   & $\bot$                 & $\bot$   & $\bot$                    & $\bot$                    \\
+$0$      & $\bot$ & $f$    & $0$      & $0\sqcup f$              & $0 \sqcup f$           & $0$      & $0\sqcup f$               & $0\sqcup f$               \\
+$x$      & $\bot$ & $f$    & $x \% y$ & $\text{uInt} \sqcup f$   & $x \% b$               & $x \% b$ & $\text{uInt}\sqcup f$     & $\text{uInt} \sqcup f$    \\
+uInt     & $\bot$ & $f$    & uInt     & $\text{uInt} \sqcup f$   & $\text{uInt} \sqcup f$ & uInt     & $\text{uInt}\sqcup f$     & $\text{uInt} \sqcup f$    \\
+$1 > a > -1$ & $\bot$ & $f$    & $a \% y$ & $\text{uInt}\sqcup f$ & $a \% b$               & $a \% b$ & $\text{uInt} \sqcup f$    & $\text{uInt} \sqcup f$    \\
+$a$      & $\bot$ & $f$    & $a \% y$ & $\text{notUInt} \sqcup f$   & $a \% b$               & $a \% b$ & $\text{notUInt} \sqcup f$ & $\text{notUInt} \sqcup f$ \\
+notUInt  & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f$         & $\top$   & $\top\sqcup f$            & $\top \sqcup f$           \\
+$\top$   & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f$         & $\top$   & $\top\sqcup f$            & $\top \sqcup f$         
+\end{tabular}
+}
+\caption{Abstract Modulus}
+\label{tab:abstract_modulus1}
+\end{table}
+
+Comparison operations are defined directly on values since different types can be compared with each other courtesy of type translation. PHP has an ordered definition of how values are compared depending on their type which can be seen in table \ref{tab:comparisons}.
+
+For performance reasons the analysis do not try to compare all different combinations of possible types when performing abstract comparison operations. If either value have multiple possible types the result is the boolean $\top$-element. Otherwise the comparison operators follow the order of table \ref{tab:comparisons} for coercion of values and comparison of specific types are specified in the tables in appendix \ref{app:abstract_operators}.
+
+Arrays are first of all compared by size. Equal sized arrays with different keys are incomparable and otherwise the arrays are compared by their values. Since the array lattice have no notion of size it is not possible to reason about the results of array comparisons. The only possible sound result is the boolean $\top$-element.
+
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{l|l||l}
+Type of left operand & Type of right operand & Result \\\hline\hline
+null or string & string & null is coerced to string \\\hline
+bool or null & anything & operands are coerced to bool \\\hline
+string or number & string or number & strings are coerced to numbers \\\hline
+array & anything & arrays are always greater
+\end{tabular}
+\caption{Comparison with Various Types based on \protect\citeA{phpcomparison}}
+\label{tab:comparisons}
+\end{table}

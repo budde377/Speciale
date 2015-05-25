@@ -1,0 +1,104 @@
+PHP is a recursive acronym meaning PHP: Hypertext Processor. As one of the first dedicated web development server-side languages it has built a huge user base over the past 20 years. A survey\citeA{w3techs} shows that 82\% of websites use PHP. Whereas PHP is used for both high traffic websites like Facebook and Wikipedia and low traffic websites, the nearest contestants tends to be used for high traffic sites. The simplicity and availability of the language allows for creating small websites with PHP even with no prior programming experience. The wide range of easy-to-use content management systems, forum application and blogging platforms also enables the use of PHP for a variety of users. All these facts makes it impossible to expect well-structured and organized use of the language and all of its possibilities.
+
+\section{Arrays in PHP}
+The language construct which is called \texttt{array} in PHP is an ordered map. Since keys of these ordered maps can be either integer, string or a combination and values can be any combination of types it is possible to use arrays as many different collection types e.g. maps, lists, queues, stacks, trees, dictionaries and probably any other collection-like type that exists.
+
+\section{Scoping}
+\label{sec:backg_scoping}
+The scoping of PHP is rather simple; the only existing local scope is inside of function bodies. All blocks inherit their parent scope and thus the developer need not worry about at which block level a variable is first declared or used. The developer should only be aware when declaring functions. PHP offers the \texttt{global} keyword to allow access to variables defined in the global scope inside of function bodies. A few variables are always accessible inside the local function scope these are called \texttt{superglobals} and consists of \texttt{\$\_POST} and \texttt{\$\_GET} for fetching user input from HTTP POST and HTTP GET requests respectively, \texttt{\$\_SERVER} for accessing server environment information and a few others. Listing \ref{lst:superglobals} shows an example of using \texttt{superglobals}.
+\todo{Other super-globals}
+\begin{program}
+\begin{lstlisting}
+session_start();
+$username = "";
+
+function setUser($ID, $name) {
+    global $username;
+    $_SESSION["ID"] = $ID;
+    $username = $name;
+}
+
+setUser(1, "Admin");
+
+echo "Hello $username"; // Result: Hello Admin
+\end{lstlisting}
+\caption{Global variables used in function scope}
+\label{lst:superglobals}
+\end{program}
+
+A superglobal to be aware of is the \texttt{\$GLOBALS} array which is an array containing all global variables with the variable names as keys. This array can be used to access global variables in function scope without using the \texttt{global} keyword.
+
+
+\section{References}
+\label{sec:backg_references}
+Many languages have a notion of pointers and provides the ability for variables to be a pointer to some value. In PHP the concept of references can easily be confused with pointers, however references are not pointers. Variables names and their content is treated as different things in PHP meaning that variables names are in fact just names for a specific content. Making a reference in PHP corresponds to giving the same content another name. Assigning a variable that is already a reference as a reference of another variable will remove the binding to the original content and bind the variable to the new content. The PHP concept of references also mean that it is not possible to change a reference by a reference as shown in listing \ref{lst:reference-reference}.
+
+\begin{program}
+\begin{lstlisting}
+$hello = "world";
+$hello2 = "stupid";
+
+function change(&$input) {
+    $input = &$GLOBALS["hello2"];
+    $input = "awesome";
+}
+
+change($hello);
+// Result: $hello2 = "awesome" and $hello remains unchanged
+\end{lstlisting}
+\caption{Changing a reference by reference is not possible}
+\label{lst:reference-reference}
+\end{program}
+
+Knowing how PHP splits handle names and content as two different concepts assignments can be seen as copying the content and assigning this new content a name. In practice a copy-on-write strategy is employed which increases performance and decreases memory usage compared with a naive copy-on-assign strategy. In listing \ref{lst:copy-on-write} after line 3 both \texttt{\$a}, \texttt{\$b}, and \texttt{\$c} points to the same array. After evaluating line 4 the array is copied, updated and \texttt{\$b} now points to the new array. Meanwhile \texttt{\$a} and \texttt{\$c} are still pointing to the same array since none of them has changed from the original array. In the example only two copies of the array are ever stored whereas a blind copy-on-assign strategy would have stored three copies of which two would never differ.
+
+\begin{program}
+\begin{lstlisting}
+$a = [1,2,3];
+$b = $a;
+$c = $b;
+$b[1] = 5;
+echo $a[1] . ", " . $b[1] . ", " . $c[1];
+// Result: 2, 5, 2
+\end{lstlisting}
+\caption{Copy-on-write strategy}
+\label{lst:copy-on-write}
+\end{program}
+
+As an alternative PHP offers an explicit way to assign and pass function parameters by-reference. Using the ampersand operator multiple variables can reference the same value as shown in listing \ref{lst:alias}
+
+\begin{program}
+\begin{lstlisting}
+function byvalFunc($input) {
+    $input["hello"] = "PHP";
+}
+
+function byrefFunc(&$input) {
+    $input["hello"] = "PHP";
+}
+
+$greet = ["hello" => "world"];
+byvalFunc($greet);
+echo $greet["hello"]; // Result: world
+byrefFunc($greet);
+echo $greet["hello"]; // Result: PHP
+\end{lstlisting}
+\caption{Aliasing}
+\label{lst:alias}
+\end{program}
+
+PHP arrays are treated as ordinary values and are thus copied like other values when assigning variables. The copy is deep in that the inner-arrays of multi-dimensional arrays will be copied as well. There is however one exception to the deep-copy of arrays namely that references inside arrays are kept even after copying. This effect can be seen in listing \ref{lst:not-deep-copy}.
+
+\begin{program}
+\begin{lstlisting}
+$a = [1,2,3];
+$c = &$a[0];
+$b = $a;
+$c = 5; // Result: $a = [5,2,3]; $b = [5,2,3]; $c = 5;
+$b[0] = 6; // Result: $a = [6,2,3]; $b = [6,2,3]; $c = 6;
+$a[0] = 7; // Result: $a = [7,2,3]; $b = [7,2,3]; $c = 7;
+$b[1] = 8; // Result: $a = [7,2,3]; $b = [7,8,3];
+\end{lstlisting}
+\caption{Keeping references in arrays}
+\label{lst:not-deep-copy}
+\end{program}

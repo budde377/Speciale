@@ -1,0 +1,77 @@
+Since the analysis is performed by a modified interpreter, there are some imposed limitations on the achievable precision. 
+
+\begin{itemize}
+\item  \texttt{array\_init} does not capture the type of the array at initialization. This implies that the type of arrays initialized without being assigned or manipulated afterwards are not captured by the analysis. In \ref{lst:dis_code} line \ref{line:print}, the call to \texttt{print\_r} does yield an \texttt{array\_init} line in the log \ref{lst:dis_code_out} but with no type, depth 1 and size 0. The size should be 3 and the type; List.
+
+\item Detecting the type does rely on the type of the values read or written to the arrays. This implies that there is no reasoning about entries or arrays never read or written. This might produce some false positives.
+
+\item Callables can be written as anonymous functions, strings, or arrays, containing an instance and a string. This analysis will fail to classify arrays containing callables, written differently, correctly, thus introducing false negatives. E.g in example \ref{lst:callables}; \texttt{\$callable1}, \texttt{\$callable3} and \texttt{\$callable4} are all valid callables, however \texttt{\$callable2} is not, since \texttt{\$a->f2()} is a private function.
+
+\begin{program}
+\centering
+\begin{lstlisting}
+class A{
+
+    public function f1(){
+        ...
+    }
+
+    private function f2(){
+        ...
+    }
+
+}
+
+function f(){
+    ...
+}
+
+$a = new A();
+
+$callable1 = [$a, "f1"];
+$callable2 = [$a, "f2"];
+$callable3 = "f";
+$callable4 = function() use ($a){
+    ...
+};
+\end{lstlisting}
+\caption{Callables in PHP}
+\label{lst:callables}
+\end{program}
+
+\item Multiple operations of the same type on different arrays leads to sharing of IDs. Following the limited information available to distinguish operations, operations such as assign to an multidimensional array leads to sharing it between the array and its sub-arrays, see \ref{lst:dis_code} line \ref{line:assign}. This follows from the value first being assigned to the sub-array which then is assigned to the super-array. This leads to false negatives and could be solved if the interpreter kept character location information in addition line number and file.   
+
+\end{itemize}
+
+
+
+\begin{figure}[ht]
+\centering
+\begin{subfigure}{\textwidth}
+\begin{lstlisting}[mathescape, deletekeywords={array},basicstyle=\tiny]
+hash_init       0x2A
+array_init      3       b.php     0       1       0       0x2A
+hash_init       0x2B
+array_write     5       b.php     0       1       0       0x2B  long    1     NULL
+hash_init       0x2C
+array_write     5       b.php     0       1       0       0x2C  long    2     NULL
+assign_const    5       b.php     NULL    long    3
+\end{lstlisting}
+\caption{Log from running file \texttt{b.php}}
+\label{lst:dis_code_out}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\begin{lstlisting}
+<?php
+
+print_r([1,2,3]); %*\label{line:print}*)
+
+$a[1][2] = 3; %*\label{line:assign}*)
+
+\end{lstlisting}
+\caption{File: \texttt{b.php}}
+\label{lst:dis_code}
+\end{subfigure}
+\caption{A problematic program}
+\label{lst:dis}
+\end{figure}

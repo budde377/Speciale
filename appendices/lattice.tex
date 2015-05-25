@@ -1,0 +1,86 @@
+\begin{definition}
+A partial order, $S = (A, \sqsubseteq)$ is a set of elements, $A$, and a binary relation, $\sqsubseteq : A \times A$, where $\sqsubseteq$ is 
+
+\begin{itemize}
+\item Reflexive: $\forall a \in A:\; a \sqsubseteq a$
+\item Anti-symmetric: $\forall a,b \in A:\; a \sqsubseteq b \wedge b \sqsubseteq a \Rightarrow a = b$
+\item Transitive: $\forall a,b,c \in A:\; a \sqsubseteq b \wedge b \sqsubseteq c \Rightarrow a \sqsubseteq c$
+\end{itemize}
+
+
+\end{definition}
+
+\begin{definition}
+A lattice $L = (E, \sqsubseteq)$ is a partial order where each subset $S \subseteq E$ has a least upper bound and a greatest lower bound. E.g. $\sqcup S$ and $\sqcap S$ respectively
+\end{definition}
+
+
+\begin{definition}
+The sum of two lattices, $L_1 = (E_1, \sqsubseteq_1)$ and $L_2 = (E_2, \sqsubseteq_2)$ where $\{\top, \bot\}\subseteq E_1 \cap E_2$, is defined as
+\begin{align}
+L_{Sum} = L_1 + L_2 = (E_{Sum}, \sqsubseteq_{Sum})
+\end{align}
+Where 
+\begin{align}
+E_{Sum} = \{(i,x) | x \in L_i\setminus\{\top, \bot\}\} \cup \{\top, \bot\}
+\end{align}
+and for every $e_1, e_2\in E_{Sum}$  
+\begin{align}
+e_1 \sqsubseteq_{Sum} e_2 \Leftrightarrow (x \sqsubseteq_i y \wedge e_1 = (x,i) \wedge e_2 = (y,i)) \vee e_2 = \top \vee e_1 = \bot
+\end{align}
+\end{definition}
+\todo{Lemma: $L_{Sum}$ is a lattice. }
+
+\begin{definition}
+The product of two lattices,  $L_1 = (E_1, \sqsubseteq_1)$ and $L_2 = (E_2, \sqsubseteq_2)$, are defined as 
+
+\begin{align}
+L_{Prod} = L_1 \times L_2 = (E_{Prod}, \sqsubseteq_{Prod})
+\end{align}
+Where 
+\begin{align}
+E_{Prod} = \{(e_1, e_2) |  e_1 \in L_1, e_2 \in L_2\}
+\end{align}
+and for every $(x_1, x_2), (y_1, y_2)\in E_{Prod}$ 
+\begin{align}
+e_1 \sqsubseteq e_2 \Leftrightarrow x_1 \sqsubseteq_1 y_1 \wedge x_2 \sqsubseteq_2 y_2
+\end{align}
+\end{definition}
+\todo{Lemma: $L_{Prod}$ is a lattice. }
+
+
+\begin{definition}
+Given a set, $A = \{a_1, \cdots, a_n\}$, and a lattice $L = \{E, \sqsubseteq\}$, a map lattice is defined as
+\begin{align}
+L_{Map} = A \mapsto L = (E_{Map}, \sqsubseteq_{Map}) 
+\end{align}
+Where 
+\begin{align}
+E_{Map} = \{([a_1 \mapsto x_1, \cdots, a_n\mapsto x_n] | x_i \in E\}
+\end{align}
+and for two elements $e_1, e_2 \in E_{Map}$, 
+\begin{align}
+e_1 \sqsubseteq_{Map} e_2 \Leftrightarrow \forall a\in A:\; e_1(a) \sqsubseteq e_2(a)
+\end{align}
+\todo{Introduce reading set of locations from heap}
+
+\end{definition}
+\todo{Lemma: $L_{Map}$ is a lattice. }
+
+
+\begin{definition}
+Given a set $A$, the powerset is defined as
+\begin{align}
+P(A) = (E_P, \sqsubseteq_P) 
+\end{align}
+Where 
+\begin{align}
+E_P = \{S  | S \subseteq E\}
+\end{align}
+and for two elements $e_1, e_2 \in E_P$
+\begin{align}
+e_1 \sqsubseteq_P e_2 \Leftrightarrow e_1 \subseteq e_2
+\end{align}
+
+\end{definition}
+\todo{Lemma: $P(A)$ is a lattice. }

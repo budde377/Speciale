@@ -1,0 +1,270 @@
+\documentclass[twoside,11pt,openright]{report}
+\usepackage[nounderscore]{syntax}
+\usepackage{etoolbox}
+\AtBeginEnvironment{grammar}{\footnotesize}
+
+\usepackage[utf8]{inputenc}
+\usepackage{comment}
+\usepackage[american]{babel}
+\usepackage{a4}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{epsfig}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[labeled]{multibib}
+\usepackage{color}
+\usepackage{datetime}
+\usepackage{epstopdf} 
+\usepackage{listings}
+\usepackage{color}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{tikz-cd}
+\usepackage{hyperref}
+\usepackage{bussproofs}
+\usepackage{amsthm}
+\usepackage{caption,subcaption}
+\usepackage{adjustbox}
+\usepackage{wasysym}
+\usepackage{multirow}
+\usepackage{tabularx}  % for 'tabularx' environment and 'X' column type
+\usepackage{ragged2e}  % for '\RaggedRight' macro (allows hyphenation)
+\usepackage{alphalph}
+\DeclareCaptionSubType*[arabic]{figure}
+
+\usepackage{float}
+
+\floatstyle{ruled}
+\newfloat{program}{thp}{lop}[chapter]
+\floatname{program}{Program}
+
+\floatstyle{plain}
+\newfloat{grammarf}{thp}{lop}[chapter]
+\floatname{grammarf}{Grammar}
+\floatstyle{plain}
+\newfloat{graph}{thp}{lop}[chapter]
+\floatname{graph}{Graph}
+
+\floatstyle{plain}
+
+\newfloat{diagram}{thp}{lop}[chapter]
+\floatname{diagram}{Diagram}
+\newcounter{subdiagram}
+\alph{subdiagram}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X} 
+\usepackage[]{algorithm2e}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\newenvironment{subproof}[1][\proofname]{%
+  \renewcommand{\qedsymbol}{$\blacksquare$}%
+  \begin{proof}[#1]%
+}{%
+  \end{proof}%
+}
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+%  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=PHP,                 % the language of the code
+  morekeywords={private,protected,function,return},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  xleftmargin = 5pt, 
+  xrightmargin = 5pt, 
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+ % stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,                        % sets default tabsize to 2 spaces
+  xleftmargin=.1\textwidth, xrightmargin=.1\textwidth,
+%  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\renewcommand*\ttdefault{txtt}
+
+\newcommand{\Tau}{\mathrm{T}}
+
+\newcommand{\todo}[1]{{\color[rgb]{.5,0,0}\textbf{$\blacktriangleright$#1$\blacktriangleleft$}}}
+
+\newcites{A,B}{Primary Bibliography,Secondary Bibliography}
+
+% see http://imf.au.dk/system/latex/bog/
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{empty} 
+\pagenumbering{roman} 
+\vspace*{\fill}\noindent{\rule{\linewidth}{1mm}\\[4ex]
+{\Huge\sf TAPAs: Type Analysis for PHP Arrays}\\[2ex]
+{\huge\sf Christian Budde Christensen, 20103616}\\[2ex]
+{\huge\sf Randi Katrine Hillerøe, 20103073}\\[2ex]
+\noindent\rule{\linewidth}{1mm}\\[4ex]
+\noindent{\Large\sf Master's Thesis, Computer Science\\[1ex] 
+\monthname\ \the\year  \\[1ex] Advisor: Anders Møller\\[15ex]}\\[\fill]}
+\epsfig{file=logo.eps}\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{plain}
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+\todo{in English\dots}
+
+\chapter*{Resum\'e}
+\addcontentsline{toc}{chapter}{Resum\'e}
+
+\todo{in Danish\dots}
+
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgments}
+
+\todo{\dots}
+
+\vspace{2ex}
+\begin{flushright}
+  \emph{...}\\
+  \emph{Aarhus, \today.}
+\end{flushright}
+
+\tableofcontents
+\pagenumbering{arabic}
+\setcounter{secnumdepth}{2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}
+\label{ch:intro}
+\input{chapters/introduction/introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Background}
+\label{ch:background}
+\input{chapters/background/php}
+\todo{expand PHP section with txt}
+\todo{Write about PHP pograms (e.g. phpunit, composer etc}
+\todo{Write about vagrant and test setup }
+\todo{write about lattice theory}
+\todo{write about monotone framework}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Dynamic Analysis}
+\label{ch:study}
+\input{chapters/study/study}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Data Flow Analysis}
+\label{ch:analysis}
+%\input{chapters/staticAnalysis/definitions}
+\input{chapters/staticAnalysis/dataflow}
+\input{chapters/staticAnalysis/languageSubset}
+\input{chapters/staticAnalysis/framework}
+\input{chapters/staticAnalysis/lattice}
+\input{chapters/staticAnalysis/transfer}
+\input{chapters/staticAnalysis/abstractevaluation}
+\input{chapters/staticAnalysis/cyclicArrays}
+\input{chapters/modellingLibraryFunctions/specialFunctions}
+\input{chapters/implementation/implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Case Study}
+\label{ch:evaluation}
+\input{chapters/caseStudy/alias}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Related work}
+\label{ch:relatedWork}
+\input{chapters/relatedWork/relatedWork}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+\todo{\dots}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Future Work}
+\label{ch:futureWork}
+\todo{Adding variable-variables with expressing scope as array}
+\todo{Handling read of $\top$-element arrays when returning location sets, current solution is naively returning the whole heap}
+
+\todo{\dots}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Work schedule}
+
+\begin{tabular}{c|l}
+Week & Task \\\hline
+12 & \\
+13 & dynamic analysis finish \\ 
+14 & static analysis research \\
+15 & static analysis \\
+16 & static analysis + prototype implementation \\
+17 & static analysis + prototype implementation \\
+18 & implementation of static analysis \\
+19 & implementation of static analysis \\
+20 & buffer \\
+21 & finishing touch on analyses \\
+22 & writing \\
+23 & writing \\
+24 & proof-reading \\
+25 & hand-in 
+\end{tabular}
+
+\todo{\dots}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\appendix
+\chapter{Basic Definitions}
+\label{app:lattice}
+\input{appendices/lattice}
+
+%\chapter{Language Definition}
+%\label{app:language}
+%\input{appendices/language}
+
+\chapter{Control Flow Graphs}
+\label{app:cfg}
+\input{appendices/cfg}
+
+\chapter{Abstract Operators}
+\label{app:abstract_operators}
+\input{appendices/abstractOperators}
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyleA{plain} 
+\bibliographyA{refs}
+\addcontentsline{toc}{chapter}{Secondary Bibliography}
+\bibliographystyleB{plain} 
+\bibliographyB{refs} % remove this if you don't need secondary literature
+
+\end{document}
+

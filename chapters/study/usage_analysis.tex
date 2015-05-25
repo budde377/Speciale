@@ -1,0 +1,84 @@
+In the following section we describe which features we analyze and why the dynamic analysis of these features are useful.
+
+As the test-suite is run, the modified interpreter logs all usages of array library functions (\texttt{array\_push()}, \texttt{array\_pop()}, \texttt{array\_search()}, \texttt{count()}, etc.), array reads, array writes, assignments, and every array initialization. These are logged in a CSV file where each line is a log entry containing information separated by the tab character. All entries are starting with a \emph{line type}, which identifies the type of the entry.
+
+\begin{itemize}
+\item \emph{array function}: Every call to an library array function\footnote{\url{http://php.net/manual/en/ref.array.php}}, such as \texttt{array\_push()} or \texttt{count()} are logged with the function name as line type. The array functions does not include the \texttt{array()} used to initialize an array, since it is a language construct and not an actual function. Some subroutines are also logged, e.g. \texttt{array\_mr\_part} used by the \texttt{array\_merge} function.
+\item \texttt{array\_read}: Every read from an array is logged with the array being read from and the key used as well as the type of the value being.
+\item \texttt{array\_write}: All array writes, on the form \texttt{\$x[\$key] = \$y}, are logged with the array being read from, \texttt{\$x}, the key, and the \texttt{\$key}. 
+\item \texttt{array\_append}: When elements are added to the array using the append method, \texttt{\$x[] = \$y}, this is logged with the array being read from, \texttt{\$x}.
+\item \texttt{assign\_*}: Every assignment is logged as either \texttt{assign\_const}, \texttt{assign\_tmp}, \texttt{assign\_var} or \texttt{assign\_ref} depending wheteher the value being assigned is a constant, temporary variable, variable or reference respectively.\\
+The assignment \texttt{\$x = (string) \$y} is an example of an assignment from a temporary variable. Here the the \texttt{\$y} variable is casted and saved in a temporary variable which then is assigned to \texttt{\$x}. One of these lines always follow \texttt{array\_write} and \texttt{array\_append} and is used to determine the type of value written in those lines.
+\item \texttt{array\_init}: When an array is initialized, in a function without the static keyword, using either the \texttt{array('key' => 'value')} construct or the corresponding bracket notation, \texttt{['key' => 'value']}, it is logged with the array being created. If the array is initialized in any other way, e.g. as a field or by array write it is not logged with \texttt{array\_init}.
+\item \texttt{hash\_init}: Whenever a hash table, the underlying structure of arrays, is initialized, this is logged with the memory address of the table.
+\end{itemize}
+
+Arrays are logged as a tuple with four entries, $(t,d,s,a)$, where $t$ is the type of the array, $d$ is the depth of the array, $s$ is the size of the array, and $a$ is the memory address. The array types are the types in table \ref{tab:array_log_type}. Any given array are either a cyclic or acyclic list, sparse list, or map. Array keys are logged with their type and value. 
+
+Objects are logged as their instance name, integers and floats are logged with their value, string are logged only as \texttt{string}, booleans as $0$ if \texttt{false} else 1, and the null value logged as \texttt{NULL}. The string is generally not logged with a value because doing so increases the file-size drastically, tend to corrupt the file when containing binary data and has not proven necessary for the analysis.
+
+Each entry, but the \texttt{hash\_init} entries, contains a line number and a file path to where the action occurred. 
+
+\begin{table}
+\centering
+\begin{tabularx}{0.8\textwidth}{@{} c|Y @{}}
+{\bf Type} & {\bf Description} \\\hline\hline
+0 & No information\\
+1 & The array is a list. I.e. all the numbers $1\dots s$, where $s$ is the size of the array are keys in the array.\\
+2 & The array is a sparse list. I.e. all keys are integers and the array is not a list.\\
+4 & The array is a map. I.e. the array is not a list or a sparse list.\\
+9 & The array is a cyclic list.\\
+10 & The array is a cyclic sparse list.\\
+12 & The array is a cyclic map.
+\end{tabularx}
+\caption{Array types}
+\label{tab:array_log_type}
+\end{table}
+\subsection{Identifying arrays}
+In order to analyse how an array changes throughout a run, some method for expressing that two arrays are the same, is needed. 
+\begin{definition}
+Given two lines, $l_1$ and $l_2$, from a log file, $R$, as described above, each containing an array $x_1\in l_1$ and $x_2\in l_2$, where $x_1 = (t_1,d_1,s_1,a_1)$ and $x_2 = (t_2,d_2,s_2,a_2)$. The arrays are said to be the same, $x_1\sim x_2$, iff the two lines share the same line number, line type, and file or $a_1 = a_2$ and there is no 
+\begin{align*}
+\texttt{hash\_init}\;a_1
+\end{align*}
+line between $l_1$ and $l_2$.
+\end{definition}
+From this definition, we can define an id for every observed array as follows.
+\begin{definition}
+Given two lines $l_1, l_2\in R$ and two arrays, $x_1\in l_1$ and $x_2 \in l_2$, then $id$ is a function from arrays to natural numbers, such that
+
+\begin{align*}
+    id(x_1) = id(x_2) \Leftrightarrow x_1 \sim x_2
+\end{align*}
+
+\end{definition}
+
+\subsection{Determining type}
+Given a log, $R$, generated from running a test suite. Determining the type of every distinct array is done by first determining the key type for each id, then determining the type of the values for every id and from this deduce the type of each id. Since an id can represent many observed arrays, the type of the keys is more accurately a set of types. E.g. if an array, with some id, is observed to have key type \emph{list} and another array, with the same id, is observed to have key type \emph{map}, then the key type of the id is $\{list, map\}$, represented as a bit-wise-or of the type integers form table \ref{tab:array_log_type}, in this case $1 | 4 = 5$.
+
+The type of the id can be either list, map or object. Here the lists are arrays with key type list and values of the same type, maps are arrays with key type sparse list or map and values of the same type, and objects are arrays with a single key type and values of different type. Any array with multiple key type is uncategorizable and our hypothesis is that this group is small.
+
+Detecting the key type for each id, in a given log, $R$, is done by traversing the file from top to bottom inspecting each line. If a line contains an array $x = (t,d,s,a)$, with an id $i= id(x)$, then if $x$ is the first array observed with id $i$, the id and key type, $t$ is remembered. Otherwise the there is an old type, $t_{old}$, associated with $i$. This type is replaced with $t' = t | t_{old}$.
+
+Detecting the type of values is also done by traversing through the log file from top to bottom. Here the reads and writes from and to the arrays are used to determine the types of the values, by associating all the types of the values read/written with the respective array id. When the log has been traversed the types for each id are compared and it is determined whether the id has one or more types. 
+
+There is no reasoning about entries never read or written which might produce some false positives. Furthermore since callables can be written as anonymous functions, strings, or arrays, containing an instance and a string, this analysis might fail to classify arrays containing callables as arrays containing elements of the same type, thus introducing false negatives.   
+
+From the two previous analysis it is now possible to determine, for every id with key and value type information, whether it is a list, map, object or uncategorizable. Any cyclic types are treated as their acyclic counterpart.
+
+When the types of the arrays are determined we can analyse the operations used with each type of array. Our hypothesis is that append, push, pop, shift and unshift operations are good predictors for list types of arrays. If that is the case we can detect when a map or object type array is used as a list which is likely to be an error. We can also detect when list types are accessed with string-type keys which is also likely to be an error.
+
+\begin{comment}
+Combining the information from the two previous sections it is possible to  identify three groups of arrays: lists, maps and objects. What will be interesting to see is whether identified arrays stay in one of these groups for its entire lifetime or whether they change types throughout a test-run.
+
+If arrays almost never changes types we can make our static analysis assume that arrays never change types without introducing too many errors by being unsound.
+\end{comment}
+\subsection{Critique}
+
+Apart from the sources of false positives and false negatives mentioned in the previous section, other points of critique include.
+\begin{itemize}
+\item \texttt{array\_init} does not capture the type of the array at initialization. This implies that the type of arrays initialized without being assigned or manipulated afterwards, e.g. as an inline argument to a library function, are not captured by the analysis.
+\item Multiple operations of the same type on different arrays leads to sharing of ids. Following the limited information available to distinguish operations, operations such as assign to an multidimensional array leads to sharing it between the array and its sub-arrays since a value first is assigned to the sub-array which then is assigned to the super-array. This leads to false negatives and could be solved if the interpreter kept character location information in addition line number and file.   
+\item The liberal nature of array initialization implies that an array can be initialized at two different code locations for different input even though they are semantically the same array. These arrays should be the same, thus share the same id. The analysis fails to observe this and thus might introduce false positives. 
+\item An array might in every possible execution have values, or keys, of the same type, but when compared over several executions have different types. This might lead to false negatives.
+\end{itemize}

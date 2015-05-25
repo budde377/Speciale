@@ -1,0 +1,158 @@
+
+\newcommand{\pvar}[1]{#1}
+\newcommand{\px}{x}
+\newcommand{\pint}{\texttt{int}}
+\newcommand{\pfloat}{\texttt{float}}
+\newcommand{\pscalar}{\texttt{scalar}}
+\newcommand{\pbool}{\texttt{boolean}}
+\newcommand{\pstring}{\texttt{string}}
+\newcommand{\parray}{\texttt{array}}
+\newcommand{\pcallable}{\texttt{callable}}
+\newcommand{\pamap}[1][\tau]{\texttt{aMap<$#1$>}}
+\newcommand{\paobj}{\texttt{aObj}}
+\newcommand{\palst}[1][\tau]{\texttt{aList<$#1$>}}
+\newcommand{\paslst}[1][\tau]{\texttt{aSparseList<$#1$>}}
+\newcommand{\presource}{\texttt{resource}}
+\newcommand{\pobject}{\texttt{object}}
+\newcommand{\pnull}{\texttt{null}}
+
+\section{Types}
+\todo{Assume law of excluded middle?}
+\begin{definition}
+Let $\mathcal{C}$ denote the set of all classes and interfaces. 
+\end{definition}
+\todo{example}
+\begin{definition}
+The set of all possible types as \pint, \pfloat, \pbool, \pstring, \pscalar, \parray, \presource, \pcallable, \pobject{} and all $c \in \mathcal{C}$.
+\end{definition}
+
+
+Given a variable \pvar{x} we denote the type, $\tau$ as $\pvar{x} : \tau $. A given variable can have multiple types E.g. since scalars are numbers, booleans, strings and null, any variable that is an integer is also a scalar. This can be expressed with the following rules 
+
+\begin{definition} 
+Subtyping
+\begin{align}
+\pint &<:  \pscalar \\
+\pfloat &<: \pscalar \\
+\pbool &<:  \pscalar \\
+\pstring &<: \pscalar
+\end{align}
+The \pobject{} type can be viewed as an equivalent of the \texttt{Java.lang.Object} class, which gives 
+\begin{align}
+\tau <: \pobject
+\end{align}
+where $\tau \in \mathcal{C}$
+\end{definition}
+
+In order to reason about arrays as objects, lists and maps, four more types are introduced : \pamap, \palst{}, \paslst{} and \paobj. Here $\tau$ is a type. 
+
+\begin{definition} The \emph{isList},  \emph{isSparseList}, \emph{isMap} and \emph{isObject} relations, where $\tau$ is some type and \px{} : \parray, are defined as
+
+\begin{align}
+    isList[\tau](\px) &\Leftrightarrow listkeys(\px) \wedge vht[\tau](\px)\\
+    isSparseList[\tau](\px) &\Leftrightarrow  \forall (k,\_) \in \px.\;k : \pint \wedge isMap[\tau](\px)\\
+    isMap[\tau](\px) &\Leftrightarrow \neg listkeys(\px) \wedge vht[\tau](\px)\\
+    isObject(\px) &\Leftrightarrow \forall \tau. \neg vht[\tau](\px)
+\end{align}
+where 
+\begin{align}
+listKeys(\px) &\Leftrightarrow \forall i \in [0, count(\px)).\;(i, \_) \in x\\
+vht[\tau](\px) & \Leftrightarrow \forall (\_, v_1),(\_, v_2) \in \px.\; v_1 : \tau \wedge v_2 : \tau
+\end{align}
+\emph{count} returns the size of the array.
+\end{definition}
+
+\begin{definition}
+Let \px{} be some variable of type \parray{}
+\begin{align}
+\exists \tau. isMap[\tau](\px) &\Leftrightarrow \px : \pamap \label{eq:defMapMap}\\
+\exists \tau. isList[\tau](\px) &\Leftrightarrow \px : \palst\label{eq:defLstLst} \\
+\exists \tau. isSparseList[\tau](\px) &\Leftrightarrow \px : \paslst\label{eq:defLstLst} \\
+isObject(\px) &\Leftrightarrow \px : \paobj \label{eq:defObjObj}
+\end{align}
+
+Let $\tau$ be some type then it holds that
+\begin{align}
+    \pamap & <: \parray\\
+    \palst & <: \parray\\
+    \paobj & <: \parray\\
+    \paslst & <: \pamap
+\end{align}
+\begin{comment}
+\begin{prooftree}
+\AxiomC{$S <: T$} \AxiomC{$T <: S$}
+\BinaryInfC{$\palst[S] <: \palst[T]$}
+\end{prooftree}
+\begin{prooftree}
+\AxiomC{$S <: T$} \AxiomC{$T <: S$}
+\BinaryInfC{$\pamap[S] <: \pamap[T]$}
+\end{prooftree}
+\end{comment}
+\end{definition}
+
+\begin{lemma} Every array is also a \pamap, \palst{} or \paobj. I.e
+\begin{align*}
+\forall a : \parray \Rightarrow (\exists \tau.\; a : \palst \vee a : \pamap) \vee a : \paobj
+\end{align*}
+\end{lemma}
+\begin{proof}
+Let $a : \parray$ and assume that there exists some $\tau$ such that. $vht[\tau](a)$ holds. \\\\
+If $listKeys(a)$ hold, then $isList[\tau](a)$. Therefor it must hold, by \ref{eq:defLstLst}, that $a : \palst$. \\\\
+Else if $listKeys(a)$ does not hold, then $isMap[\tau](a)$ holds. From this and \ref{eq:defMapMap} it follows that $a : \pamap$.\\\\
+If there does not exists some $\tau$ such that $vht[\tau](a)$ then it holds that $\forall \tau.\; \neg vht[\tau](a)$. This implies that $isObject(a)$ holds, from which and \ref{eq:defObjObj} follows that $a : \paobj$.
+
+\end{proof}
+
+
+\begin{lemma} Every array is either an \pamap, \palst{} or \paobj 
+\begin{align}
+\forall a,\tau : \palst &\Rightarrow \forall \tau_2. \; \neg (x :\pamap[\tau_2]) \wedge \neg (x: \paobj)\label{eq:onlyList}\\
+\forall a,\tau : \pamap &\Rightarrow \forall \tau_2. \; \neg (x :\palst[\tau_2]) \wedge \neg (x: \paobj)\label{eq:onlyMap}\\
+\forall a : \paobj &\Rightarrow \forall \tau_2. \; \neg (x :\palst[\tau_2]) \wedge \neg (x : \pamap[\tau_2])\label{eq:onlyObj}
+\end{align}
+\end{lemma}
+\begin{proof}
+The lemma is proven one equation at a time. 
+
+\begin{description}
+\item[Equation \ref{eq:onlyList}] 
+\begin{subproof}
+Let $a : \palst$ for some $\tau$, then \ref{eq:defLstLst} gives us that $isList[\tau](a)$ i.e. $vht[\tau](a)$ and $listKeys(a)$. \\
+Assume that $\exists \tau'.\;a : \pamap[\tau']$ this, by \ref{eq:defMapMap}, implies that $\neg listKeys(a)$ \lightning. By contradiction it must hold that $\forall \tau'.\; \neg(a : \pamap[\tau'])$.\\
+Assume that $a : \paobj$ this, by \ref{eq:defObjObj}, implies that $\forall \tau'.\; \neg vht[\tau'](a)$ \lightning. By contradiction it must hold $\neg (a : \paobj)$
+\end{subproof}
+
+\item[Equation \ref{eq:onlyMap}]
+\begin{subproof}
+Let $a : \pamap$ for some $\tau$, then \ref{eq:defMapMap} gives us that $isMap[\tau](a)$ i.e. $vht[\tau](a)$ and $\neg listKeys(a)$. \\
+Assume that $\exists \tau'.\;a : \palst[\tau']$ this, by \ref{eq:defLstLst}, implies that $listKeys(a)$ \lightning. By contradiction it must hold that $\forall \tau'.\; \neg(a : \palst[\tau'])$.\\
+Assume that $a : \paobj$ this, by \ref{eq:defObjObj}, implies that $\forall \tau'.\; \neg vht[\tau'](a)$ \lightning. By contradiction it must hold $\forall \neg (a : \paobj)$
+\end{subproof}
+
+\item[Equation \ref{eq:onlyObj}]
+\begin{subproof}
+Let $a : \paobj$ then \ref{eq:defObjObj} gives us that $isObject(a)$ i.e. $\forall \tau. \neg vht[\tau](a)$. \\
+Assume that $\exists \tau'.\;a : \palst[\tau']$ this, by \ref{eq:defLstLst}, implies that $vht[\tau'](a)$ \lightning. By contradiction it must hold that $\forall \tau'.\; \neg(a : \palst[\tau'])$.\\
+Assume that $\exists \tau'.\;a : \pamap[\tau']$ this, by \ref{eq:defMapMap}, implies that $vht[\tau'](a)$ \lightning. By contradiction it must hold that $\forall \tau'.\; \neg(a : \pamap[\tau'])$.\\
+\end{subproof}
+
+\end{description}
+\end{proof}
+
+\todo{Extend with rules for callable. Strings and arrays can be callable and so are anonymous functions}
+
+\section{Coersion}
+
+Array keys can be of type \pstring{} or \pint. 
+
+
+
+
+
+
+
+
+
+
+
+

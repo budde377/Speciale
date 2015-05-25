@@ -1,0 +1,79 @@
+PHP is one of the most popular languages for server-side web-development. It is used by major websites, such as Wikipedia and Facebook, are powering over 80\% of the web\footnote{\url{http://w3techs.com/}}, and the most used CMS's: Wordpress, Joomla, Dupal, and Magento. It requires no compilation and is dynamically typed, which makes development and deployment easy, and hosting cheap.
+
+%When developing code in a dynamic interpreted language like PHP it is easy to introduce errors in the code because there is no compiler to catch errors early. It is important to have strong tool support to be able to catch errors early in the development process and avoid time consuming debugging. 
+
+As other dynamically typed languages, static type reasoning is non-trivial and is only complicated by the all-purpose array datastructure. PHP supports associative arrays with integer and/or string-typed indices (referred to as keys) and anything, specially arrays, as possible values. Combined with the dynamic type system, extensive coercion, and optional error-reporting   bug-finding is time consuming. Furthermore there exists no official language specification and the language is thus defined by the reference Zend Engine interpreter.
+
+%The many dynamic features makes PHP a very flexible language with a large range of possibilities. It is a huge task to cover all of those possibilities in tools for supporting PHP developers.
+%\section{Problem}
+%The structure of arrays are extremely flexible and thus statically hard to reason about. It is however believed that programmers in practice do not use arrays as some obscure structure, but rather uses arrays as lists, maps or objects. If this proves to be the case, a static analysis may reasonably introduce assumptions on the structure of an array. Any action acting against these asumtions are suspicious and might be a bug.
+%\section{Motivation}
+%PHP's way of coercing when needed complicates the analysis. When dealing with keys to arrays strings containing only an integer number are coerced to integers. Strings containing other numbers are not coerced. Integers are not coerced, but other numbers are coerced into integers. This is also the case for boolean true and false values which are coerced to the integers 1 og 0 respectively. Using an object or an array as key yields a warning, which the developer might ignore.
+%\todo{Describe the scope\dots}
+%\todo{Language spec in the making: https://github.com/php/php-langspec/tree/master/spec}
+
+This thesis will focus on a static type analysis of arrays, which in many existing tools are treated as a black hole where all information is lost. \todo{maybe cite some related work here?} Reasoning about the structure of an array with a decent level of precision, seems like an impossible task, since practically no structure is imposed on arrays. But is the imagination of the average PHP developer in practice limited? Are arrays used as other data-structures, such as maps and lists, and can these structures be identified statically? If this is the case then these structures might be the key to an abstraction, yielding a fair compromise between speed and precision for a static type analysis. 
+
+By analysing a corpus of existing frameworks dynamically, this thesis aims to identify use-patterns of arrays as other, more restrictive, data-structures. The results of the dynamic analysis is going to motivate the abstraction in a static interprocedural data-flow type analysis on a subset of the PHP language. The static analysis should facilitate error detection by identifying suspicious code. 
+
+As mentioned before error reporting is optional and throwing a warning or a notice might not stop the program from running. Program \ref{prog:ugly} will result in a notice being thrown at line \ref{line:ugly-notice}. The interpreter will assume that \texttt{test} should be interpreted as the string \texttt{'test'}, following no constant \texttt{test} being defined. The program is thus valid PHP, but suspicious to say the least.  
+
+In the following real-life example, from the Part framework, the \texttt{\$keyArray} and \texttt{\$valueArray} arrays are first used as a map in lines \ref{line:part-keyar1} and \ref{line:part-valar1} while later, at \ref{line:part-keyar2} and \ref{line:part-valar2} with the \emph{array append} operation, being used as a list. The intentions of this kind of usage is unclear and not very maintainable, but since it ultimately results in the correct behavior, and yields no errors, it is not discovered. The analysis should facilitate discovery of such cases as suspicious.
+
+%The PHP arrays are optimized for many different purposes i.e. list, hash table, dictonary, collection, stack etc. \footnote{\url{http://php.net/manual/en/language.types.array.php}}. 
+
+%We believe that arrays can be identified as either of three types namely: lists, maps, and objects. Lists are arrays with only integer keys and values with some kind of related types. Maps have string keys and map to related types while objects have string keys and value types that may not be related at all. By being able to quickly identify the type of an array we may be able to identify possible errors when one type is suddenly used as another type.
+
+%In the following example from the framework Part the \texttt{keyArray} and \texttt{valueArray} arrays are first used as the map type in lines 4 and 5 while later being used as the list type. This kind of error is hard to spot since the code ultimately results in the correct behavior. The intention is unclear making it difficult to change the code later on.
+\begin{program}
+\centering 
+\begin{lstlisting}
+$a = ['test' => 42];
+echo $a[test]; %*\label{line:ugly-notice}*)
+\end{lstlisting}
+\caption{Valid, but ugly, program \label{prog:ugly}}
+\end{program}
+
+
+\begin{program}
+\centering 
+\begin{lstlisting}
+private function createInstance($string, $instance, callable $callback)
+{
+    if (!isset($this->keyArray[$string])) {
+        $this->keyArray[$string] = []; %*\label{line:part-keyar1}*)
+        $this->valueArray[$string] = []; %*\label{line:part-valar1}*)
+    } else if(($k = array_search($instance, $this->keyArray, true)) !== false){
+        return $this->valueArray[$k];
+    }
+    $this->keyArray[] = $instance; %*\label{line:part-keyar2}*)
+    return $this->valueArray[] = $callback(); %*\label{line:part-valar2}*)
+}
+\end{lstlisting}
+\caption{Other type}
+\end{program}
+
+\section{Problem Statement}
+The widely used array data structure in PHP has very few restrictions making it difficult to reason about with program analysis. This thesis will identify possible use-patterns for arrays in PHP and how to detect them in static analysis. An interprocedural data flow type analysis is proposed to detect suspicious cross-use of the identified patterns.
+
+\section{Motivation}
+Our hypothesis is that arrays keep to a specific use-pattern during its lifetime. If the hypothesis holds a statical analysis can be employed to detect and thereby prevent cross-use of the patterns which in turn will lead to a more clear intention of the code and in the end higher maintainability of the program code.
+
+\section{Structure of this thesis}
+Chapter \ref{ch:background} provides the necessary background knowledge of the PHP language to understand why arrays are difficult to apply existing methods to. In chapter \ref{ch:study} a dynamic analysis is conducted to identify use-patterns and test the hypothesis about use-patterns of arrays. Chapter \ref{ch:analysis} use patterns and knowledge gained in the previous chapter to define and implement a static analysis of PHP arrays which detects suspicious use of arrays. The static analysis implementation is evaluated in chapter \ref{ch:evaluation} and relevant related work is described in chapter \ref{ch:relatedWork}. The last two chapters \ref{ch:conclusion} and \ref{ch:futureWork} concludes our thesis and describes possible future work identified.
+
+\begin{comment}
+
+\section{Methodology}
+To establish whether our three array types are accurate we dynamically analyse a range of popular open source PHP applications. We want to find operations that can be used to predict what type of array we are dealing with early in our static analysis.
+
+
+\subsection{Metric}
+%\subsection{Evaluation}
+\todo{In order to evaluate our results, we need to compare the performance of our tool against other similar tools wrt. the number of bugs found (real and false positives) and speed/scalability.}
+
+\subsection{Benchmarks}
+
+\subsection{Iterative process}
+
+\end{comment}

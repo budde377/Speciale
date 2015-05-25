@@ -1,0 +1,9 @@
+A data flow analysis can be used to reason about properties at different program points of interest. The analysis employed in this chapter aims to reason about the types of expressions, especially arrays, to be able to detect what the analysis define as suspicious use of arrays.
+
+Based on the results of the dynamic analysis in chapter \ref{ch:study} the static analysis is working with two types of arrays: lists and maps. The third type of the dynamic analysis, objects, has been incorporated into the list and map types due to the fact that it did not provide any insights in and of itself. Working with two types instead of three minimizes the lattice passed around in the analysis and thus increases the performance of the implementation.
+
+From the dynamic analysis it is known that any use of the superglobal \texttt{\$GLOBALS} will introduce a cyclic array since the \texttt{\$GLOBALS} array has a reference to itself. To ensure termination of the analysis cyclic arrays are treated as statically unknown arrays. \todo{The last sentence is not right anymore}
+
+
+\section{Basic definitions}
+To reason statically about program behavior abstractions are needed. A complete lattice is used for the abstraction to benefit from its known properties to ensure termination and soundness of the analysis. Definitions of a complete lattice and how to create and combine complete lattices can be found in appendix \ref{app:lattice}.

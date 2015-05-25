@@ -1,0 +1,78 @@
+Table \ref{tab:cyclic_arrays} shows that across all frameworks in the corpus less than 1\% of the arrays are detected as being cyclic. Cyclic arrays are created using the the PHP reference operator, \texttt{\&}, which must be used explicitly. Due to the explicit reference operator cyclic arrays does not occur as an unintentional side effect of something else\todo{something else?}. The largest amount of cyclic arrays detected in the corpus is PhpMyAdmin with a total of 10 cyclic arrays out of 3,373 identified arrays. By assuming that arrays are acyclic the static analysis would not have to take recursive types into consideration. Since the results shows that almost every framework contains some cyclic arrays the static analysis must handle recursive types in some way. The small amount of cyclic arrays however does imply that an imprecise handling of recursive types should not impact the overall precision by much.
+\todo{Rewrite this with new findings. See comment.}
+\begin{comment}
+NG cyclic arrays are the cyclic arrays that are NOT the \$GLOBAL array, which is recursive. 
+Notice that no creation of cyclic arrays has been found, thus the last arrays might also be the globals array.
+The assumption of acyclic arrays is not totally wrong.
+\end{comment}
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{l| r  r  r}
+Framework & \# Arrays & \# Cyclic arrays & \# NG Cyclic arrays  \\ \hline \hline
+Code igniter & 331 & 0 & 0 \\
+Joomla & 1969 & 2 & 0\\ 
+Magento2 & 6942 & 0 & 0\\ 
+Mediawiki & 27368 & 1 & 0\\ 
+Part & 378 & 0 & 0\\ 
+phpBB & 2529 & 1 & 0\\
+PhpMyAdmin & 3373 & 10 & 0\\
+Symfony & 3707 & 6 & 6\\ %Ten found when running program, but only six were not errors
+Wordpress & 3054 & 1 & 0\\ 
+Zend Framework 2 & 4381 & 3 & 2
+\end{tabular}
+\end{center}
+\caption{Amount of cyclic arrays detected in the corpus}
+\label{tab:cyclic_arrays}
+\end{table}
+
+Figure \ref{fig:array_types} shows the distribution of array types for the frameworks.  Between 4\% and 12\% of the arrays are uncategorizable these include false uncategorizables originating from flaws in the array identification. If multiple categorizable arrays from different categories are identified as a single array it might end up in the uncategorizable part of the distribution.
+
+The Object group marked with List is by the definition categorized as objects, but they might fit better into the List category, as lists of a top level type. \todo{elaborate}
+
+\begin{table}[htbp]
+\begin{adjustbox}{center}
+\begin{tabular}{l | c c c c c c c}
+    &   List    &   Map &   Sparse List &   Object  &   Object (L)   &   Object (SL)   &   Uncategorizable \\
+\hline \hline
+Code Igniter    &   39.66\% &   36.21\% &   2.59\%  &   12.93\% &   2.59\%  &   0.00\%  &   6.03\% \\
+Joomla          &   30.78\% &   39.13\% &	2.17\%	&   20.02\% &	3.66\%	&   0.11\%  &   4.12\% \\
+Magento 2	    &   23.54\% &   46.51\% &	3.38\%	&   17.93\% &	2.63\%	&   0.70\%  &   	5.30\% \\
+MediaWiki	    &   32.48\%	&   32.23\% &	2.69\%	&   15.60\% &	8.20\%	&   0.49\%  &   	8.32\% \\
+Part	        &   33.33\%	&   39.10\% &	0.00\%	&   12.82\% &	5.77\%	&   0.00\%  &   	8.97\% \\
+phpBB	        &   27.13\%	&   33.33\% &	3.17\%	&   25.11\% &	4.33\%	&   0.14\%  &   	6.78\% \\
+PhpMyAdmin	    &   33.24\%	&   33.43\% &	2.09\%	&   14.06\% &	5.89\%	&   0.38\%  &   	10.92\% \\
+Symfony	        &   34.32\%	&   28.01\% &	1.99\%	&   14.86\% &	8.63\%	&   0.21\%  &   	11.99\% \\
+WordPress	    &   35.50\%	&   33.03\% &	2.02\%	&   14.11\% &	6.61\%	&   0.45\%  &   	8.29\% \\
+Zend Framework 2&	30.99\%	&   35.07\% &	1.08\%	&   19.78\% &	6.25\%	&   0.00\%  &   	6.82\% 
+\end{tabular}
+\end{adjustbox}
+\caption{Distribution of different array types}
+\label{tab:array_types}
+\end{table}
+
+% There might be a problem with our classification. E.g. the groups decided to be objects are prob. not objects, but really lists with different type. It might be an idea to go through the groups and analyse. The only "real" objects are maps (what is callables then? Special case?). If it is the case that the M lists are in fact S lists, then we may make the assumption that when a list is observed, it has the same type and really doesn't change over time. We need however to keep track of key -> type of maps, since they may prove to be objects rather than maps. A further study on how the depth/size changes for each group would be nice.  
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{chapters/study/g1.png}
+\caption{Distribution of different types of arrays}
+\label{fig:array_types}
+\end{figure}
+
+Figure \ref{fig:type_operations} shows the distribution of operations on the arrays, over the different array types from figure \ref{fig:array_types}. Write and append corresponds to the language features for writing to arrays:
+
+\begin{lstlisting}
+$a = [];
+$a[0] = 42; // array write
+$a[] = 1337; // array append
+\end{lstlisting}
+
+These operations are by far the most used. The built-in push function is equivalent to the append operation if given only a single argument. The documentation recommends the append operation in such situations for performance reasons which aligns with the use of append over push in the figure. The operation on arrays of map and object type, consists almost entirely of write operations whereas arrays of type list have some write operation but mostly append operations. This indicates that append is a good predictor for arrays in the list category.
+
+The distribution of operations support the claim that the List-marked objects fit better into the list category than the object category since multiple list operations are frequently used with these arrays.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{chapters/study/g2.png}
+\caption{Distribution of array-changing operations over array types}
+\label{fig:type_operations}
+\end{figure}

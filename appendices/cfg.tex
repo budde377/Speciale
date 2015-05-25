@@ -1,0 +1,475 @@
+\todo{make legend for graphs}
+\tikzstyle{subtree} = [rectangle, draw, fill=gray!20, text width=4em, text badly centered, minimum height=3em]
+\tikzstyle{node} = [draw, circle, minimum height=2em]
+\tikzstyle{emptynode} = [draw, circle]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{entry} = [draw=none,fill=none]
+\tikzstyle{exit} = [draw=none,fill=none]
+\tikzstyle{dots} = [draw=none,fill=none]
+\begin{figure}
+\hspace*{\fill}
+\subcaptionbox{\texttt{if} ($E$) $S$\label{fig:flowifA}}{
+\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E(t)$};
+    \node [node, below of=e1, label={45:$if(t)$}] (if) {};
+    \node [subtree, below of=if] (s1) {$S$};
+    \node [emptynode, below of=s1](end) {};
+    \node [exit, below of=end] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (if);
+    \path [line] (if) -> (s1);
+    \path [line] (s1) -> (end);
+    \path [line] (if) -- (2,-4) |-  (end);
+    \path [line] (end) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\texttt{if} ($E$) $S_1$ \texttt{else} $S_2$ \label{fig:flowifelseA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree,below of=en] (e1) {$E(t)$};
+    \node [node, below of=e1, label={35:$if(t)$}] (if) {};
+    \node [subtree, below left of=if] (s1) {$S_1$};
+    \node [subtree, below right of=if] (s2) {$S_2$};
+    \node [emptynode, below right of=s1](end) {};
+    \node [exit, below of=end] (ex) {};
+    % Draw edges
+    \path[line] (en) -> (e1);
+    \path [line] (e1) -> (if);
+    \path [line] (if) -> (s1);
+    \path [line] (if) -> (s2);
+    \path [line] (s1) -> (end);
+    \path [line] (s2) -> (end);
+    \path [line] (end) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\texttt{while} ($E$) $S$\label{fig:flowwhileA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E(t)$};
+    \node [node, below of=e1, label={0:$if(t)$}] (if) {};
+    \node [subtree, below of=if ] (s1) {$S$};
+    \node [emptynode, below of=s1 ] (end) {};
+    \node [exit, below of=end] (ex) {};
+
+    % Draw edges
+    \path[line] (en) -> (e1);
+    \path [line] (e1) -> (if);
+    \path [line] (if) -> (s1);
+    \path [line] (if) -- (-2, -4) |- (end); 
+    \path [line] (s1) -- (2, -6) |- (e1); 
+    \path [line] (end) -> (ex);
+\end{tikzpicture}\end{adjustbox}}%
+\hspace*{\fill}
+
+\bigskip
+
+\hspace*{\fill}
+\subcaptionbox{statement list\label{fig:flowsl}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (s1) {$S_1$};
+    \node [dots, below of=s1] (dots) {$\vdots$};
+    \node [subtree, below of=dots](sn) {$S_n$};
+    \node [exit, below of=sn] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (s1);
+    \path [line] (s1) -> (dots);
+    \path [line] (dots) -> (sn);
+    \path [line] (sn) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\texttt{for} ($E_1$;$E_2$;$E_3$) $S$\label{fig:flowforA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E_1$};
+    \node [subtree, below of=e1] (e2) {$E_2(t)$};
+    \node [node, below of=e2, label={135:$if(t)$}] (if) {};
+    \node [subtree, below left of=if] (s) {$S$};
+    \node [subtree, below right of=if] (e3) {$E_3$};
+    \node [emptynode, below right of=s] (end) {};
+    \node [exit, below of=end] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (e2);
+    \path [line] (e2) -> (if);
+    \path [line] (if) -> (s);
+    \path [line] (s) -> (e3);
+%    \path [line] (e3) -> (end);
+    \path [line] (end) -> (ex);
+    \path [line] (e3) |- (e2);
+    \path [line] (if) -- (-3, -6) |- (end);
+    
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{$E_1$ $\oplus$ $E_2$ \label{fig:flowbop}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E_1(t_l)$};
+    \node [subtree, below of=e1] (e2) {$E_2(t_r)$};
+    \node [node, below of=e2, label={0:$bop_\oplus(t_l,t_r,t_{tar})$}] (bop) {};
+    \node [exit, below of=bop] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (e2);
+    \path [line] (e2) -> (bop);
+    \path [line] (bop) -> (ex);
+    
+\end{tikzpicture}\end{adjustbox}}%
+\hspace*{\fill}
+\end{figure}
+
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{Unary operation on $E$\label{fig:flowuop}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e) {$E(t_{val})$};
+    \node [node, below of=e, label={0:$uop_\circ(t_{val},t_{tar})$}] (uop) {};
+    \node [exit, below of=uop] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e);
+    \path [line] (e) -> (uop);
+    \path [line] (uop) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{$fn$ \texttt{(} $Re_1, \cdots, E_n$\texttt{)}. 
+\todo{elaborate on pass-by- and return-reference} \label{fig:flowcall}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$Re_1(h_1)$};
+    \node [dots, below of=e1] (dots) {$\vdots$};
+    \node [subtree, below of=dots] (em) {$E_n(t_n)$};
+    \node [node, below of=em] [label={-90:$call_{fn}(h_1,\cdots,t_n)$}] (call) {};
+    \node [node, right of=call, label={$start$}] (entry) {};
+    \node [subtree, below of=entry] (sl) {$B$};
+    \node [node, below of=sl, label={-90:$exit(t)$}] (exit) {};
+    \node [node, left of=exit, label={$result_{call_{fn}}(t)$}] (result) {};
+    \node [exit, below of=result] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (dots);
+    \path [line] (dots) -> (em);
+    \path [line] (em) -> (call);
+    \path [line] (call) -> (entry);
+    \path [line] (entry) -> (sl);
+    \path [line] (sl) -> (exit);
+    \path [line] (exit) -> (result);
+    \path [line] (result) -> (ex);
+    \draw [dashed, ->] (call) -- (-2, -8) |- (result);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Short-circuit binary operation on $E_1$ and $E_2$.\label{fig:flowsop}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E_1(t_l)$};
+    \node [node, below of=e1, label={0:$if(t_l)$}] (if) {};
+    \node [subtree, below of=if] (e2) {$E_2(t_r)$};
+    \node [node, below of=e2, label={0:$sop_\oplus(t_l,t_r,t_{tar})$}] (sop) {};
+    \node [exit, below of=sop] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (if);
+    \path [line] (if) -> (e2);
+    \path [line] (e2) -> (sop);
+    \path [line] (if) -- (-2, -4) |- (sop);
+    \path [line] (sop) -> (ex);
+\end{tikzpicture}\end{adjustbox}}%
+\hspace*{\fill}
+\end{figure}
+
+
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{Function return \texttt{return} $E$}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e) {$E(t_{val})$};
+    \node [node, below of=e, label={0:$return(t_{val})$}] (ret) {};
+    \node [exit, below of=ret] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e);
+    \path [line] (e) -> (ret);
+    \path [line] (ret) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Reference function return \texttt{return }$Ve$ }{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e) {$Ve(h_{val})$};
+    \node [node, below of=e, label={0:$return(h_{val})$}] (ret) {};
+    \node [exit, below of=ret] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e);
+    \path [line] (e) -> (ret);
+    \path [line] (ret) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Global \texttt{global \$a \$b;}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    \node [entry] (en) {};
+    \node [node, below of=en, label={0:$global(\texttt{\$a}, \texttt{\$b})$}] (e) {};
+    \node [exit, below of=e] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e);
+    \path [line] (e) -> (ex);
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
+
+\begin{figure}
+\centering
+\ContinuedFloat
+\subcaptionbox{Read constant: \texttt{"1337"}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    \node [entry] (en) {};
+    \node [node, below of=en, label={0:$const_r(\texttt{"1337"}, t_{tar})$}] (e) {};
+    \node [exit, below of=e] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e);
+    \path [line] (e) -> (ex);
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
+
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{\texttt{[}$Ae_1, \cdots , Ae_n$\texttt{]}\label{fig:flowai}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [node, below of=en, label={0:$array_i(t)$}] (ai) {};
+    \node [subtree, below of=ai] (ae1) {$Ae_1(t)$};
+    \node [dots, below of=ae1] (dots) {$\vdots$};
+    \node [subtree, below of=dots] (aen) {$Ae_n(t)$};
+    \node [exit, below of=aen] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ai);
+    \path [line] (ai) -> (ae1);
+    \path [line] (ae1) -> (dots);
+    \path [line] (dots) -> (aen);
+    \path [line] (aen) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Array expression: $\cdots, E, \cdots$\label{fig:flowae1}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e) {$E(t)$};
+    \node [node, below of=e, label={0:$array_a(t,t_{ar})$}] (app) {};
+    \node [exit, below of=app] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e);
+    \path [line] (e) -> (app);
+    \path [line] (app) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Array expression: $\cdots, E_1 $\texttt{=>}$E_2, \cdots$\label{fig:flowae2}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E_1(t_1)$};
+    \node [subtree, below of=e1] (e2) {$E_2(t_2)$};
+    \node [node, below of=e2, label={0:$array_w(t_1,t_2,t_{ar})$}] (wr) {};
+    \node [exit, below of=wr] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (e2);
+    \path [line] (e2) -> (wr);
+    \path [line] (wr) -> (ex);
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
+
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{Array read: $E_1$\texttt{[}$E_2$\texttt{]}\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E_1(t_{ar})$};
+    \node [subtree, below of=e1] (e2) {$E_2(t_{key})$};
+    \node [node, below of=e2, label={0:$array_r(t_{ar},t_{key},t_{tar})$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (e2);
+    \path [line] (e2) -> (rd);
+    \path [line] (rd) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Variable read \texttt{\$v}\label{fig:flowread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [node, below of=en, label={0:$var_r(\texttt{\$v},t)$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+%    \path [line] (en) -> (e1);
+    \path [line] (en) -> (rd);
+    \path [line] (rd) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Increment/decrement $Ve$\texttt{++},\texttt{- -}$V_E$\label{fig:flowinc}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e) {$Ve(h_{val})$};
+    \node [node, below of=e, label={0:$inc_\circ(h_{val},t_{tar})$}] (inc) {};
+    \node [exit, below of=inc] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e);
+    \path [line] (e) -> (inc);
+    \path [line] (inc) -> (ex);
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
+
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{Array write: \\ $Ve$\texttt{[}$E_1$\texttt{] = } $E_2$\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (ve) {$Ve(h_{var})$};
+    \node [subtree, below of=ve] (e1) {$E_1(t_{key})$};
+    \node [subtree, below of=e1] (e2) {$E_2(t_{val})$};
+    \node [node, below of=e2, label={0:$array_w(h_{var}, t_{key},t_{val},t_{tar})$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ve);
+    \path [line] (ve) -> (e1);
+    \path [line] (e1) -> (e2);
+    \path [line] (e2) -> (rd);
+    \path [line] (rd) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Array append: \\ $Ve$\texttt{[] = } $E$\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (ve) {$Ve(h_{var})$};
+    \node [subtree, below of=ve] (e1) {$E(t_{val})$};
+    \node [node, below of=e1, label={0:$array_a(h_{var}, t_{val},t_{tar})$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ve);
+    \path [line] (ve) -> (e1);
+    \path [line] (e1) -> (rd);
+    \path [line] (rd) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\texttt{\$v = }$E$ \label{fig:flowassign}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e2) {$E(t)$};
+    \node [node, below of=e2, label={0:$var_w(\texttt{\$v},t,t_{tar})$}] (ass) {};
+    \node [exit, below of=ass] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e2);
+    \path [line] (e2) -> (ass);
+    \path [line] (ass) -> (ex);
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{Array write reference: \\ $Ve$\texttt{[}$E$\texttt{] = \&}$Re$\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (ve) {$Ve(h_{var})$};
+    \node [subtree, below of=ve] (e1) {$E(t_{key})$};
+    \node [subtree, below of=e1] (e2) {$Re(h_{val})$};
+    \node [node, below of=e2, label={0:$array_w(h_{var}, t_{key},h_{val},t_{tar})$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ve);
+    \path [line] (ve) -> (e1);
+    \path [line] (e1) -> (e2);
+    \path [line] (e2) -> (rd);
+    \path [line] (rd) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Array append reference: \\ $Ve$\texttt{[] = \&}$Re$\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (ve) {$Ve(h_{var})$};
+    \node [subtree, below of=ve] (e1) {$Re(h_{val})$};
+    \node [node, below of=e1, label={0:$array_a(h_{var}, h_{val},t_{tar})$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ve);
+    \path [line] (ve) -> (e1);
+    \path [line] (e1) -> (rd);
+    \path [line] (rd) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\texttt{\$v = \&}$Re$ \label{fig:flowassign}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e2) {$Re(h_{val})$};
+    \node [node, below of=e2, label={0:$var_w(\texttt{\$v},h_{val},t_{tar})$}] (ass) {};
+    \node [exit, below of=ass] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e2);
+    \path [line] (e2) -> (ass);
+    \path [line] (ass) -> (ex);
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{Read variable locations: \texttt{\$v}\label{fig:flowve}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [node, below of=en, label={0:$var_r(\texttt{\$v}, h_{tar})$}] (loc) {};
+    \node [exit, below of=loc] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (loc);
+    \path [line] (loc) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Array read locations $V_E\texttt{[}E\texttt{]}$\label{fig:flowvea}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (ve) {$V_E(h_{var})$};
+    \node [subtree, below of=ve] (e) {$E(t_{key})$};
+    \node [node, below of=e, label={0:$array_r(h_{var},t_{key},h_{tar})$}] (loca) {};
+    \node [exit, below of=loca] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ve);
+    \path [line] (ve) -> (e);
+    \path [line] (e) -> (loca);
+    \path [line] (loca) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{Variable Array Expression $V_E\texttt{[}\texttt{]}$\label{fig:flowveaa}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (ve) {$V_E(h_{var})$};
+    \node [node, below of=ve, label={0:$array_a(h_{var},h_{tar})$}] (loca) {};
+    \node [exit, below of=loca] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ve);
+    \path [line] (ve) -> (loca);
+    \path [line] (loca) -> (ex);
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
