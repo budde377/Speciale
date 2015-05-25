@@ -106,7 +106,7 @@
     \path [line] (if) -- (-3, -6) |- (end);
     
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{$E_1$ $\oplus$ $E_2$ \label{fig:flowbop}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{$E_1$ $\oplus$ $E_2$ \label{fig:flowbopA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e1) {$E_1(t_l)$};
@@ -127,7 +127,7 @@
 \begin{figure}
 \ContinuedFloat
 \hspace*{\fill}
-\subcaptionbox{Unary operation on $E$\label{fig:flowuop}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Unary operation on $E$\label{fig:flowuopA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e) {$E(t_{val})$};
@@ -165,7 +165,7 @@
     \path [line] (result) -> (ex);
     \draw [dashed, ->] (call) -- (-2, -8) |- (result);
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{Short-circuit binary operation on $E_1$ and $E_2$.\label{fig:flowsop}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Short-circuit binary operation on $E_1$ and $E_2$.\label{fig:flowsopA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e1) {$E_1(t_l)$};
@@ -292,7 +292,7 @@
 \begin{figure}
 \ContinuedFloat
 \hspace*{\fill}
-\subcaptionbox{Array read: $E_1$\texttt{[}$E_2$\texttt{]}\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Array read: $E_1$\texttt{[}$E_2$\texttt{]}\label{fig:flowareadA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e1) {$E_1(t_{ar})$};
@@ -318,7 +318,7 @@
     \path [line] (en) -> (rd);
     \path [line] (rd) -> (ex);
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{Increment/decrement $Ve$\texttt{++},\texttt{- -}$V_E$\label{fig:flowinc}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Increment/decrement $Ve$\texttt{++},\texttt{- -}$V_E$\label{fig:flowincA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e) {$Ve(h_{val})$};

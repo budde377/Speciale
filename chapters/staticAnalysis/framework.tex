@@ -103,18 +103,17 @@ Let $s : \syn{statement}$ be a statement, then there are nine different graphs, 
 \hspace*{\fill}
 \end{figure}
 
-For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $global$, node which takes the variable names $v_1,\cdots v_n$ as argument. For $s =$ \texttt{return $e$} statement there are three possible graphs. If the return statement is empty, i.e. does not contain an expression, then this is equivalent of returning \texttt{null}
-
-
+For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $global$, node which takes the variable names $v_1,\cdots v_n$ as argument. For $s =$ \texttt{return $e$} statement there are three possible graphs. If the return statement is empty, i.e. does not contain an expression, then this is equivalent of returning \texttt{null}, this case yields the graph in \ref{fig:floweret}. If $e : \syn{rexpr}$ and the function is a reference function, i.e. the function signature has an ampersand before the function name, then the references is returned (figure \ref{fig:flowrret}). If this is not the case, assuming the program is a valid P0 program, then it's fair to assume that $e$ can be parsed as an expression, since it cannot be an array-append operation. If it was an array append operation, then the program wouldn't be a valid PHP program and thus not a valid P0 program (see section \ref{sec:langsubset}). Assuming that the $e : \syn{expr}$ the graphs for a return statement should evaluate $e$ and return the result, this is the case in figure \ref{fig:flowret}. For all graphs, the exit-node is the unique exit-node of the function.
 
 \begin{figure}
+\ContinuedFloat
 \hspace*{\fill}
-\subcaptionbox{\label{fig:flowwhile}}{\begin{adjustbox}{max size={.25\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{\label{fig:floweret}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
-    \node [node, below of=en, label={135:$const_r(null, t_{tar})$}] (const) {};
-    \node [node, right of=const, label={-90:$exit(\cdots, t_{tar}, \cdots)$}] (exitn) {};
-    \node [emptynode, below of=const ] (end) {};
+    \node [node, below of=en, label={45:$const_r(\texttt{null}, t_{tar})$}] (const) {};
+    \node [node, below of=const, label={45:$exit(\cdots, t_{tar}, \cdots)$}] (exitn) {};
+    \node [emptynode, below of=exitn ] (end) {};
     \node [exit, below of=end] (ex) {};
       % Draw edges
     \path[line] (en) -> (const);
@@ -122,56 +121,123 @@ For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $g
     \path[line] (end) -> (ex);
     
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{\label{fig:flowfor}}{\begin{adjustbox}{max size={.25\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{\label{fig:flowret}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
-    
     \node [entry] (en) {};
-    \node [subtree, below of=en] (e1) {$E_1(\_)$};
-    \node [subtree, below of=e1] (e2) {$E_2(t)$};
-    \node [node, below of=e2, label={135:$if(t)$}] (if) {};
-    \node [subtree, below left of=if] (s) {$S$};
-    \node [subtree, below right of=if] (e3) {$E_3(\_)$};
-    \node [emptynode, below right of=s] (end) {};
+    \node [subtree, below of=en] (exp) {$E(t)$};
+    \node [node, below of=exp, label={45:$exit(\cdots, t, \cdots)$}] (exitn) {};
+    \node [emptynode, below of=exitn ] (end) {};
     \node [exit, below of=end] (ex) {};
-    
     % Draw edges
-    \path [line] (en) -> (e1);
-    \path [line] (e1) -> (e2);
-    \path [line] (e2) -> (if);
-    \path [line] (if) -> (s);
-    \path [line] (s) -> (e3);
-%    \path [line] (e3) -> (end);
-    \path [line] (end) -> (ex);
-    \path [line] (e3) |- (e2);
-    \path [line] (if) -- (-3, -6) |- (end);
+    \path[line] (en) -> (exp);
+    \path[line] (exp) -> (exitn);
+    \path[line] (end) -> (ex);
+    
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{\label{fig:flowifelse}}{\begin{adjustbox}{max size={.25\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
-    % Place nodes
+\subcaptionbox{\label{fig:flowrret}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+  % Place nodes
     \node [entry] (en) {};
-    \node [subtree,below of=en] (e1) {$E(t)$};
-    \node [node, below of=e1, label={35:$if(t)$}] (if) {};
-    \node [subtree, below left of=if] (s1) {$S_1$};
-    \node [subtree, below right of=if] (s2) {$S_2$};
-    \node [emptynode, below right of=s1](end) {};
+    \node [subtree, below of=en] (exp) {$Re(h)$};
+    \node [node, below of=exp, label={45:$exit(\cdots, h, \cdots)$}] (exitn) {};
+    \node [emptynode, below of=exitn ] (end) {};
     \node [exit, below of=end] (ex) {};
     % Draw edges
-    \path[line] (en) -> (e1);
-    \path [line] (e1) -> (if);
-    \path [line] (if) -> (s1);
-    \path [line] (if) -> (s2);
-    \path [line] (s1) -> (end);
-    \path [line] (s2) -> (end);
-    \path [line] (end) -> (ex);
+    \path[line] (en) -> (exp);
+    \path[line] (exp) -> (exitn);
+    \path[line] (end) -> (ex);
 \end{tikzpicture}\end{adjustbox}}
 \hspace*{\fill}
 \end{figure}
-
 
 The fifth graph is the empty graph, the sixth is the graph of the expression, and the ninth graph is the graph of the block statement, which is the consisting of each statement in the block connected by edges in the right order.
 
 
 \subsection{Expressions}
 
+Let $e : \syn{expr}$ then, by ignoring the trivial parenthesized expression case, viewing the four increment/decrement operations as one, and the two array-initialization operations as one, the expression can be on nine different forms. For $e = E_l \oplus E_r$ the graph depends on the operation. If the operation is a short-circuit operation, logical \texttt{\&\&} or \texttt{||}, then the graph is as \ref{fig:flowsop} because only one branch may be required to be evaluated. If the operation is not a short-circuit operation then the graph becomes as \ref{fig:flowbop}, because both expressions must be evaluated. In both cases the operations are performed on, and saved in, the temporary storage. The unary operation, $e = \circ E$ is similar to the previous case with a graph as \ref{fig:flowuop}. A separate graph for unary post/pre increment/decrement operations are necessary because of the performed update on the heap location. This is the reason for the operations not being performed on the temporary storage, but instead on heap-locations directly. The result of the operation is naturally still stored in the temporary storage. Figure \ref{fig:flowinc} illustrates the corresponding flow graph.
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{\label{fig:flowsop}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E_l(t_l)$};
+    \node [node, below of=e1, label={0:$if(t_l)$}] (if) {};
+    \node [subtree, below of=if] (e2) {$E_r(t_r)$};
+    \node [node, below of=e2, label={0:$sop_\oplus(t_l,t_r,t_{tar})$}] (sop) {};
+    \node [exit, below of=sop] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (if);
+    \path [line] (if) -> (e2);
+    \path [line] (e2) -> (sop);
+    \path [line] (if) -- (-2, -4) |- (sop);
+    \path [line] (sop) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\label{fig:flowbop}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E_l(t_l)$};
+    \node [subtree, below of=e1] (e2) {$E_r(t_r)$};
+    \node [node, below of=e2, label={0:$bop_\oplus(t_l,t_r,t_{tar})$}] (bop) {};
+    \node [exit, below of=bop] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (e2);
+    \path [line] (e2) -> (bop);
+    \path [line] (bop) -> (ex);
+    
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\label{fig:flowuop}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e) {$E(t_{val})$};
+    \node [node, below of=e, label={0:$uop_\circ(t_{val},t_{tar})$}] (uop) {};
+    \node [exit, below of=uop] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e);
+    \path [line] (e) -> (uop);
+    \path [line] (uop) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\label{fig:flowinc}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e) {$Ve(h_{val})$};
+    \node [node, below of=e, label={0:$inc_\circ(h_{val},t_{tar})$}] (inc) {};
+    \node [exit, below of=inc] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e);
+    \path [line] (e) -> (inc);
+    \path [line] (inc) -> (ex);
+\end{tikzpicture}\end{adjustbox}}%
+\hspace*{\fill}
+\end{figure}
+
+For $e = \texttt{\$v}$ for some variable \texttt{\$v}, the graph is a single $var_r(\texttt{\$v}, t_{tar})$ node. For an array read expression, $e = E_{ar}\texttt[E_{key}\texttt{]}$, the sub array expression, $E_{ar}$, should be evaluated before the key expression, $E_{key}$, and the graph then becomes like figure \ref{fig:flowaread}.
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$E_1(t_{ar})$};
+    \node [subtree, below of=e1] (e2) {$E_2(t_{key})$};
+    \node [node, below of=e2, label={0:$array_r(t_{ar},t_{key},t_{tar})$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (e2);
+    \path [line] (e2) -> (rd);
+    \path [line] (rd) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
 \subsection{Function definitions}
 
 \clearpage
