@@ -6,4 +6,6 @@
 %\todo{How is the lattice compared properly with an infinite domain of variables set to NULL}
 In order to perform a dataflow analysis on a P0 program, the monotone framework is used. By defining a control flow graph, $G = (V, E, s,t)$, a lattice, $L$, a set of transfer functions $F_N : L \rightarrow L$, a initial lattice $i : L$, the empty lattice $\epsilon : L$, and a predecessor function, $pred : N \rightarrow N^*$
 
+The initial array has all variables set to $Value(Null(\top))$ and contain super globals.
+
 \todo{check signatures and formal}
