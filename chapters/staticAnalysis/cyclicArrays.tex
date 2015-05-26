@@ -1,3 +1,4 @@
+\begin{comment}
 \section{Cyclic Arrays}
 As described in chapter \ref{ch:study} the dynamic analysis detected cyclic arrays in most of the corpus. To account for this the analysis have to handle cyclic arrays in a sound manner. When determining containment of arrays a cyclic array is treated as the $\top$-element in the array lattice, containing all other arrays. Whether an array is cyclic is determined every time containment is evaluated. A cyclic array may later become acyclic as shown in listing \ref{lst:cyclicAcyclic}
 
@@ -9,3 +10,4 @@ As described in chapter \ref{ch:study} the dynamic analysis detected cyclic arra
 \end{lstlisting}
 
 \todo{does this array become acyclic in the analysis?}
+\end{comment}

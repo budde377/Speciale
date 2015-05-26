@@ -1,10 +1,9 @@
 \section{The Monotone Framework}
-\todo{global arrays GET, POST and COOKIE are initialized as maps with map or string values. Depth 1 is implemented, but arbitrary depth could be implemented easily. SESSION is a top array since anything can be stored in it and will be automatically serialized/unserialized between requests. FILES is a map of maps, each inner map providing data about the corresponding uploaded file}
+%\todo{global arrays GET, POST and COOKIE are initialized as maps with map or string values. Depth 1 is implemented, but arbitrary depth could be implemented easily. SESSION is a top array since anything can be stored in it and will be automatically serialized/unserialized between requests. FILES is a map of maps, each inner map providing data about the corresponding uploaded file}
+%\todo{describe the monotone framework and how the informal CFG + transfer functions apply}
+%\todo{Write about initial lattice (Super globals + hloc)}
+%\todo{All Variables should map to NULL initially}
+%\todo{How is the lattice compared properly with an infinite domain of variables set to NULL}
+In order to perform a dataflow analysis on a P0 program, the monotone framework is used. By defining a control flow graph, $G = (V, E, s,t)$, a lattice, $L$, a set of transfer functions $F_N : L \rightarrow L$, a initial lattice $i : L$, the empty lattice $\epsilon : L$, and a predecessor function, $pred : N \rightarrow N^*$
 
-\todo{describe the monotone framework and how the informal CFG + transfer functions apply}
-
-\todo{Write about initial lattice (Super globals + hloc)}
-
-\todo{All Variables should map to NULL initially}
-
-\todo{How is the lattice compared properly with an infinite domain of variables set to NULL}
+\todo{check signatures and formal}
