@@ -100,24 +100,24 @@ Let $s : \syn{statement}$ be a statement, then there are nine different graphs, 
 %For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $global$, node which takes the variable names $v_1,\cdots v_n$ as argument. 
 Return-statements, $s =$ \texttt{return $T$} have three different graphs. If the return statement is empty, i.e. does not contain an expression, then this is equivalent of returning \texttt{null}, this case yields the graph in \ref{fig:floweret}. If $T : \syn{rexpr}$ and the function is a reference function, i.e. the function signature has an ampersand before the function name, then the references is returned (figure \ref{fig:flowret} where $c : \text{HeapTemps}$). If this is not the case, assuming the program is a valid P0 program, then it is fair to assume that $T$ can be parsed as an expression, since it cannot be an array-append operation. If it was an array append operation, then the program wouldn't be a valid PHP program and thus not a valid P0 program (see section \ref{sec:langsubset}). Assuming that the $T : \syn{expr}$ the graphs for a return statement should evaluate $T$ and return the result, this is the case in figure \ref{fig:flowret} with $c : \text{Temps}$.  For all graphs, the exit-node is the unique exit-node of the function.
 
-
 \begin{program}
-\subcaptionbox{Example of normal return-statement}{
-\begin{lstlisting}
+ \begin{subfigure}[b]{.45\linewidth}
+	\begin{lstlisting} 
+	\end{lstlisting}
+    \caption{Example of normal return-statement}
+  \end{subfigure}\hfill%
+ \begin{subfigure}[b]{.45\linewidth}
+	\begin{lstlisting} 
+	\end{lstlisting}
+    \caption{Example of reference return-statement}
+  \end{subfigure}
 
-\end{lstlisting}
-}%
-\subcaptionbox{Example of reference return-statement}{
-\begin{lstlisting}
-
-\end{lstlisting}
-}%
 \caption{Return-statement examples}
 \label{lst:return-statements}
 \end{program}
 
 \begin{figure}
-\ContinuedFloat
+
 \hspace*{\fill}
 \subcaptionbox{\label{fig:floweret}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
@@ -155,7 +155,6 @@ The remaining three graphs are the empty graph, the graph of the expression, and
 
 Let $e : \syn{expr}$ then, by ignoring the trivial parenthesized expression case, viewing the four increment/decrement operations as one, and the two array-initialization operations as one, the expression can be on nine different forms. For $e = E_l \oplus E_r$ the graph depends on the operation. If the operation is a short-circuit operation, logical \texttt{\&\&} or \texttt{||}, then the graph is as \ref{fig:flowsop} because only one branch may be required to be evaluated. If the operation is not a short-circuit operation then the graph becomes as \ref{fig:flowbop}, because both expressions must be evaluated. In both cases the operations are performed on, and saved in, the temporary storage. The unary operation, $e = \circ E$ is similar to the previous case with a graph as \ref{fig:flowuop}. A separate graph for unary post/pre increment/decrement operations are necessary because of the performed update on the heap location. This is the reason for the operations not being performed on the temporary storage, but instead on heap-locations directly. The result of the operation is stored in the temporary storage. Figure \ref{fig:flowinc} illustrates the corresponding flow graph.
 \begin{figure}
-\ContinuedFloat
 \hspace*{\fill}
 \subcaptionbox{\label{fig:flowsop}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
@@ -218,7 +217,7 @@ Let $e : \syn{expr}$ then, by ignoring the trivial parenthesized expression case
 
 For a variable read, $e = \texttt{\$v}$ for some variable \texttt{\$v}, or a constant read, e.g. $e = \texttt{"foo"}$, the graph is a single $var_r(\texttt{\$v}, t_{tar})$ or $const_r(\texttt{"foo"}, t_{tar})$ node respectively. For an array read expression, $e = E_{ar}\texttt[E_{key}\texttt{]}$, the sub array expression, $E_{ar}$, should be evaluated before the key expression, $E_{key}$, and the graph then becomes like figure \ref{fig:flowaread}, where $T$ is the graph corresponding to $E_{ar}$ and $c_{ar}, c_{tar} : \text{Temps}$. If the expression is an array initialization, $e = \texttt{[}\cdots, E_1, \cdots, E_2\texttt{=>}E_3\texttt{]}$, then an array is first initialized in temporary storage after the entries are either appended or written to the array. Hence the graph in figure \ref{fig:flowai}.
 \begin{figure}
-\ContinuedFloat
+
 \hspace*{\fill}
 \subcaptionbox{\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
@@ -268,7 +267,7 @@ For function calls, $e = fn\texttt{(}T_1,\cdots, T_n\texttt{)}$, the result vari
 
 
 \begin{figure}
-\ContinuedFloat
+
 \hspace*{\fill}
 \subcaptionbox{\label{fig:flowcall}}{\begin{adjustbox}{max size={.3\textwidth}{.40\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
@@ -300,7 +299,7 @@ For function calls, $e = fn\texttt{(}T_1,\cdots, T_n\texttt{)}$, the result vari
 
 Finally the expression can be an assignment. There are two types of assignments, a regular value-assignment and a reference-assignment, using the \texttt{\&} operator. Each assignment can be split up in three categories, variable-, array-write-, and array-append-assignments, depending on the target (left side of the operation). Examples of these six operations can be seen in program \ref{lst:assignments}. Due to the distinction between temporary storage of values and heap-location-sets, these six cases must be handled individually. For value array write ($e = R\texttt{[$E_{key}$]=} E_{val}$), array append ($e = R\texttt{[]=} E_{val}$), and variable write ($e = \texttt{\$v=} E_{val}$), the graphs are as \ref{fig:flowawrite}, \ref{fig:flowaappend}, and \ref{fig:vwrite} respectively, where $T$ is the subgraph of the value expression $E_{val} : \syn{expr}$ and $c_{val} : \text{Temps}$ is the temporary variable holding the result. The reference assignments,  $e = R\texttt{[$e_{key}$]=\&} R_{val}$, $e = r\texttt{[]=\&} R_{val}$, and $e = \texttt{\$v=\&} R_{val}$, are similar, but with $T$ being the subgraph of the reference expression, $R_{val} : \syn{rexpr}$ and $c_{val} : \text{HeapTemp}$ the heap temporary variable holding the heap locations of the value.
 \begin{figure}
-\ContinuedFloat
+
 \hspace*{\fill}
 \subcaptionbox{\label{fig:flowawrite}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
