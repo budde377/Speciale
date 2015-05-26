@@ -140,7 +140,7 @@
     \path [line] (uop) -> (ex);
 \end{tikzpicture}\end{adjustbox}}\hfill%
 \subcaptionbox{$fn$ \texttt{(} $Re_1, \cdots, E_n$\texttt{)}. 
-\todo{elaborate on pass-by- and return-reference} \label{fig:flowcall}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\todo{elaborate on pass-by- and return-reference} \label{fig:flowcallA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e1) {$Re_1(h_1)$};
@@ -243,7 +243,7 @@
 \begin{figure}
 \ContinuedFloat
 \hspace*{\fill}
-\subcaptionbox{\texttt{[}$Ae_1, \cdots , Ae_n$\texttt{]}\label{fig:flowai}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{\texttt{[}$Ae_1, \cdots , Ae_n$\texttt{]}\label{fig:flowaiA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [node, below of=en, label={0:$array_i(t)$}] (ai) {};
@@ -260,7 +260,7 @@
     \path [line] (aen) -> (ex);
 
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{Array expression: $\cdots, E, \cdots$\label{fig:flowae1}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Array expression: $\cdots, E, \cdots$\label{fig:flowae1A}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e) {$E(t)$};
@@ -272,7 +272,7 @@
     \path [line] (e) -> (app);
     \path [line] (app) -> (ex);
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{Array expression: $\cdots, E_1 $\texttt{=>}$E_2, \cdots$\label{fig:flowae2}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Array expression: $\cdots, E_1 $\texttt{=>}$E_2, \cdots$\label{fig:flowae2A}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e1) {$E_1(t_1)$};
@@ -336,7 +336,7 @@
 \begin{figure}
 \ContinuedFloat
 \hspace*{\fill}
-\subcaptionbox{Array write: \\ $Ve$\texttt{[}$E_1$\texttt{] = } $E_2$\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Array write: \\ $Ve$\texttt{[}$E_1$\texttt{] = } $E_2$\label{fig:flowareadA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (ve) {$Ve(h_{var})$};
@@ -353,7 +353,7 @@
     \path [line] (rd) -> (ex);
 
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{Array append: \\ $Ve$\texttt{[] = } $E$\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Array append: \\ $Ve$\texttt{[] = } $E$\label{fig:flowareadA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (ve) {$Ve(h_{var})$};
@@ -368,7 +368,7 @@
     \path [line] (rd) -> (ex);
 
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{\texttt{\$v = }$E$ \label{fig:flowassign}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{\texttt{\$v = }$E$ \label{fig:flowassignA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e2) {$E(t)$};
@@ -385,7 +385,7 @@
 \begin{figure}
 \ContinuedFloat
 \hspace*{\fill}
-\subcaptionbox{Array write reference: \\ $Ve$\texttt{[}$E$\texttt{] = \&}$Re$\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Array write reference: \\ $Ve$\texttt{[}$E$\texttt{] = \&}$Re$\label{fig:flowareadA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (ve) {$Ve(h_{var})$};
@@ -402,7 +402,7 @@
     \path [line] (rd) -> (ex);
 
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{Array append reference: \\ $Ve$\texttt{[] = \&}$Re$\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Array append reference: \\ $Ve$\texttt{[] = \&}$Re$\label{fig:flowareadA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (ve) {$Ve(h_{var})$};
@@ -417,7 +417,7 @@
     \path [line] (rd) -> (ex);
 
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{\texttt{\$v = \&}$Re$ \label{fig:flowassign}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{\texttt{\$v = \&}$Re$ \label{fig:flowassignA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e2) {$Re(h_{val})$};
@@ -434,7 +434,7 @@
 \begin{figure}
 \ContinuedFloat
 \hspace*{\fill}
-\subcaptionbox{Read variable locations: \texttt{\$v}\label{fig:flowve}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Read variable locations: \texttt{\$v}\label{fig:flowveA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [node, below of=en, label={0:$var_r(\texttt{\$v}, h_{tar})$}] (loc) {};
@@ -445,7 +445,7 @@
     \path [line] (loc) -> (ex);
 
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{Array read locations $V_E\texttt{[}E\texttt{]}$\label{fig:flowvea}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Array read locations $V_E\texttt{[}E\texttt{]}$\label{fig:flowveaA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (ve) {$V_E(h_{var})$};
@@ -459,7 +459,7 @@
     \path [line] (e) -> (loca);
     \path [line] (loca) -> (ex);
 \end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{Variable Array Expression $V_E\texttt{[}\texttt{]}$\label{fig:flowveaa}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\subcaptionbox{Variable Array Expression $V_E\texttt{[}\texttt{]}$\label{fig:flowveaaA}}{\begin{adjustbox}{max size={.3\textwidth}{.4\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (ve) {$V_E(h_{var})$};

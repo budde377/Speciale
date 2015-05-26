@@ -20,10 +20,10 @@
 <expr> ::= <expr> $\oplus$ <expr>
 \alt $\circ$ <expr>
 \alt `(' <expr> `)'
-\alt <var-expr>`+ +'
-\alt <var-expr>`- -'
-\alt `+ +'<var-expr>
-\alt `- -'<var-expr>
+\alt <vexpr>`+ +'
+\alt <vexpr>`- -'
+\alt `+ +'<vexpr>
+\alt `- -'<vexpr>
 \alt <var>
 \alt <expr> `['<expr> `]'
 \alt <function-reference>
@@ -46,7 +46,7 @@
 \alt <rexpr>`[' <expr> `]'
 \end{grammar}
 \begin{grammar}
-<var-expr> ::= <var> 
+<vexpr> ::= <var> 
 \alt <rexpr>`[]'
 \alt <rexpr>`[' <expr> `]'
 \end{grammar}
@@ -55,8 +55,12 @@
 \alt <expr>
 \end{grammar}
 \begin{grammar}
-<assignment> ::= <var-expr> `=' <rexpr>`;'
-\alt <var-expr> `=' `&'<rexpr>`;'
+<assignment> ::= <rexpr>`[]'  `=' <expr>`;'
+\alt <rexpr>`[' <expr> `]'  `=' <expr>`;'
+\alt <var> `=' <expr>
+\alt <rexpr>`[]'  `=' `&' <rexpr>`;'
+\alt <rexpr>`[' <expr> `]'  `=' ` &' <rexpr>`;'
+\alt <var> `=' `&' <rexpr>
 \end{grammar}
 
 \begin{grammar}

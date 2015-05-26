@@ -5,11 +5,13 @@ To simplify the static analysis a subset of the PHP language, P0, is used. The P
 
 To simplify the analysis and keep the focus on arrays; resource handles and objects have been completely removed from the language. Dynamic dispatch (variable function names), variable variables and dynamic loading of code (\texttt{require} and \texttt{include}) have also been removed. There are no anonymous functions and a limited number of statements. The language does however support all reference features, i.e. reference assigning entries in an array or variables.
 
-The syntax can be expressed with grammar \ref{gramm:p0}. Furthermore it being a subset of PHP, a program is only valid in P0  if it is also a valid PHP program. E.g. while the syntax allows negation of arrays, this action yields a fatal error in PHP, i.e. is an invalid program, hence is also an invalid P0 program. 
+The syntax can be expressed with grammar \ref{gramm:p0}. Here $e : \syn{expr}$ denotes an expression, $e : \syn{rexpr}$ a reference expression, and $e : \syn{vexpr}$ a variable expression.   Furthermore it being a subset of PHP, a program is only valid in P0  if it is also a valid PHP program. E.g. while the syntax allows negation of arrays, this action yields a fatal error in PHP, i.e. is an invalid program, hence is also an invalid P0 program. 
 
 Notice that returning an $\syn{rexpr}$ with a non-reference function might result in a fatal error, e.g. when returning the result of an array-append operation, but the same operation is valid in a reference-function.  
 
 Return statements are only allowed in a function body.
+
+Every function ends with a return statement.
 
 \todo{elaborate}
 

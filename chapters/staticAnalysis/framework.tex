@@ -8,7 +8,7 @@
 \todo{All Variables should map to NULL initially}
 
 \todo{How is the lattice compared properly with an infinite domain of variables set to NULL}
-\clearpage
+
 \section{Control flow graph}
 \tikzstyle{subtree} = [rectangle, draw, fill=gray!20, text width=4em, text badly centered, minimum height=3em]
 \tikzstyle{node} = [draw, circle, minimum height=2em]
@@ -17,9 +17,14 @@
 \tikzstyle{entry} = [draw=none,fill=none]
 \tikzstyle{exit} = [draw=none,fill=none]
 \tikzstyle{dots} = [draw=none,fill=none]
-Given a P0 program, $p : \syn{program}$, parsed to a abstract syntax tree, the control flow graph can be constructed recursively. Every graph has an entry and an exit node. The control-flow graph created from $p$ consists of the control-flow graphs for each statement in $p$ connecting each sub-graph with edges from exit to entry nodes. The order of execution is preserved. 
+Given a P0 program, $p : \syn{program}$, parsed to a abstract syntax tree, the control flow graph can be constructed recursively where every graph has an entry and an exit node. Most of the nodes takes arguments. Here $h$ denotes variables of type {\bf HeapTemps}, $t$ variables of type {\bf Temps}, and $c$ variables of either type. Subgraphs are denoted by a grey rectangles with letters $E$, $R$, $V$, and $T$ which denotes subgraphs of expressions, reference expressions, variable expression, or either respectively. 
+
+The control-flow graph created from $p$ starts with a $start$ node followed by the control-flow graphs for each statement in $p$, connected edges from exit to entry nodes, in the order of appearance. 
+
+For each function definition encountered a separate graph is created, which may later be referenced. This graph starts with a $start$ node and ends with an $exit$ node, between these are the graph corresponding to the function body. The arguments of the exit node are the temporary variables created by the return statements. 
+
 \subsection{Statements}
-Let $s : \syn{statement}$ be a statement, then there are nine different graphs, one for each case in the grammar \ref{gramm:p0}. The first four, for $s = $ \texttt{while($E$) $S$}, $s = $ \texttt{for($E_1$;$ E_2$;$E_3$) $S$}, $s = $ \texttt{if($E$) $S$}, and $s = $ \texttt{if($E$) $S_1$ else $S_2$} statements, are depicted as figure \ref{fig:flowwhile}, \ref{fig:flowfor}, \ref{fig:flowif}, and \ref{fig:flowifelse} respectively. In the graphs the nodes are circles with an associated label indicating the node type, and the grey rectangles are sub-graphs. Notice how the expression-sub-graph takes a temporary variable, $t$, as argument. This indicates where the result of evaluating the expression should be stored in the temporary storage of the lattice. 
+Let $s : \syn{statement}$ be a statement, then there are nine different graphs, one for each case in the grammar \ref{gramm:p0}. The first four, for $s = $ \texttt{while($E$) $S$}, $s = $ \texttt{for($E_1$;$ E_2$;$E_3$) $S$}, $s = $ \texttt{if($E$) $S$}, and $s = $ \texttt{if($E$) $S_1$ else $S_2$} statements, are depicted as figure \ref{fig:flowwhile}, \ref{fig:flowfor}, \ref{fig:flowif}, and \ref{fig:flowifelse} respectively.
 
 
 \begin{figure}
@@ -103,7 +108,7 @@ Let $s : \syn{statement}$ be a statement, then there are nine different graphs, 
 \hspace*{\fill}
 \end{figure}
 
-For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $global$, node which takes the variable names $v_1,\cdots v_n$ as argument. For $s =$ \texttt{return $e$} statement there are three possible graphs. If the return statement is empty, i.e. does not contain an expression, then this is equivalent of returning \texttt{null}, this case yields the graph in \ref{fig:floweret}. If $e : \syn{rexpr}$ and the function is a reference function, i.e. the function signature has an ampersand before the function name, then the references is returned (figure \ref{fig:flowrret}). If this is not the case, assuming the program is a valid P0 program, then it's fair to assume that $e$ can be parsed as an expression, since it cannot be an array-append operation. If it was an array append operation, then the program wouldn't be a valid PHP program and thus not a valid P0 program (see section \ref{sec:langsubset}). Assuming that the $e : \syn{expr}$ the graphs for a return statement should evaluate $e$ and return the result, this is the case in figure \ref{fig:flowret}. For all graphs, the exit-node is the unique exit-node of the function.
+For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $global$, node which takes the variable names $v_1,\cdots v_n$ as argument. For $s =$ \texttt{return $T$} statement there are three possible graphs. If the return statement is empty, i.e. does not contain an expression, then this is equivalent of returning \texttt{null}, this case yields the graph in \ref{fig:floweret}. If $T : \syn{rexpr}$ and the function is a reference function, i.e. the function signature has an ampersand before the function name, then the references is returned (figure \ref{fig:flowret} where $c : \text{HeapTemps}$). If this is not the case, assuming the program is a valid P0 program, then it's fair to assume that $T$ can be parsed as an expression, since it cannot be an array-append operation. If it was an array append operation, then the program wouldn't be a valid PHP program and thus not a valid P0 program (see section \ref{sec:langsubset}). Assuming that the $T : \syn{expr}$ the graphs for a return statement should evaluate $T$ and return the result, this is the case in figure \ref{fig:flowret} with $c : \text{Temps}$. For all graphs, the exit-node is the unique exit-node of the function.
 
 \begin{figure}
 \ContinuedFloat
@@ -124,8 +129,8 @@ For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $g
 \subcaptionbox{\label{fig:flowret}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
-    \node [subtree, below of=en] (exp) {$E(t)$};
-    \node [node, below of=exp, label={45:$exit(\cdots, t, \cdots)$}] (exitn) {};
+    \node [subtree, below of=en] (exp) {$T(c)$};
+    \node [node, below of=exp, label={45:$exit(\cdots, c, \cdots)$}] (exitn) {};
     \node [emptynode, below of=exitn ] (end) {};
     \node [exit, below of=end] (ex) {};
     % Draw edges
@@ -133,18 +138,6 @@ For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $g
     \path[line] (exp) -> (exitn);
     \path[line] (end) -> (ex);
     
-\end{tikzpicture}\end{adjustbox}}\hfill%
-\subcaptionbox{\label{fig:flowrret}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
-  % Place nodes
-    \node [entry] (en) {};
-    \node [subtree, below of=en] (exp) {$Re(h)$};
-    \node [node, below of=exp, label={45:$exit(\cdots, h, \cdots)$}] (exitn) {};
-    \node [emptynode, below of=exitn ] (end) {};
-    \node [exit, below of=end] (ex) {};
-    % Draw edges
-    \path[line] (en) -> (exp);
-    \path[line] (exp) -> (exitn);
-    \path[line] (end) -> (ex);
 \end{tikzpicture}\end{adjustbox}}
 \hspace*{\fill}
 \end{figure}
@@ -205,7 +198,7 @@ Let $e : \syn{expr}$ then, by ignoring the trivial parenthesized expression case
 \subcaptionbox{\label{fig:flowinc}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
-    \node [subtree, below of=en] (e) {$Ve(h_{val})$};
+    \node [subtree, below of=en] (e) {$V(h_{val})$};
     \node [node, below of=e, label={0:$inc_\circ(h_{val},t_{tar})$}] (inc) {};
     \node [exit, below of=inc] (ex) {};
 
@@ -217,16 +210,16 @@ Let $e : \syn{expr}$ then, by ignoring the trivial parenthesized expression case
 \hspace*{\fill}
 \end{figure}
 
-For $e = \texttt{\$v}$ for some variable \texttt{\$v}, the graph is a single $var_r(\texttt{\$v}, t_{tar})$ node. For an array read expression, $e = E_{ar}\texttt[E_{key}\texttt{]}$, the sub array expression, $E_{ar}$, should be evaluated before the key expression, $E_{key}$, and the graph then becomes like figure \ref{fig:flowaread}.
+For a variable read, $e = \texttt{\$v}$ for some variable \texttt{\$v}, or a constant read, e.g. $e = \texttt{"foo"}$, the graph is a single $var_r(\texttt{\$v}, t_{tar})$ or $const_r(\texttt{"foo"}, t_{tar})$ node respectively. For an array read expression, $e = E_{ar}\texttt[E_{key}\texttt{]}$, the sub array expression, $E_{ar}$, should be evaluated before the key expression, $E_{key}$, and the graph then becomes like figure \ref{fig:flowaread}, where $T$ is the graph corresponding to $E_{ar}$ and $c_{ar}, c_{tar} : \text{Temps}$. If the expression is an array initialization, $e = \texttt{[}\cdots, E_1, \cdots, E_2\texttt{=>}E_3\texttt{]}$, then an array is first initialized in temporary storage after which the entries are either appended or written to the array. Hence the graph in figure \ref{fig:flowai}.
 \begin{figure}
 \ContinuedFloat
 \hspace*{\fill}
 \subcaptionbox{\label{fig:flowaread}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
-    \node [subtree, below of=en] (e1) {$E_1(t_{ar})$};
-    \node [subtree, below of=e1] (e2) {$E_2(t_{key})$};
-    \node [node, below of=e2, label={0:$array_r(t_{ar},t_{key},t_{tar})$}] (rd) {};
+    \node [subtree, below of=en] (e1) {$T(c_{ar})$};
+    \node [subtree, below of=e1] (e2) {$E_{key}(t_{key})$};
+    \node [node, below of=e2, label={0:$array_r(c_{ar},t_{key},c_{tar})$}] (rd) {};
     \node [exit, below of=rd] (ex) {};
     
     % Draw edges
@@ -234,22 +227,134 @@ For $e = \texttt{\$v}$ for some variable \texttt{\$v}, the graph is a single $va
     \path [line] (e1) -> (e2);
     \path [line] (e2) -> (rd);
     \path [line] (rd) -> (ex);
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\label{fig:flowai}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [node, below of=en, label={0:$array_i(t_{ar})$}] (ai) {};
+    \node [dots, left of=ai] (dots1) {$\vdots$};
+    \node [subtree, below of=dots1] (e1) {$E_1(t_1)$};
+    \node [node, right of=e1, label={45:$array_a(t_1, t_{ar})$}] (app) {};
+	\node [dots, right of=app] (dots2) {$\vdots$};
+    \node [subtree, below of=dots2] (e2) {$E_2(t_2)$};
+    \node [subtree, left of=e2] (e3) {$E_3(t_2)$};
+	\node [node, left of=e3, label={-85:$array_w(t_2, t_3, t_{ar})$}] (aw) {};
+	\node [exit, below of=aw] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (ai);
+    \path [line] (ai) -> (dots1);
+    \path [line] (dots1) -> (e1);
+    \path [line] (e1) -> (app);
+    \path[line] (app) -> (dots2);
+    \path[line] (dots2) -> (e2);
+    \path[line] (e2) -> (e3);
+    \path[line] (e3) -> (aw);
+        \path[line] (aw) -> (ex);
+
+
 
 \end{tikzpicture}\end{adjustbox}}
 \hspace*{\fill}
 \end{figure}
-\subsection{Function definitions}
 
-\clearpage
-\begin{comment}
-
-\todo{rewrite}
-Control flow graphs defines how a program might be executed. The elementary blocks of the program is represented by nodes in the graph and the possible execution flows is represented by edges. To keep track of calculations across different nodes the temporary storage is utilized. Program variables are denoted with $v_j \in Var$, expressions with $E$, statements with $S$, and a block of statements is denoted with $B$. 
+For function calls, $e = fn\texttt{(}T_1,\cdots, T_n\texttt{)}$, the result variable is a temporary variable, $c_{tar}:\text{Temps}$, the arguments are either an expression, $T_i : \syn{expr}$ and $c_i : \text{Temps}$, or an reference expression, $T_i : \syn{rexpr}$ and $c_i : \text{HeapTemps}$, depending on the signature of $fn$. If the argument is pass-by-reference i.e. the variable, $v_i$ is denoted with a \texttt{\&} in the signature, then the expression must be a reference expression, if not, then the argument is an expression. This follows from the program being a valid P0 program. The function graph will be as figure \ref{fig:flowcall}, where the start node, exit node, and function body are the unique nodes of the $fn$ function i.e. they are not copied. This ensures that the graph is finite, but forces the notion of valid successors. Multiple, say $n$, calls to the same function will yield a graph with $n$ edges to the start node and from the exit node, thus indicating that the flow may jump to an arbitrary exit. This is naturally not the case and a successor, $w$, to a node, $v$, is thereby only valid iff. $v$ is an exit node and $w$ is the return node corresponding to the call node of the current function-call, or if $v$ is not an exit node. Notice the dashed line going directly from the call node to the return node. This indicates that the call node may pass information directly to the return node, typically information regarding the local context before calling $fn$.
 
 
-\subsection{Assignment}
-PHP supports two types of assignments, a regular value-assignment and a reference-assignment using the \texttt{\&} operator. 
-Each assignment can be split up in three categories, variable-, array-write-, and array-append-assignments, depending on the target (left side of the operation). Examples of these six operations can be seen in program \ref{lst:assignments}.
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{\label{fig:flowcall}}{\begin{adjustbox}{max size={.3\textwidth}{.40\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e1) {$T_1(c_1)$};
+    \node [dots, below of=e1] (dots) {$\vdots$};
+    \node [subtree, below of=dots] (em) {$T_n(c_n)$};
+    \node [node, below of=em] [label={-90:$call_{fn}(c_1,\cdots,c_n)$}] (call) {};
+    \node [node, right of=call, label={$start$}] (entry) {};
+    \node [subtree, below of=entry] (sl) {$B$};
+    \node [node, below of=sl, label={-90:$exit(t)$}] (exit) {};
+    \node [node, left of=exit, label={$result_{call_{fn}}(c_{tar})$}] (result) {};
+    \node [exit, below of=result] (ex) {};
+
+    % Draw edges
+    \path [line] (en) -> (e1);
+    \path [line] (e1) -> (dots);
+    \path [line] (dots) -> (em);
+    \path [line] (em) -> (call);
+    \path [line] (call) -> (entry);
+    \path [line] (entry) -> (sl);
+    \path [line] (sl) -> (exit);
+    \path [line] (exit) -> (result);
+    \path [line] (result) -> (ex);
+    \draw [dashed, ->] (call) -- (-2, -8) |- (result);
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
+
+Finally the expression can be an assignment. There are two types of assignments, a regular value-assignment and a reference-assignment, using the \texttt{\&} operator. Each assignment can be split up in three categories, variable-, array-write-, and array-append-assignments, depending on the target (left side of the operation). Examples of these six operations can be seen in program \ref{lst:assignments}. Due the distinction between temporary storage of values and heap-location-sets, these six cases must be handled individually. For value array write ($e = R\texttt{[$E_{key}$]=} E_{val}$), array append ($e = R\texttt{[]=} E_{val}$), and variable write ($e = \texttt{\$v=} E_{val}$), the graphs are as \ref{fig:flowawrite}, \ref{fig:flowaappend}, and \ref{fig:vwrite} respectively, where $T$ is the subgraph of the value expression $E_{val} : \syn{expr}$ and $c_{val} : \text{Temps}$ is the temporary variable holding the result. The reference assignments,  $e = R\texttt{[$e_{key}$]=\&} R_{val}$, $e = r\texttt{[]=\&} R_{val}$, and $e = \texttt{\$v=\&} R_{val}$, are similar, but with $T$ being the subgraph of the reference expression, $R_{val} : \syn{rexpr}$ and $c_{val} : \text{HeapTemp}$ the heap temporary variable holding the heap locations of the value.
+\begin{figure}
+\ContinuedFloat
+\hspace*{\fill}
+\subcaptionbox{\label{fig:flowawrite}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (ve) {$R(h_{var})$};
+    \node [subtree, below of=ve] (e1) {$E(t_{key})$};
+    \node [subtree, below of=e1] (e2) {$T(c_{val})$};
+    \node [node, below of=e2, label={0:$array_w(h_{var}, t_{key},c_{val},t_{tar})$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ve);
+    \path [line] (ve) -> (e1);
+    \path [line] (e1) -> (e2);
+    \path [line] (e2) -> (rd);
+    \path [line] (rd) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\label{fig:flowaappend}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (ve) {$R(h_{var})$};
+    \node [subtree, below of=ve] (e1) {$T(c_{val})$};
+    \node [node, below of=e1, label={0:$array_a(h_{var}, c_{val},t_{tar})$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ve);
+    \path [line] (ve) -> (e1);
+    \path [line] (e1) -> (rd);
+    \path [line] (rd) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\label{fig:flowaappend2}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (ve) {$R(h_{var})$};
+    \node [node, below of=ve, label={0:$array_a(h_{var},h_{tar})$}] (rd) {};
+    \node [exit, below of=rd] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (ve);
+    \path [line] (ve) -> (rd);
+    \path [line] (rd) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}}\hfill%
+\subcaptionbox{\label{fig:vwrite}}{\begin{adjustbox}{max size={.24\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [entry] (en) {};
+    \node [subtree, below of=en] (e2) {$T(c_{val})$};
+    \node [node, below of=e2, label={0:$var_w(\texttt{\$$$v},c_{val},t_{tar})$}] (ass) {};
+    \node [exit, below of=ass] (ex) {};
+    
+    % Draw edges
+    \path [line] (en) -> (e2);
+    \path [line] (e2) -> (ass);
+    \path [line] (ass) -> (ex);
+\end{tikzpicture}\end{adjustbox}}
+\hspace*{\fill}
+\end{figure}
 \begin{program}
 \begin{lstlisting}
 <?php
@@ -266,6 +371,20 @@ $d[1] = &$a; //Array write reference assignment
 \caption{Assignments}
 \label{lst:assignments}
 \end{program}
+
+\subsection{Reference and variable expressions}
+In order to resolve the variable being modified reference- and variable-expressions are introduced. The only difference between the two is that reference expressions may contain function references. For $r = fn \texttt{(}c_1, \cdots, c_n\texttt{)}$ the graphs corresponds to figure \ref{fig:flowcall}, with heap-locations as result, i.e. $c_{tar} : \text{HeapTemps}$. For the variable read, $r = \texttt{\$v}$, the graphs is a single $var_r(\texttt{\$v}, h_{tar})$ node. When the expression is an array-read, $r= R_{ar}[E_{key}]$, the graph corresponds to that of \ref{fig:flowaread} with $c_{ar},c_{tar} : \text{HeapTemps}$ and $T$ being the graph of $R_{ar}$. Finally for the append operation, $r = R_{ar}[]$, the graphs corresponds that of figure \ref{fig:flowaappend2}.
+
+\begin{comment}
+
+\todo{rewrite}
+Control flow graphs defines how a program might be executed. The elementary blocks of the program is represented by nodes in the graph and the possible execution flows is represented by edges. To keep track of calculations across different nodes the temporary storage is utilized. Program variables are denoted with $v_j \in Var$, expressions with $E$, statements with $S$, and a block of statements is denoted with $B$. 
+
+
+\subsection{Assignment}
+PHP supports two types of assignments, a regular value-assignment and a reference-assignment using the \texttt{\&} operator. 
+Each assignment can be split up in three categories, variable-, array-write-, and array-append-assignments, depending on the target (left side of the operation). Examples of these six operations can be seen in program \ref{lst:assignments}.
+
 \subsection{Function calls}
 
 
