@@ -1,4 +1,5 @@
 \section{Transfer functions}
+\label{sec:transferf}
 \newcommand{\letin}[1]{\texttt{let } #1 \texttt{in }}
 \newcommand{\ifelse}[3]{\texttt{if }#1\texttt{ then } #2 \texttt{ else } #3}
 \newcommand{\match}[1]{\texttt{match }#1}
@@ -61,7 +62,7 @@ With a separate {\bf Locals} and {\bf Globals} scope, the current scope, wrt. a 
 
 For $n = var_w(v,t_{val},t_{tar})$ the transfer function is defined as
 \begin{align}
-f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta = () \vee isSuperGlobal(v)}{\notag\\
+f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta = \Lambda \vee isSuperGlobal(v)}{\notag\\
                                             &\quad\letin{(g,h) = writeVar_{n,\delta}(v, s_g, s_h, s_t(t_{val}))}\notag\\
                                             &\quad (s_l,g,h,s_t[t_{tar}\mapsto s_t(t_{val})], s_{ht})\notag\\
                                             &}{\notag\\
@@ -70,7 +71,7 @@ f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta = () \vee isSuperGlo
 \end{align}
 and for $n = var_w(v,h_{val},t_{tar})$ the transfer function is defined as
 \begin{align}
-f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta = () \vee isSuperGlobal(v)}{\notag\\
+f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta = \Lambda \vee isSuperGlobal(v)}{\notag\\
                                             &\quad (s_l,s_g[v\mapsto s_{ht}(h_{val})],s_h,s_t[t_{tar}\mapsto s_h(s_{ht}(h_{val}))], s_{ht})\notag\\
                                             &}{\notag\\
                                             &\quad (s_l[v\mapsto s_{ht}(h_{val})],s_g,s_h,s_t[t_{tar}\mapsto s_h(s_{ht}(h_{val}))], s_{ht})}
@@ -80,7 +81,7 @@ In the latter case the variable is always strongly updated. This is sound becaus
 Besides resolving the scope, as above, reading a variable is quite straight forward. In order to be sound however, the transfer function does need to take uninitialized variables into account. When reading an uninitialized variable in PHP, the default value is \texttt{NULL}, therefor if reading to a temporary variable, the results should be $\text{Value}(\text{Null}(\top))$ if a variable, in the current scope, is not pointing to any locations. Else the result should be the joined value of the heap locations. For $n = var_r(v,t_{tar})$ the transfer function is defined as
 \begin{align}
 f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\letin{s = \notag\\
-                                            &\quad\ifelse{\delta = () \vee isSuperGlobal(v)}{s_g}{s_l}\notag\\
+                                            &\quad\ifelse{\delta = \Lambda \vee isSuperGlobal(v)}{s_g}{s_l}\notag\\
                                             &}\notag\\
                                             &\letin{v = \notag\\
                                             &\quad\ifelse{s(v) = \emptyset}{\text{Value}(\text{Null}(\top))}{s_h(s(v))}\notag\\
@@ -93,7 +94,7 @@ initializeVariable_{n, \delta}(v,s) = \ifelse{s(v) = \emptyset}{s[v\mapsto \{\te
 \end{align}
 For $n = var_r(v,h_{tar})$ the transfer function becomes
 \begin{align}
-f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta= () \vee isSuperGlobal(v)}{\notag\\
+f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta= \Lambda \vee isSuperGlobal(v)}{\notag\\
                                             &\quad\letin{ s_g' = initializeVariable_{n,\delta}(v,s_g)}\notag\\
                                             &\quad (s_l, s_g', s_h, s_t, s_{ht}[h_{tar}\mapsto s_g'(v)]\notag\\
                                             &}{\notag\\
@@ -330,7 +331,7 @@ f_{n,\delta}((s_l, s_g, s_h, s_t,s_{ht})) = (s_l, s_g, s_h, s_t[t_{tar} \mapsto 
 and finally for $n = global(v_0, v_1, \cdots, v_{n-1});$ which creates variables in the local scope, sharing the locations of the corresponding variable in the global scope. If the current scope is empty, them no modifications are made to the input lattice. The transfer function is defined as
 \begin{align}
 f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) =     &\match{\delta}\notag\\
-                                                &\quad\with{()}(s_l,s_g,s_h,s_t, s_{ht})\notag\\
+                                                &\quad\with{\Lambda}(s_l,s_g,s_h,s_t, s_{ht})\notag\\
                                                 &\quad\with{\_}(s_l[\forall 0\leq i \leq n. v_i\mapsto s_g(v_i)],s_g,s_h,s_t, s_{ht})
 \end{align}
 All other transfer functions are the identity function: $f_{n,\delta}(l) = l$.

@@ -6,7 +6,9 @@
 \tikzstyle{entry} = [draw=none,fill=none]
 \tikzstyle{exit} = [draw=none,fill=none]
 \tikzstyle{dots} = [draw=none,fill=none]
-Given a P0 program, $p : \syn{program}$, parsed to a abstract syntax tree, the control flow graph can be constructed recursively where every graph has an entry and an exit node. Most of the nodes takes arguments. Here $h$ denotes variables of type {\bf HeapTemps}, $t$ variables of type {\bf Temps}, and $c$ variables of either type. Subgraphs are denoted by a grey rectangles with letters $E$, $R$, $V$, and $T$ which denotes subgraphs of expressions, reference expressions, variable expression, or either respectively. 
+\newcommand{\subt}[1]{\llbracket #1\rrbracket}
+
+Given a P0 program, $p : \syn{program}$, parsed to a abstract syntax tree, the control flow graph can be constructed recursively where every graph has an entry and an exit node. Most of the nodes takes arguments. Here $h$ denotes variables of type HeapTemps, $t$ variables of type Temps, and $c$ variables of either type. Subgraphs are denoted by a grey rectangles with letters $\subt{E}$, $\subt{R}$, $\subt{V}$, and $\subt{T}$ which denotes subgraphs of expressions, reference expressions, variable expression, or either respectively. 
 
 The control-flow graph created from $p$ starts with a $start$ node followed by the control-flow graphs for each statement in $p$, connected edges from exit to entry nodes, in the order of appearance. 
 
@@ -39,8 +41,8 @@ Let $s : \syn{statement}$ be a statement, then there are nine different graphs, 
     % Place nodes
     
     \node [entry] (en) {};
-    \node [subtree, below of=en] (e1) {$E_1(\_)$};
-    \node [subtree, below of=e1] (e2) {$E_2(t)$};
+    \node [subtree, below of=en] (e1) {$\subt{E_1}(\_)$};
+    \node [subtree, below of=e1] (e2) {$\subt{E_2}(t)$};
     \node [node, below of=e2, label={135:$if(t)$}] (if) {};
     \node [subtree, below left of=if] (s) {$S$};
     \node [subtree, below right of=if] (e3) {$E_3(\_)$};
@@ -263,8 +265,15 @@ For a variable read, $e = \texttt{\$v}$ for some variable \texttt{\$v}, or a con
 \hspace*{\fill}
 \end{figure}
 
-For function calls, $e = fn\texttt{(}T_1,\cdots, T_n\texttt{)}$, the result variable is a temporary variable, $c_{tar}:\text{Temps}$, the arguments are either an expression, $T_i : \syn{expr}$ and $c_i : \text{Temps}$, or an reference expression, $T_i : \syn{rexpr}$ and $c_i : \text{HeapTemps}$, depending on the signature of $fn$. If the argument is pass-by-reference i.e. the variable, $v_i$ is denoted with a \texttt{\&} in the signature, then the expression must be a reference expression, if not, then the argument is an expression. This follows from the program being a valid P0 program. The function graph will be as figure \ref{fig:flowcall}, where the start node, exit node, and function body are the unique nodes of the $fn$ function i.e. they are not copied. This ensures that the graph is finite, but forces the notion of valid successors. Multiple, say $n$, calls to the same function will yield a graph with $n$ edges to the start node and from the exit node, thus indicating that the flow may jump to an arbitrary exit. This is naturally not the case and a successor, $w$, to a node, $v$, is thereby only valid iff. $v$ is an exit node and $w$ is the return node corresponding to the call node of the current function-call, or if $v$ is not an exit node. Notice the dashed line going directly from the call node to the return node. This indicates that the call node may pass information directly to the return node, typically information regarding the local context before calling $fn$.
-
+For function calls, $e = fn\texttt{(}T_1,\cdots, T_n\texttt{)}$, the result variable is a temporary variable, $c_{tar}:\text{Temps}$, the arguments are either an expression, $T_i : \syn{expr}$ and $c_i : \text{Temps}$, or an reference expression, $T_i : \syn{rexpr}$ and $c_i : \text{HeapTemps}$, depending on the signature of $fn$. If the argument is pass-by-reference i.e. the variable, $v_i$ is denoted with a \texttt{\&} in the signature, then the expression must be a reference expression, if not, then the argument is an expression. This follows from the program being a valid P0 program. The function graph will be as figure \ref{fig:flowcall}, where the start node, exit node, and function body are the unique nodes of the $fn$ function i.e. they are not copied. This ensures that the graph is finite, but forces the introduction of the notion \emph{valid successors}. Multiple, say $n$, calls to the same function will yield a graph with $n$ edges to the start node and from the exit node, thus indicating that the flow may jump to an arbitrary exit. This is naturally not the case and a successor, $w$, to a node, $v$, is thereby only valid iff. $v$ is an exit node and $w$ is the return node corresponding to the call node of the current function-call, or if $v$ is not an exit node (See def. \ref{def:validsuc}). Notice the dashed line going directly from the call node to the return node. This indicates that the call node may pass information directly to the return node, typically information regarding the local context before calling $fn$.
+\begin{definition}
+\label{def:validsuc}
+The predicate $\mathit{validSuccessor} : (\mathcal{N}\times \Delta) \times (\mathcal{N} \times \Delta)$, is defined as
+\begin{align}
+\mathit{validSuccessor}(n, \delta, n', \delta') \Leftrightarrow &(n = \mathit{exit}(\_) \wedge n' = \mathit{result}_c(\_) \wedge \delta  = (\delta' c)) \notag\\
+&\quad\vee n \neq \mathit{exit}(\_)
+\end{align}
+\end{definition}
 
 \begin{figure}
 

@@ -4,8 +4,58 @@
 %\todo{Write about initial lattice (Super globals + hloc)}
 %\todo{All Variables should map to NULL initially}
 %\todo{How is the lattice compared properly with an infinite domain of variables set to NULL}
-In order to perform a dataflow analysis on a P0 program, the monotone framework is used. By defining a control flow graph, $G = (V, E, s,t)$, a lattice, $L$, a set of transfer functions $F_N : L \rightarrow L$, a initial lattice $i : L$, the empty lattice $\epsilon : L$, and a predecessor function, $pred : N \rightarrow N^*$
+In order to perform a data flow analysis on a P0 program, the embellished monotone framework is used \todo{ref}. Given a control flow graph, $G = (V,E,s,t)$, an instance of the monotone framework, $(L, \mathcal{F}, F, E', \iota, f)$, with data flow equations, $A :  \mathcal{N} \times \Delta \rightarrow L$, 
+\begin{align}
+	A_\bullet ((n, \delta)) = \begin{cases} 
+		f_{(n, \delta)}(A_\circ((\delta, c)), A_\circ((n, \delta))) &\text{if $n=\mathit{return}_c(\_)$}\\
+		f_{(n, \delta)}(A_\circ(l))& \text{else}
+		\end{cases}
+\end{align}
+\begin{align}
+	A_\circ (l) = \bigsqcup \{A_\bullet(l') | (l', l) \in F\} \sqcup i_E^l
+\end{align}
+can be derived. Here $L = \text{AnalysisLattice}$, $\mathcal{F}$ is the set of transfer functions in in the analysis, closed under composition, $f$ is defined throughout section \ref{sec:transferf}, $F : (\mathcal{N} \times \Delta) \times (\mathcal{N} \times \Delta)$ is defined as 
+\begin{align}
+F = &\{((n, \delta), (n', \delta')) | (n,n') \in E \wedge\delta \in \Delta \notag\\
+&\quad \wedge \mathit{validSuccessor}(n, n')\notag\\
+&\quad \wedge  \delta' = \mathit{nextC}( n, \delta)\}
+\end{align} 
+where 
+\begin{align}
+\mathit{nextC}(n,\delta) = 
+	\begin{cases}
+		\delta' & \text{if $n = \mathit{exit(\_)}$ and $\delta = (\delta', c)$}\\
+		(\delta, n) &\text{if }n=\mathit{call}(\_)\\
+		\delta &\text{else} 
+	\end{cases}
+\end{align} and $\mathit{validSuccessor}$ is as defined in definition \ref{def:validsuc}. 
 
-The initial array has all variables set to $Value(Null(\top))$ and contain super globals.
+The set of external nodes is $E' = \{s\}$, the initial lattice element is the element where the empty context, $\Lambda$, maps to the state, $s_\iota = (\bot, g_\iota, h_\iota, \bot, \bot)$. Here the global scope, $g_\iota$ models the super-globals as
+\begin{align*}
+g_\iota = 	[&\texttt{\$GLOBALS}\mapsto \{\text{HLoc}(\Lambda, s, 0)\},\notag\\
+			 &\texttt{\$\_SERVER}\mapsto \{\text{HLoc}(\Lambda, s, 1)\},\notag\\
+			 &\texttt{\$\_SESSION}\mapsto \{\text{HLoc}(\Lambda, s, 2)\},\notag\\
+			 &\texttt{\$\_ENV}\mapsto \{\text{HLoc}(\Lambda, s, 3)\},\notag\\
+			 &\texttt{\$\_COOKIE}\mapsto \{\text{HLoc}(\Lambda, s, 4)\},\notag\\
+			 &\texttt{\$\_POST}\mapsto \{\text{HLoc}(\Lambda, s, 5)\},\notag\\
+			 &\texttt{\$\_GET}\mapsto \{\text{HLoc}(\Lambda, s, 6)\},\notag\\
+			 &\texttt{\$\_REQUEST}\mapsto \{\text{HLoc}(\Lambda, s, 7)\}, \notag\\
+			 &\texttt{\$\_FILES}\mapsto \{\text{HLoc}(\Lambda, s, 8)\}]
+\end{align*} 
+and the heap, $h_\iota$ is
+\begin{align*}
+h_\iota = [	&\text{HLoc}(\Lambda, s, i\in[0,2])\mapsto \text{Value}(\text{Array}(\top)),\notag\\
+			&\text{HLoc}(\Lambda, s, 3)\mapsto \text{Value}(\text{ArrayMap}([\text{Index}(\top)\mapsto\text{HLoc}(\Lambda, s, 9)])),\notag\\
+			&\text{HLoc}(\Lambda, s, 4)\mapsto \text{Value}(\text{ArrayMap}([\text{Index}(\top)\mapsto\text{HLoc}(\Lambda, s, 10)])),\notag\\
+			&\text{HLoc}(\Lambda, s, 5)\mapsto \text{Value}(\text{ArrayMap}([\text{Index}(\top)\mapsto\text{HLoc}(\Lambda, s, 11)])),\notag\\			
+			&\text{HLoc}(\Lambda, s, 6)\mapsto \text{Value}(\text{ArrayMap}([\text{Index}(\top)\mapsto\text{HLoc}(\Lambda, s, 12)])),\notag\\			
+			&\text{HLoc}(\Lambda, s, 7)\mapsto \text{Value}(\text{ArrayMap}([\text{Index}(\top)\mapsto\text{HLoc}(\Lambda, s, 13)])),\notag\\			
+			&\text{HLoc}(\Lambda, s, 8)\mapsto \text{Value}(\text{ArrayMap}([\text{Index}(\top)\mapsto\text{HLoc}(\Lambda, s, 14)])),\notag\\			
+			&\text{HLoc}(\Lambda, s, i \in [9, 10])\mapsto \text{Value}(\text{String}(\top)),\notag\\
+			&\text{HLoc}(\Lambda, s, i\in[11,13])\mapsto \text{Value}(\text{Array}(\top),\text{String}(\top)),\notag\\
+			&\text{HLoc}(\Lambda, s, 14)\mapsto \text{Value}(\text{ArrayMap}([\text{Index}(\top)\mapsto\text{HLoc}(\Lambda, s, 15)])),\notag\\			
+			&\text{HLoc}(\Lambda, s, 15)\mapsto \text{Value}(\text{Number}(\top),\text{String}(\top)),\notag\\
+			&\_ \mapsto \text{Value}(\text{Null}(\top))]
+\end{align*}
+the last entry maps all other locations to the null value. 
 
-\todo{check signatures and formal}
