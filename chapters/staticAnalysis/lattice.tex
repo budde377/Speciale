@@ -30,7 +30,7 @@ The {\bf Temps} and {\bf HeapTemps} are for storing intermediate results. Since 
 \end{align}
 The necessity for the latter lattice follows from the fact that reference assignments may be nested, which requires intermediate results shared between nodes in the control-flow graph. The sets of temporary variables, {\bf TVar} and {\bf THVar}, are both finite, following from the control-flow-graph being finite.
 
-The heap locations are allocation site abstractions wrt. context, node, and a natural number. Adding the natural number as a factor makes the set of allocation sites possibly infinite, in practise however the set is finite. 
+The heap locations are allocation site abstractions wrt. context, node, and a natural number. The natural number allows the creation of multiple location per node, which is necessary in e.g. $\mathit{call}$-nodes. Adding the natural number as a factor makes the set of allocation sites possibly infinite, in practise however the set is finite. 
 \begin{align}
 \text{HLoc}  = \Delta \times \mathcal{N} \times \mathbb{N}
 \end{align}
