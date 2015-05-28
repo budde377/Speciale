@@ -1,0 +1,19 @@
+\section{Maps and lists}
+This study concerns a constructed case to illustrate how the analysis work with the two array-types, lists and maps. What the program does is define an array of month names and use a loop to create an array with these month names as keys and the corresponding month number as value as seen in listing \ref{lst:monthsNoError}. The first array is considered a list by the analysis whereas the second array is considered a map from strings to numbers. The last two lines of the program uses the map to look up the number of a month name provided by the user (from the superglobal \texttt{\$\_GET}). Since the definition of lists in the analysis does not take indices into account the analysis lose precision for the map in this example. The analysis can only tell it is a map from strings to unsigned integers and nothing more precise.
+
+\begin{program}
+\begin{lstlisting}
+$monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+$monthMap = [];
+
+for($i = 1; $i <= 12; $i++) {
+	$monthMap[array_pop($monthNames)] = $i;
+}
+
+$input = $_GET["monthName"];
+
+echo $input . " is month number " . $monthMap[$input];
+\end{lstlisting}
+\caption{Turning a month list into a ``month name to month number''-map}
+\label{lst:monthsNoError}
+\end{program}
