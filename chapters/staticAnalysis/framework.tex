@@ -12,7 +12,11 @@ In order to perform a data flow analysis on a P0 program, the embellished monoto
 		\end{cases}
 \end{align}
 \begin{align}
-	A_\circ (l) = \bigsqcup \{A_\bullet(l') | (l', l) \in F\} \sqcup i_E^l
+	A_\circ (l) = \bigsqcup \{A_\bullet(l') | (l', l) \in F\} \sqcup \iota_{E'}^l
+\end{align}
+where 
+\begin{align}
+\iota_{E'}^l = \begin{cases} \iota & \text{if }l\in E' \\  \bot &\text{else} \end{cases}
 \end{align}
 can be derived. Here $L = \text{AnalysisLattice}$, $\mathcal{F}$ is the set of transfer functions in in the analysis, closed under composition, $f$ is defined throughout section \ref{sec:transferf}, $F : (\mathcal{N} \times \Delta) \times (\mathcal{N} \times \Delta)$ is defined as 
 \begin{align}

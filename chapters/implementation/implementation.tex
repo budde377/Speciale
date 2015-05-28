@@ -1,6 +1,41 @@
 \section{Worklist algorithm}
-The widely popular Intellij IDEA by Jetbrain's rely heavily on plug-ins and facilitate generation of the AST.
- 
+In order to solve the data-flow equation of the monotone framework, the above lattice, control-flow-graph, and transfer functions has been implemented in approximately $8100$ lines of Java code, as a plug-in in the Intellij IDEA (Ultimate edition) development environment, by JetBrains\todo{ref}. This IDE supports multiple languages, such as Java, Python, C, C++, C\#, Ruby, and PHP, with tools for re-factoring, type-checking, a vast library of plug-ins, developed by JetBrains or the JetBrains community, etc. 
+
+When running a plug-in on a given program, an AST and type-information is available from the environment, expressed as \texttt{PSIElements} (Program-Structure-Interface elements).  The control-flow graph is created from a single pass parsing of these elements and each node is keeping a reference to the element, from which they were created. This allows for easy error reporting, when performing the analysis. 
+
+The lattices are defined by interfaces and the elements are implemented as immutable data structures of these interfaces. In the name of efficiency the domain of map-lattice elements (\texttt{MapLatticeElement}) are defined as the indices of modified entries, not including the values defaulted to Value(Null($\top$)) in the initial array. Comparing two map elements is then done by comparing the values corresponding to the joint domain of the elements, which in turn allows comparisons to be done in finite time. This \emph{short-cut} does also entail that when updating the entry of a $\top$-array, only the variables initialized are effected, which is sound and yields a more precise model.
+
+The transfer functions are implemented notoriously as introduced in section \ref{sec:transferf}, with added statements for reporting of suspicious behaviour, to the IDE through \texttt{Annotation}'s. Reporting does not effect the outcome of the analysis and is made possible by the references to the \texttt{PSIElements} in the nodes of the control-flow-graph. The analysis reports the following
+\begin{itemize}
+\item When ???
+\item \todo{List errors}
+\end{itemize}
+
+Solving the data-flow equations are performed by an implementation of the worklist algorithm. 
+\begin{algorithm}
+\caption{Worklist algorithm}
+\label{algo:worklist}
+\begin{algorithmic}[1]
+\scriptsize
+\Require Control flow graph, $G=(V,E,s,t)$
+\State{$I = [\forall \delta\in\Delta, n\in\mathcal{N}. ( n, \delta)\mapsto \bot]$}
+\State{$I[(s, \Lambda)\mapsto \iota]$}
+\State{$W = [f \in F | f = ((s, \Lambda),\_)]$}
+\While{$W \neq \emptyset$}
+	
+	\State{$(l_1, l_2) = W.\mathit{takeFirst}()$}
+	\If{$ f_{l_1}(l_1) \not\sqsubseteq I[l_2] $}
+		
+		\State{$I[l_2 \mapsto f_{l_1}(l_1)]$}		
+		\State{$W.\mathit{append}([f \in F | f = (l_2,\_)])$}
+		
+	\EndIf
+	
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\todo{Library functions}
 \todo{write about the implementation}
 
 \todo{look and feel}
