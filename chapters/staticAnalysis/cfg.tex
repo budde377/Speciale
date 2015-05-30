@@ -1,5 +1,6 @@
 \section{Control flow graph}
-\tikzstyle{subtree} = [rectangle, draw, fill=gray!20, text width=4em, text badly centered, minimum height=3em]
+\label{sec:cfg}
+\tikzstyle{subtree} = [rectangle, draw, fill=gray!20,  minimum width=4em, text badly centered, minimum height=3em]
 \tikzstyle{node} = [draw, circle, minimum height=2em]
 \tikzstyle{emptynode} = [draw, circle]
 \tikzstyle{line} = [draw, -latex']
@@ -8,10 +9,10 @@
 \tikzstyle{dots} = [draw=none,fill=none]
 \newcommand{\subt}[1]{\llbracket #1\rrbracket}
 
-Given a P0 program, $p : \syn{program}$, parsed to a abstract syntax tree, the control flow graph can be constructed recursively. Most of the nodes takes arguments. Here $h$ denotes variables of type HeapTemps, $t$ variables of type Temps, and $c$ variables of either type. Subgraphs are denoted by a grey rectangles with letters $\subt{S}$, $\subt{E}(t)$, $\subt{R}(h)$, $\subt{V}(h)$, and $\subt{T}(c)$ which denotes subgraph of statement $S$, expression $E$ with the resulting value stored in variable $t$, reference expression $R$ with resulting heap-location-set stored in $h$, variable expression $V$ with resulting heap-location-set stored in $h$, or either expression with the result stored in $c$ respectively. For a given argument, $c$, to the subgraph, the variable corresponds to the target variable, $c_{tar}$, in the subgraph. E.g. let  $E = \texttt{1+(2+3)}$ then the graph of $\subt{E}(t)$ is graph \ref{graph:exexpr}. Notice how the argument, $t$, passed to the graph is the third argument of the last $\mathit{bop}_+(\_)$ node
+Given a P0 program, $p : \syn{program}$, parsed to a abstract syntax tree, the control flow graph can be constructed recursively. Most of the nodes takes arguments. Here $h$ denotes variables of type HeapTemps, $t$ variables of type Temps, and $c$ variables of either type. Subgraphs are denoted by a grey rectangles with letters $\subt{S}$, $\subt{E}(t)$, $\subt{R}(h)$, $\subt{V}(h)$, and $\subt{T}(c)$ which denotes subgraph of statement $S$, expression $E$ with the resulting value stored in variable $t$, reference expression $R$ with resulting heap-location-set stored in $h$, variable expression $V$ with resulting heap-location-set stored in $h$, or either expression with the result stored in $c$ respectively. For a given argument, $c$, to the subgraph, the variable corresponds to the target variable, $c_{tar}$, in the subgraph. E.g. let  $E = \texttt{1+(2+3)}$ then the graph of $\subt{E}(t)$ is recursively constructed as in graph \ref{graph:exexpr}. Notice how the argument, $t$, passed to the graph is the third argument of the last $\mathit{bop}_+(\_)$ node.
 \begin{definition}
 \label{def:cfg}
-A control-flow-graph $G = (V,E, s, t)$ where $V$ is a set of nodes, $E$ is a set of node pairs representing an edge between two nodes, $s\in V$ is a start node and $t\in V$ is an exit node. When illustrated as a graph, the entry node is marked with an ingoing edge with no origin and the exit node is marked with an outgoing edge with no target. E.g. in example graph \ref{graph:exexpr}, $s = \mathit{const}_r(1, t_1)$ and $t = \mathit{bop}_+(t_1, t_4, t)$.
+A control-flow-graph $G = (V,E, s, t)$ where $V$ is a set of nodes, $E$ is a set of node pairs representing an edge between two nodes, $s\in V$ is a start node and $t\in V$ is an exit node. When illustrated as a graph, the entry node is marked with an ingoing edge with no origin and the exit node is marked with an outgoing edge with no target. E.g. in example graph \ref{graph:exexpr}, $s = \mathit{const}_r(1, t_1)$ and $t = \mathit{bop}_+(t_1, t_2, t)$.
 \end{definition}
 
 There are seventeen different nodes, all introduced below
@@ -31,14 +32,39 @@ There are seventeen different nodes, all introduced below
 
 \begin{graph}
 \centering
-\begin{adjustbox}{max size={1\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\begin{adjustbox}{max size={1\textwidth}{.25\textheight}, margin = 10pt}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+	\node [entry] (en) {};
+ 	\node [subtree, right of =en] (t1){\scriptsize $\subt{\texttt{1+(2+3)}}(t)$};
+	\node [exit, right of=t1] (ex) {};
+    % Draw edges
+    \path[line] (en) -> (t1);
+    \path[line] (t1) ->(ex);
+
+\end{tikzpicture}\end{adjustbox}
+
+\begin{adjustbox}{max size={1\textwidth}{.25\textheight}, margin = 10pt}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
 	\node [entry] (en) {};
  	\node [node, right of=en, label={270:$\mathit{const_r}(\texttt{1},t_1)$}] (c1) {};
- 	\node [node, right of=c1, label={90:$\mathit{const_r}(\texttt{2},t_2)$}] (c2) {};
- 	\node [node, right of=c2, label={270:$\mathit{const_r}(\texttt{3},t_3)$}] (c3) {};
- 	\node [node, right of=c3, label={90:$\mathit{bop}_+(t_2,t_3, t_4)$}] (bop1) {};
- 	\node [node, right of=bop1, label={270:$\mathit{bop}_+(t_1,t_4, t)$}] (bop2) {};
+ 	\node [subtree, right of =c1] (t1){$\subt{\texttt{2+3}}(t_2)$};
+ 	\node [node, right of=t1, label={270:$\mathit{bop}_+(t_1,t_2, t)$}] (bop1) {};
+	\node [exit, right of=bop1] (ex) {};
+    % Draw edges
+    \path[line] (en) -> (c1);
+    \path[line] (c1) -> (t1);
+    \path[line] (t1) -> (bop1);
+     \path[line] (bop1) -> (ex);
+
+\end{tikzpicture}\end{adjustbox}
+\begin{adjustbox}{max size={1\textwidth}{.25\textheight}, margin = 10pt}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+	\node [entry] (en) {};
+ 	\node [node, right of=en, label={270:$\mathit{const_r}(\texttt{1},t_1)$}] (c1) {};
+ 	\node [node, right of=c1, label={90:$\mathit{const_r}(\texttt{2},t_3)$}] (c2) {};
+ 	\node [node, right of=c2, label={270:$\mathit{const_r}(\texttt{3},t_4)$}] (c3) {};
+ 	\node [node, right of=c3, label={90:$\mathit{bop}_+(t_3,t_4, t_2)$}] (bop1) {};
+ 	\node [node, right of=bop1, label={270:$\mathit{bop}_+(t_1,t_2, t)$}] (bop2) {};
 	\node [exit, right of=bop2] (ex) {};
     % Draw edges
     \path[line] (en) -> (c1);
@@ -49,7 +75,8 @@ There are seventeen different nodes, all introduced below
     \path[line] (bop2) -> (ex);
 
 \end{tikzpicture}\end{adjustbox}
-\caption{Example graph $\subt{\texttt{1+(2+3)}}(t)$}
+
+\caption{Recursively constructing graph $\subt{\texttt{1+(2+3)}}(t)$}
 \label{graph:exexpr}
 \end{graph}
 
@@ -144,7 +171,7 @@ Let $s : \syn{statement}$ be a statement, then there are nine different graphs, 
 \end{graph}
 
 %For $s =$ \texttt{global $v_1,\cdots, v_n$} the graph is containing a single, $global$, node which takes the variable names $v_1,\cdots v_n$ as argument. 
-Return-statements, $s =$ \texttt{return $T$} have three different graphs. If the return statement is empty, i.e. does not contain an expression, then this is equivalent of returning \texttt{null}, this case yields the graph in \ref{graph:floweret}. If $T : \syn{rexpr}$. If the function is a reference function, i.e. the function signature has an ampersand before the function name (see program \ref{lst:retref}), then the references is returned (graph \ref{graph:flowret} where $c : \text{HeapTemps}$). If this is not the case, (see program \ref{lst:retnoref}), assuming the program is a valid P0 program, then it is fair to assume that $T$ can be parsed as an expression, since it cannot be an array-append operation. If it was an array append operation, then the program wouldn't be a valid PHP program and thus not a valid P0 program (see section \ref{sec:langsubset}). Assuming that the $T : \syn{expr}$ the graphs for a return statement should evaluate $T$ and return the result, this is the case in graph \ref{graph:flowret} with $c : \text{Temps}$.  For all graphs, the exit-node is the unique exit-node of the function.
+Return-statements, $s =$ \texttt{return $T$} have three different graphs. If the return statement is empty, i.e. does not contain an expression, then this is equivalent of returning \texttt{null}, this case yields the graph in \ref{graph:floweret}. If $T : \syn{rexpr}$ and the function is a reference function, i.e. the function signature has an ampersand before the function name (see program \ref{lst:retref}), then the references is returned (graph \ref{graph:flowret} where $c : \text{HeapTemps}$). If this is not the case, (see program \ref{lst:retnoref}), assuming the program is a valid P0 program, then it is fair to assume that $T$ can be parsed as an expression, since it cannot be an array-append operation. If it was an array append operation, then the program wouldn't be a valid PHP program and thus not a valid P0 program (see section \ref{sec:langsubset}). Assuming that the $T : \syn{expr}$ the graphs for a return statement should evaluate $T$ and return the result, this is the case in graph \ref{graph:flowret} with $c : \text{Temps}$.  For all graphs, the exit-node is the unique exit-node of the function.
 
 \begin{program}
  \begin{subfigure}[b]{.45\linewidth}
@@ -442,114 +469,74 @@ $d[1] = &$a; //Array write reference assignment
 \end{program}
 
 \subsection{Reference and variable expressions}
-In order to resolve the variable being modified reference- and variable-expressions are introduced. The only difference between the two is that reference expressions may contain function references. For $r = \mathit{fn} \texttt{(}c_1, \cdots, c_n\texttt{)}$ the graphs corresponds to graph \ref{graph:flowcall}, with heap-locations as result, i.e. $c_{tar} : \text{HeapTemps}$. For the variable read, $r = \texttt{\$v}$, the graphs is a single $\mathit{var}_r(\texttt{\$v}, h_{tar})$ node. When the expression is an array-read, $r= R_{ar}[E_{key}]$, the graph corresponds to that of \ref{graph:flowaread} with $c_{ar},c_{tar} : \text{HeapTemps}$ and $T$ being the graph of $R_{ar}$. Finally for the append operation, $r = R_{ar}[]$, the graphs corresponds that of graph \ref{graph:flowaappend2}.
+Since PHP supports nested assignments e.g. \texttt{\$a[]['foo']  = \&func()[]}, deciding which location to update is performed recursively. The graph of this assignment is illustrated as graph \ref{graph:exassign}. Here the locations of variable \texttt{\$a} is stored in variable $h_{var'}$. Then a new location, $l$, is appended to the array values of the locations in $h_{var'}$, and $h_{var} = \{l\}$. Now the expression of the index is resolved and stored in $t_{key}$, and the locations of the right side is resolved in $h_{val}$. Finally the locations in $h_{val}$ are written to the array at $h_{var}$, i.e. $l$, with the key of $t_{key}$. 
 
-\begin{comment}
+\begin{graph}
+\centering
+\begin{adjustbox}{max size={.33\textwidth}{.33\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+	\node [entry] (en) {};
+	\node [subtree, below of =en](t1) {	 $\subt{\texttt{\$$$a[]}}(h_{var})$};
+	\node [subtree, below of =t1](t2) {$\subt{\texttt{'foo'}}(t_{key})$};
+	\node [subtree, below of =t2](t3) { $\subt{\texttt{func()[]}}(h_{val})$};
+	\node [node, below of =t3, label={-45:$array_w(h_{var}, t_{key}, h_{val}, t)$}] (ass) {};
+	\node [exit, below of=ass] (ex) {};
+    % Draw edges
+    \path [line] (en) -> (t1);
+    \path [line] (t1) -> (t2);
+    \path [line] (t2) -> (t3);
+    \path [line] (t3) -> (ass);
+    \path [line] (ass) -> (ex);
 
-\todo{rewrite}
-Control flow graphs defines how a program might be executed. The elementary blocks of the program is represented by nodes in the graph and the possible execution flows is represented by edges. To keep track of calculations across different nodes the temporary storage is utilized. Program variables are denoted with $v_j \in Var$, expressions with $E$, statements with $S$, and a block of statements is denoted with $B$. 
+\end{tikzpicture}\end{adjustbox}
+\begin{adjustbox}{max size={.33\textwidth}{.33\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+	\node [entry] (en) {};
+	\node [subtree, below of =en](t1) {	 $\subt{\texttt{\$$$a}}(h_{var'})$};
+	\node [node, below of = t1, label={-45:$array_a(h_{var'}, h_{var})$}] (aa) {};
+	\node [node, below of = aa, label={-45:$const_r(\texttt{'foo'}, t_{key})$}] (cr) {};		
+	\node [subtree, below of =cr](t3) { $\subt{\texttt{func()}}(h_{val'})$};
+	\node [node, below of = t3, label={-45:$array_a(h_{val'}, h_{val})$}] (aa2) {};
+	\node [node, below of =aa2, label={-45:$array_w(h_{var}, t_{key}, h_{val}, t)$}] (ass) {};
+	\node [exit, below of=ass] (ex) {};
+    % Draw edges
+    \path [line] (en) -> (t1);
+    \path [line] (t1) -> (aa);
+    \path [line] (aa) -> (cr);
+    \path [line] (cr) -> (t3);
+    \path [line] (t3) -> (aa2);
+    \path [line] (aa2) -> (ass);
+    \path [line] (ass) -> (ex);
 
+\end{tikzpicture}\end{adjustbox}
+\begin{adjustbox}{max size={.33\textwidth}{.33\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+	\node [entry] (en) {};
+	\node [node, below of =en, label = {-45: $var_r(\texttt{\$$$a}, h_{var'})$}](t1) {};
+	\node [node, below of = t1, label={-45:$array_a(h_{var'}, h_{var})$}] (aa) {};
+	\node [node, below of = aa, label={-45:$const_r(\texttt{'foo'}, t_{key})$}] (cr) {};		
+	\node [node, below of =cr, label={-45:$call_{\texttt{func}}()$}](call) {};
+	\node [node, below of =call, label={-45:$result_{call_{\texttt{func}}()}(h_{val'})$}](t3) {};
+	\node [entry, right of =call] (fn) {};
+	\node [node, below of = t3, label={-45:$array_a(h_{val'}, h_{val})$}] (aa2) {};
+	\node [entry, right of =t3] (fex) {};
+	\node [node, below of =aa2, label={-45:$array_w(h_{var}, t_{key}, h_{val}, t)$}] (ass) {};
+	\node [exit, below of=ass] (ex) {};
+    % Draw edges
+    \path [line] (en) -> (t1);
+    \path [line] (t1) -> (aa);
+    \path [line] (aa) -> (cr);
+    \path [line] (cr) -> (call);
+    \path [line] (call) -> (fn);
+    \draw [dashed, ->] (call) -- (t3);
+    \path [line] (t3) -> (aa2);
+    \path [line] (fex) -> (t3);
+    \path [line] (aa2) -> (ass);
+    \path [line] (ass) -> (ex);
 
-\subsection{Assignment}
-PHP supports two types of assignments, a regular value-assignment and a reference-assignment using the \texttt{\&} operator. 
-Each assignment can be split up in three categories, variable-, array-write-, and array-append-assignments, depending on the target (left side of the operation). Examples of these six operations can be seen in program \ref{lst:assignments}.
+\end{tikzpicture}\end{adjustbox}
+\caption{Creating graph of expression $\subt{\texttt{\$a[]['foo']  = \&func()[]}}(t)$}
+\label{graph:exassign}
+\end{graph}
 
-\subsection{Function calls}
-
-
-
-\begin{description}
-\item[$\subt{E}(t)$] represent an expression $E$ with the result of its evaluation, stored in temporary variable $t$
-\item[$\subt{Ve}(L)$] ?
-\item[$\subt{Re}(L)$] ?
-\item[$Ae(L)$] ?
-\item[$\mathit{start}$] ?
-\item[$nop$] ?
-\item[$\mathit{if}(t)$] handle a condition stored in temporary variable $t$
-\item[$\mathit{bop}_{\oplus}(t_l,t_r,t_{tar})$] a binary operation, $\oplus$, on $t_l$ and $t_r$ with the result stored in $t_{tar}$
-\item[$\mathit{uop}_{\circ}(t_{val},t_{tar})$] an unary operation, $\circ$ on $t_{val}$ storing the result in $t_{tar}$
-\item[$\mathit{inc}_{\circ}(h_{val},t_{tar})$] an $\circ$ (increment or decrement) operation. For pre- the values at locations in $L$ are in/decremented and the value stored in t, for post- the values at locations in $L$ are stored in t and the in/decremented
-\item[$\mathit{sop}_{\oplus}(t_l,t_r,t_{tar})$] a binary operation, $\oplus$ on $t_l$ and $t_r$ which may only evaluate the first expression if the result is known without evaluating the second expression. The result is stored in $t_{tar}$
-\item[$call_{\mathit{fn}}(L_1,\dots,t_n)$] a function call with parameters $t_1$ through $t_n$, this node have corresponding \emph{exit} and \emph{result} nodes that handle passing information to functions and passing the result back 
-\item[$\mathit{exit}(L_1, \cdots, t_n)$] ?
-\item[$result(t_{val})$] ? 
-\item[$result(h_{val})$] ? 
-\item[$\mathit{const}_r(c, t_{tar})$] ? 
-\item[$\mathit{array}_i(t_{tar})$] initialize an array in the temporary variable $t_{tar}$
-\item[$\mathit{array}_a(t_{val},t_{ar})$] append the value of $t_{val}$ to the array in $t_{ar}$
-\item[$\mathit{array}_a(h_{var}, t_{val},t_{tar})$] ?
-\item[$\mathit{array}_a(h_{var}, h_{val},t_{tar})$] ?
-\item[$\mathit{array}_a(h_{var}, h_{tar})$] ?
-\item[$\mathit{array}_w(t_{key},t_{val},t_{ar})$] write the value of $t_{val}$ to the index stored in $t_{key}$ in the array stored in $t_{ar}$
-\item[$\mathit{array}_w(h_{var}, t_{key},t_{val},t_{tar})$] ? 
-\item[$\mathit{array}_w(h_{var}, t_{key},h_{val},t_{tar})$] ? 
-\item[$\mathit{array}_r(t_{ar},t_{key},t_{tar})$] read the index stored in $t_{key}$ from the array stored in $t_{ar}$ and store the result in $t_{tar}$
-\item[$\mathit{array}_r(h_{var},t_{key},h_{tar})$] ? 
-\item[$\mathit{var}_w(v,t_{val},t_{tar})$] write the value of variable $t_{val}$ to $v$ and store it at stack variable $t_{tar}$.
-\item[$\mathit{var}_w(v,h_{val},t_{tar})$] ? 
-\item[$\mathit{var}_r(v,t_{tar})$] read the variable $v$ into the temporary variable $t_{tar}$
-\item[$\mathit{var}_r(v,h_{tar})$] ? 
-\item[$global(v_1, v_2, \cdots, v_n)$] create new alias variables $v_1$, ..., $v_n$ in the local scope for each global counterpart.
-\end{description}
-
-\todo{Add missing signatures}
-\todo{Examples and mention interesting cases.}
-\todo{If its statically certain that the if expression is true or false, then the flow is limited}
-% Define block styles
-\todo{Write about $Re$}
- \todo{change to new nodes}
-
-The below description uses the following shorthands for parts of the grammar:
-
-\begin{verbatim}
-<function>: F
-<function-name>: f
-<statement>: S
-<block>: B
-<expr>: E
-<var-list>: VL
-<var>: V
-<statement-list>: SL
-<expr-list>: EL
-<empty-array-init>: EAI
-<array-init>: AI
-<array-init-entry>: AIE
-<array-init-list>: AIL
-<const>: C
-<var-array-write>: VAW
-<var-array-read>: VAR
-array-read: E[E1]...[En]
-\end{verbatim}
-
-\begin{align*}
-blocks(F) &= \{\texttt{function} f^{l_n}, end^{l_x} \} \cup blocks(B) \\
-blocks(S SL) &= blocks(S) \cup blocks(SL) \\
-blocks(\texttt{while} (E) S) &= blocks(E) \cup blocks(S) \\
-blocks(\texttt{foreach} ( E ... ) S) &= blocks(E) \cup blocks(S) \\
-blocks(\texttt{if} (E) B) &= blocks(E) \cup blocks(B) \\
-blocks(\texttt{if} (E) S_1 else S_2) &= blocks(E) \cup blocks(S_1) \cup blocks(S_2) \\
-blocks(;) &= \emptyset \\
-blocks(E;) &= blocks(E) \\
-blocks(\texttt{global VL;}) &= \{\texttt{global VL;}^l\} \\
-blocks(B) &= blocks(SL) \\
-blocks(E_1 \oplus E_2) &= \{E_1 \oplus E_2^l\} \cup blocks(E_1^{l_1}) \cup blocks(E_2^{l_2}) \\
-blocks(!E)  &= \{ !E^l \} \cup blocks(E) \\
-blocks((E)) &= \{ (E)^l \} \cup blocks(E) \\
-blocks(\texttt{V++}) &= \{\texttt{V++}^l \} \\
-blocks(\texttt{V-\,-}) &= \{\texttt{V-\,-}^l \} \\
-blocks(f()) &= \{f()^{l_c,l_r} \} \\
-blocks(f(EL) &= \{f(EL)^{l_c,l_r} \} \\
-blocks(EAI) &= \{EAI^l \} \\
-blocks(AI(AIL)) &= \{AI^l \} \cup blocks(AIL) \\
-blocks(AIE AIL) &= blocks(AIE) \cup blocks(AIL) \\
-blocks(E_1 => E_2) &= \{ E_1 => E_2^l \} \cup blocks(E_1) \cup blocks(E_2) \\
-blocks(VAR) &= \{ VAR^l \} \cup blocks(E) \cup blocks(E_1) ... \cup blocks(E_n) \\
-blocks(C) &= \{ C^l \} \\
-blocks(VAW = E) &= \{ VAW = E^l \} \cup blocks(E) \\
-blocks(VAW = \&VAR) &= \{ VAW = \&VAR^l \} \cup blocks(VAR) \\
-blocks(V) &= \{ V^l \} 
-\end{align*}
-
-With the elementary blocks defined it is then possible to define flow between the blocks. The flow for the operation-expression is dependent on the type of the operator. Operators are divided into short-circuit operators (SCO) and non-short-circuit operators (nSCO). 
-\todo{describe flow}
-\end{comment}
+The subtrees which takes a $h : \text{HeapTemp}$ variable are called reference- and variable-expressions. Where the only difference between the two is that reference expressions may contain function references. As seen in the previous example they resolve heap-locations rather than values. For $r = \mathit{fn} \texttt{(}c_1, \cdots, c_n\texttt{)}$ the graphs corresponds to graph \ref{graph:flowcall}, with heap-locations as result, i.e. $c_{tar} : \text{HeapTemps}$. For the variable read, $r = \texttt{\$v}$, the graphs is a single $\mathit{var}_r(\texttt{\$v}, h_{tar})$ node. When the expression is an array-read, $r= R_{ar}[E_{key}]$, the graph corresponds to that of \ref{graph:flowaread} with $c_{ar},c_{tar} : \text{HeapTemps}$ and $T$ being the graph of $R_{ar}$. Finally for the append operation, $r = R_{ar}[]$, the graphs corresponds that of graph \ref{graph:flowaappend2}.

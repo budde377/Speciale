@@ -1,4 +1,5 @@
 \section{Worklist algorithm}
+\label{sec:worklist}
 In order to solve the data-flow equation of the monotone framework, the above lattice, control-flow-graph, and transfer functions has been implemented in approximately $8100$ lines of Java code, as a plug-in in the Intellij IDEA (Ultimate edition) development environment, by JetBrains\todo{ref}. This IDE supports multiple languages, such as Java, Python, C, C++, C\#, Ruby, and PHP, with tools for re-factoring, type-checking, a vast library of plug-ins, developed by JetBrains or the JetBrains community, etc. 
 
 When running a plug-in on a given program, an AST and type-information is available from the environment, expressed as \texttt{PSIElements} (Program-Structure-Interface elements).  The control-flow graph is created from a single pass parsing of these elements and each node is keeping a reference to the element, from which they were created. This allows for easy error reporting, when performing the analysis. 
@@ -7,11 +8,17 @@ The lattices are defined by interfaces and the elements are implemented as immut
 
 The transfer functions are implemented notoriously as introduced in section \ref{sec:transferf}, with added statements for reporting of suspicious behaviour, to the IDE through \texttt{Annotation}'s. Reporting does not effect the outcome of the analysis and is made possible by the references to the \texttt{PSIElements} in the nodes of the control-flow-graph. The analysis reports the following
 \begin{itemize}
-\item When ???
-\item \todo{List errors}
+\item Appending on definite map yields error
+\item Merging a list with a map and visa versa yields error
+\item Definite string write on list yields error
+\item Adding new type to array yields warning
+\item Writing to possible non-array yields warning
+\item Appending on possible map yields warning
+\item Possible string write on list yields warning
 \end{itemize}
+\todo{Write better list}
+Solving the data-flow equations are performed by an implementation of the worklist algorithm (Algorithm \ref{algo:worklist}). Notice, that since $\iota \not\sqsubseteq \bot$, any reachable node is bound to be analysed at least once. 
 
-Solving the data-flow equations are performed by an implementation of the worklist algorithm. 
 \begin{algorithm}
 \caption{Worklist algorithm}
 \label{algo:worklist}
@@ -35,9 +42,31 @@ Solving the data-flow equations are performed by an implementation of the workli
 \end{algorithmic}
 \end{algorithm}
 
-\todo{Library functions}
-\todo{write about the implementation}
+Until now it has been assumed that any function called should be implemented in the same program. PHP however comes with a large number of internal functions, which are essential any program. In order to support these, a \texttt{LibraryFunction} interface has been created. Implementing a class of this interface, and registering it in the \texttt{PSIParser}, allows modelling of a function by expressing the signature, whether arguments and return values are passed by reference or value, and specifying a transfer function for the result node. Let $\mathit{lib}$ be the name of a library function, then the transfer function of the $\mathit{call}_\mathit{lib}(\_)$ node becomes the identity function, the flow graph is the graph containing a $\mathit{start}$ node followed by an $\mathit{exit}$ node, and the transfer function of the $\mathit{result}_{\mathit{call}_{\mathit{lib}(\_)}}$ is the specified transfer function. 
 
-\todo{look and feel}
+For the library function $fn = $\texttt{array\_merge} \todo{ref: http://php.net/manual/en/function.array-merge.php} the arguments and return value are all passed by value. The transfer function for the result node, $n = \mathit{result}_{c}(c_{\mathit{tar}})$, where $c = \mathit{call}_{{fn}}(t_1,\cdots, t_n)$, is defined as 
+\begin{align*}
+f_{n,\delta_{\mathit{call}},\delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\mathit{exit}}) = 	&\letin{(s_l, s_g, s_h, s_t, s_{ht}) = l_{\mathit{call}}[\delta_{\mathit{call}}]}\notag\\
+																							&\letin{V =  \{v_i| v_i = s_t[t_i]\wedge i \in [1;n]\}}\notag\\
+																							&\letin{(v_a,v_s, v_n, v_b, v_u) = \bigsqcup V}\notag\\
+																							&\letin{w =  \notag\\
+																							&\quad\ifelse{\bot \in V \vee v_s \neq \bot \vee v_n \neq \bot\notag\\
+																							&\quad\quad \vee v_b \neq \bot \vee v_u \neq \bot}{\notag\\
+																							&\quad\quad\text{Value}(\text{Null}(\top))}{\bot}\notag\\
+																							&}\notag\\
+																							&\letin{v = w \sqcup \text{Value}(v_a)}\notag\\
+																							&\letin{(s_t', s_{ht}',s_h') = \match{c_{tar}}\notag\\
+																							&\quad\with{\text{Temp}} (s_t[c_{tar}\mapsto v], s_{ht}, s_h)\notag\\
+																							&\quad\with{\text{HeapTemp}}\notag\\
+																							&\quad\quad(s_t, \notag\\
+																							&\quad\quad\quad s_{ht}[c_{tar}\mapsto \text{HLoc}(\delta_{\mathit{call}}, n, 0)], \notag\\
+																							&\quad\quad\quad s_h[\text{HLoc}(\delta_{\mathit{call}}, n, 0)\mapsto v])\notag\\
+																							&}\notag\\
+																							&l_{\mathit{call}}[\delta_{\mathit{call}}\mapsto (s_l, s_g, s_h', s_t', s_{ht}')]
+\end{align*} 
+This basically just joins the arrays of each input value, taking invalid arguments yielding \texttt{null} into account. The joined value is then stored in the heap or temporary storage, depending on the result argument.
 
-\todo{Short cuts?}
+
+
+
+

@@ -1,4 +1,5 @@
 \section{The Monotone Framework}
+\label{sec:framework}
 %\todo{global arrays GET, POST and COOKIE are initialized as maps with map or string values. Depth 1 is implemented, but arbitrary depth could be implemented easily. SESSION is a top array since anything can be stored in it and will be automatically serialized/unserialized between requests. FILES is a map of maps, each inner map providing data about the corresponding uploaded file}
 %\todo{describe the monotone framework and how the informal CFG + transfer functions apply}
 %\todo{Write about initial lattice (Super globals + hloc)}
@@ -7,7 +8,7 @@
 In order to perform a data flow analysis on a P0 program, the embellished monotone framework is used \todo{ref}. Given a control flow graph, $G = (V,E,s,t)$, an instance of the monotone framework, $(L, \mathcal{F}, F, E', \iota, f)$, with data flow equations, $A :  \mathcal{N} \times \Delta \rightarrow L$, 
 \begin{align}
 	A_\bullet ((n, \delta)) = \begin{cases} 
-		f_{(n, \delta)}(A_\circ((\delta, c)), A_\circ((n, \delta))) &\text{if $n=\mathit{return}_c(\_)$}\\
+		f_{(n, \delta, (\delta, c))}(A_\circ((\delta, c)), A_\circ((n, \delta))) &\text{if $n=\mathit{return}_c(\_)$}\\
 		f_{(n, \delta)}(A_\circ(l))& \text{else}
 		\end{cases}
 \end{align}

@@ -1,5 +1,6 @@
 
 \section{Lattice}
+\label{sec:lattice}
 %\todo{The keys of PHP arrays can be strings and/or integers. If given an integer string (e.g. "1") the key will be coerced to an integer key. Strings containing an integer as well as other characters well be kept as a string key as opposed to the string to integer coercing with math operators. Taking this fact into consideration it is interesting to support differentiating of Strings and IntegerStrings in our lattice.}
 In order to create a inter-procedural analysis, the analysis lattice is defined as
 \begin{align}
@@ -40,7 +41,7 @@ An abstract value is defined a product lattice with five factors defined by the 
 \begin{align}
 \text{Value} = \text{Array} & \times \text{String} \times \text{Number} \times \text{Boolean}  \times \text{Null}
 \end{align}
-Following the results of the dynamic analysis in \label{ch:study}, the array is considered either a set of locations or a map from indices to sets of types. I.e. lists or maps. The sum-lattice has been chosen as opposed to a product-lattice, following the study in chapter \ref{ch:study}, which indicates that arrays seldom changes from lists to maps or vice versa. Top array elements is then a predictor for suspicious behavior. Furthermore the array lattice has an element for the empty array which can become either a list or a map.  
+Following the results of the dynamic analysis in \ref{ch:study}, the array is considered either a set of locations or a map from indices to sets of types. I.e. lists or maps. The sum-lattice has been chosen as opposed to a product-lattice, because the dynamic analysis indicated that arrays seldom changes from lists to maps or vice versa. Top array elements is then a predictor for suspicious behavior. Furthermore the array lattice has an element for the empty array which can become either a list or a map.  
 \begin{align}
 \text{ArrayList}= \mathcal{P}( L )
 \end{align}

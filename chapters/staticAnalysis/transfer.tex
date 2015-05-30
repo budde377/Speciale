@@ -287,11 +287,11 @@ The transfer functions for function call, $\mathit{call}$ and $\mathit{result}$ 
 \end{align}
 where the $\mathit{addCallNode} : \Delta \times \text{CallNode} \rightarrow \Delta$ is deciding the target context from the current, the $\mathit{args} : \text{FunctionNames} \rightarrow (\text{Var} \times \mathbb{N})^*$ function, given a function name, returns a list of arguments expressed as pairs of variable names and positions, and $\mathit{startNode} : \text{FunctionNames} \rightarrow \text{StartNode}$, given a function name, returns the unique $\mathit{start}$ node of that function. The heap locations created are associated with the start node, rather than the call node, because of efficiency. 
 
-After running a function it is the task of the transfer function of the result node, to restore the old execution context.  For $n = \mathit{result}_{\mathit{call}_{fn}}(\_)$ the transfer functions are defined as functions from two lattices to a single lattice: $f_{n,\delta_{call},\delta_{exit}}: \text{AnalysisLattice} \times \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$ where the first lattice is the lattice passed to the transfer function of the call node, ${\mathit{call}_{fn}}$ and $\delta_{call}$ is the original context. Depending on the argument of the $\mathit{result}$ node the transfer function is defined as either
+After running a function it is the task of the transfer function of the result node, to restore the old execution context.  For $n = \mathit{result}_{\mathit{call}_{fn}}(\_)$ the transfer functions are defined as functions from two lattices to a single lattice: $f_{n,\delta_{\mathit{call}},\delta_{\mathit{exit}}}: \text{AnalysisLattice} \times \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$ where the first lattice is the lattice passed to the transfer function of the call node, ${\mathit{call}_{fn}}$ and $\delta_{\mathit{call}}$ is the original context. Depending on the argument of the $\mathit{result}$ node the transfer function is defined as either
 \begin{align}
-f_{n,\delta_{call}, \delta_{exit}}(l_{call}, l_{exit})=   &\letin{\mathit{exit}(c_1, \cdots, c_n) = \mathit{exitNode}(fn)}\notag\\
-                                                &\letin{(s_l, \_, \_, s_t, s_{ht}) = l_{call}(\delta_{call})}\notag\\
-                                                &\letin{(\_, s_g, s_h, s_t', s_{ht}') = l_{exit}(\delta_{exit})}\notag\\
+f_{n,\delta_{\mathit{call}}, \delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\mathit{exit}})=   &\letin{\mathit{exit}(c_1, \cdots, c_n) = \mathit{exitNode}(fn)}\notag\\
+                                                &\letin{(s_l, \_, \_, s_t, s_{ht}) = l_{\mathit{call}}(\delta_{\mathit{call}})}\notag\\
+                                                &\letin{(\_, s_g, s_h, s_t', s_{ht}') = l_{\mathit{exit}}(\delta_{\mathit{exit}})}\notag\\
                                                 &\letin{v = \notag\\
                                                 &\quad \bigsqcup_{0<i \leq n} \match{c_i}\notag\\
                                                 &\quad\quad\quad\quad \with{TVar} s_t(c_i)\notag\\
@@ -301,18 +301,18 @@ f_{n,\delta_{call}, \delta_{exit}}(l_{call}, l_{exit})=   &\letin{\mathit{exit}(
 \end{align}
 for $n = \mathit{result}_{\mathit{call}_{fn}}(t_{val})$ or for $n = \mathit{result}_{\mathit{call}_{fn}}(h_{val})$ as 
 \begin{align}
-f_{n,\delta_{call}, \delta_{exit}}(l_{call}, l_{exit})=   &\letin{\mathit{exit}(c_1, \cdots, c_n) = \mathit{exitNode}(fn)}\notag\\
-                                                &\letin{(s_l, \_, \_, s_t, s_{ht}) = l_{call}(\delta_{call})}\notag\\
-                                                &\letin{(\_, s_g, s_h, s_t', s_{ht}') = l_{exit}(\delta_{exit})}\notag\\
+f_{n,\delta_{\mathit{call}}, \delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\mathit{exit}})=   &\letin{\mathit{exit}(c_1, \cdots, c_n) = \mathit{exitNode}(fn)}\notag\\
+                                                &\letin{(s_l, \_, \_, s_t, s_{ht}) = l_{\mathit{call}}(\delta_{\mathit{call}})}\notag\\
+                                                &\letin{(\_, s_g, s_h, s_t', s_{ht}') = l_{\mathit{exit}}(\delta_{\mathit{exit}})}\notag\\
                                                 &\letin{L = \notag\\
                                                 &\quad \bigcup_{0<i \leq n} \match{c_i}\notag\\
-                                                &\quad\quad\quad\quad \with{TVar} \{\text{HLoc}(n,\delta_{call}, i)\}\notag\\
+                                                &\quad\quad\quad\quad \with{TVar} \{\text{HLoc}(n,\delta_{\mathit{call}}, i)\}\notag\\
                                                 &\quad\quad\quad\quad \with{THVar} s_{ht}(c_i)\notag\\
                                                 &}\notag\\
-                                                &\letin{s_h' = s_h[\forall 0 < i \leq n. \text{HLoc}(n,\delta_{call}, i) \mapsto\notag\\
+                                                &\letin{s_h' = s_h[\forall 0 < i \leq n. \text{HLoc}(n,\delta_{\mathit{call}}, i) \mapsto\notag\\
                                                 &\quad\match{c_i}\notag\\
                                                 &\quad\quad \with{TVar} s_t(c_i)\notag\\
-                                                &\quad\quad \with{THVar} s_h(\text{HLoc}(n,\delta_{call}, i))]\notag\\
+                                                &\quad\quad \with{THVar} s_h(\text{HLoc}(n,\delta_{\mathit{call}}, i))]\notag\\
                                                 &}\notag\\
                                                 &(s_l,s_g,s_h', s_t, s_{ht}[h_{val}\mapsto L])
 \end{align}
@@ -329,6 +329,7 @@ f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) =     &\match{\delta}\notag\\
                                                 &\quad\with{\_}(s_l[\forall 0\leq i \leq n. v_i\mapsto s_g(v_i)],s_g,s_h,s_t, s_{ht})
 \end{align}
 All other transfer functions are the identity function: $f_{n,\delta}(l) = l$.
+
 \begin{comment}
 The node for the global keyword copies the locations of the given variable name from the global scope to the same name in the local scope. This behavior corresponds to make an alias assignment from global variable to the local variable of the same name.
 
@@ -355,9 +356,9 @@ Since our lattice does not keep indices for list type arrays any read from a lis
 Array indices can be either strings or integers and as such reside in either the Number or String part of our lattice. A value that can be either string or integer coerced to a single index lattice element will have to be the top element. To get more precision an index lattice element is created for each possible value.
 \end{comment}
 
-
+\begin{comment}
 \subsection{Applying transfer functions}
 For control flow nodes with a single incoming edge applying the transfer function is simple. The lattice associated with the other node of the incoming edge has the transfer function applied directly. If multiple incoming edges exist the corresponding lattices have to be combined by their least-upper-bound. The least-upper-bound can be calculated either before or after applying the transfer function. Applying the transfer function before finding the least-upper-bound requires applying the transfer function multiple times and while this increases the precision of the analysis it decreases the performance. Because of the small size of the cases contained in the case study the precision and performance impact of choosing either method will not be noticeable. The choice fell upon applying transfer functions and then finding the least-upper-bound due to implementation details.
 
 \todo{Write about how we read array entries, e.g. containment of keys and stuff}
-
+\end{comment}
