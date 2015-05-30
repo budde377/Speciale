@@ -7,7 +7,7 @@ $monthNames = ["January", "February", "March", "April", "May", "June", "July", "
 $monthMap = [];
 
 for($i = 1; $i <= 12; $i++) {
-	$monthMap[array_pop($monthNames)] = $i;
+	$monthMap[array_pop($monthNames)] = $i; %* \label{line:pop}*)
 }
 
 $input = $_GET["monthName"];
@@ -17,3 +17,9 @@ echo $input . " is month number " . $monthMap[$input];
 \caption{Turning a month list into a ``month name to month number''-map}
 \label{lst:monthsNoError}
 \end{program}
+
+The first step of the analysis is generating the control flow graph. For the array in the first line of this program a CFG node is generated for creating an empty array. Then nodes are generated for each of the 12 initial strings as well as for adding them to the array which will update the initial empty array to become a list array. Lastly the variable name ``monthNames'' will be associated with the initialized list array.
+
+The next interesting step of the analysis is line \ref{line:pop} where the analysis generates possible index values for the expression \texttt{array\_pop(\$monthNames)}. The possibility of a string index makes the analysis update the array associated with ``monthMap'' to a map array.
+
+\todo{write something about GET}
