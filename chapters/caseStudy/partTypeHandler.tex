@@ -1,0 +1,32 @@
+\section{Keeping track of instances}
+
+
+\begin{program}
+\begin{lstlisting}
+$keyArray = [];
+$valueArray = [];
+function createInstance($string, $instance, $value)
+{
+    global $keyArray,$valueArray;
+
+    if (!isset($keyArray[$string])) {
+        $keyArray[$string] = [];
+        $valueArray[$string] = [];
+    } else if(($k = array_search($instance, $keyArray, true)) !== false){
+        return $this->valueArray[$k];
+    }
+    $keyArray[] = $instance;
+    return $valueArray[] = $value;
+}
+createInstance("test", "test2", "testValue");
+\end{lstlisting}
+\caption{}
+\label{lst:typeHandler}
+\end{program}
+
+\begin{figure}
+\centering
+\includegraphics{chapters/caseStudy/typeHandlerError}
+\caption{}
+\label{fig:typeHandlerScreenshot}
+\end{figure}

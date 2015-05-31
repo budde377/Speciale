@@ -18,8 +18,8 @@ echo $input . " is month number " . $monthMap[$input];
 \label{lst:monthsNoError}
 \end{program}
 
-The first step of the analysis is generating the control flow graph. For the array in the first line of this program a CFG node is generated for creating an empty array. Then nodes are generated for each of the 12 initial strings as well as for adding them to the array which will update the initial empty array to become a list array. Lastly the variable name ``monthNames'' will be associated with the initialized list array.
+The first step of the analysis is generating the control flow graph. For the array in the first line of this program a CFG node is generated for creating an empty array. Then nodes are generated for each of the 12 initial strings as well as for adding them to the array, when the analysis encounter on of these nodes the empty array will become a list type array since they are represented as array append nodes due to no keys being specified. Lastly the variable name ``monthNames'' will be associated with the initialized list array.
 
-The next interesting step of the analysis is line \ref{line:pop} where the analysis generates possible index values for the expression \texttt{array\_pop(\$monthNames)}. The possibility of a string index makes the analysis update the array associated with ``monthMap'' to a map array.
+The next interesting step of the analysis is line \ref{line:pop} where an array write node is generated preceded by a sub tree for the expression \texttt{array\_pop(\$monthNames)}. When the analysis encounters the array write node it determines the possible index values for the expression sub tree and since string values are possible the array becomes a map array.
 
 \todo{write something about GET}

@@ -1,0 +1,41 @@
+\section{Date Validation}
+Similarly to the previous case this case also concern mixing of map and list arrays. The case is inspired by the e-commerce platform Magento where code similar to the two functions seen in \ref{lst:dateValidation} can be found. The problem can easily be spotted when placing the two functions together as done here, however the original code is separated in two different files which conceals the problem.
+
+The difference from the previous example is that the mixing occurs in a library function \texttt{array\_merge}. Each library function has transfer function which implements an abstract version of that particular function. The \texttt{array\_merge} abstract function also detects possible merges of different types of arrays and warns the user like shown in figure \ref{fig:dateScreenshot}.
+
+\begin{program}
+\begin{lstlisting}
+function isValidDate($day, $month, $year) {
+    $errors = [];
+    if(!checkdate($month, $day, $year))
+        $errors["invalidDate"] = "The given date is not valid";
+
+    return $errors;
+}
+
+function isMinimumDay($day, $month, $year, $required, $minDay) {
+    $errors = [];
+    if($required && $day == 0 && $month == 0 && $year == 0)
+        $errors[] = "The date is required";
+
+    $result = isValidDate($day, $month, $year);
+    $errors = array_merge($errors, $result);
+
+    if($minDay > $day)
+        $errors[] = "The day should at least be " . $minDay;
+
+    return $errors;
+}
+$valid = isMinimumDay(27, 5, 2015, true, 6);
+$invalid = isMinimumDay(1, 3, 1991, true, 5);
+\end{lstlisting}
+\caption{Date Validation split into different functions resulting in a mixed map/list output}
+\label{lst:dateValidation}
+\end{program}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.6]{chapters/caseStudy/dateError}
+\caption{Array merge error message}
+\label{fig:dateScreenshot}
+\end{figure}

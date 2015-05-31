@@ -1,0 +1,45 @@
+\section{Directory Content}
+Inspired by the framework CodeIgniter this example demonstrates mixing of the map and list type arrays. The function takes a directory name and a depth as input and returns the structure of the given directory recursively until the given depth is reached or no more sub directories are found. The resulting structure is a mix of a list of file names and a map from sub directory name to the structure of that sub directory. Mixing a list array and a map array like seen in listing \ref{lst:directoryMap} provides no obvious way of using the ouput of the function. If the function ever has to be refactored the users may use the resulting structure in many different ways making it difficult to refactor without breaking possible use cases.
+
+The analysis provides an error to bring attention to the possibly bad design choice as seen in figure \ref{fig:directoryScreenshot}. The mixing of array types are detected by the analysis because the append operation creates a list array and then afterwards a write is encountered with the index possibly being a string which then triggers the error.
+
+Another possible problem with this design is that directories can be named with just numbers which might then override a file already added to the list. This problem occurs because the library function \texttt{readdir} follows the order of which the file system stores the files and directories. Such an error is difficult to reproduce and therefore potentially difficult to find.
+
+\begin{program}
+\begin{lstlisting}
+function directory_map($dir, $depth)
+{
+    if ($fp = opendir($dir))
+    {
+        $filedata	= [];
+        $new_depth	= $depth - 1;
+        while (FALSE !== ($file = readdir($fp)))
+        {
+            is_dir($dir.$file) && $file .= '/';
+            if (($depth < 1 || $new_depth > 0) 
+                && is_dir($dir.$file))
+            {
+                $filedata[$file] = directory_map($dir.$file, $new_depth);
+            }
+            else
+            {
+                $filedata[] = $file;
+            }
+        }
+        closedir($fp);
+        return $filedata;
+    }
+    return FALSE;
+}
+$result = directory_map("testDir", 2);
+\end{lstlisting}
+\caption{Mixing of map and list}
+\label{lst:directoryMap}
+\end{program}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[scale=0.6]{chapters/caseStudy/directoryError}
+\caption{Error about writing to a list, thus mixing the list and map type}
+\label{fig:directoryScreenshot}
+\end{figure}
