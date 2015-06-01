@@ -196,13 +196,13 @@ In the same manner can a the act of writing to an array be generalized to the fu
                             &\quad\quad\quad \text{ArrayMap}([\top \mapsto L'])\sqcup m}{\notag\\
                             &\quad\quad\quad \text{ArrayList}(L\cup L')}\notag\\
                             & \quad \with{\text{ArrayMap}(m')} m'\sqcup m\notag\\
-                            & \quad \with{\text{emptyArray}} : \notag\\
+                            & \quad \with{\text{emptyArray}} \notag\\
                             & \quad\quad\ifelse{\exists i \in \mathit{indices}(k).i \is \text{String}(\_)}{\notag\\
                             &\quad\quad\quad m}{\text{ArrayList(L)}}\notag\\
-                            & \quad \with{\bot}  : \notag\\
+                            & \quad \with{\bot}  \notag\\
                             & \quad\quad\ifelse{\exists i \in \mathit{indices}(k).i \is \text{String}(\_)}{\notag\\
                             &\quad\quad\quad m}{\text{ArrayList(L)}}\notag\\
-                            & \quad \with{\top} : \top, v_s, v_n, v_b, v_u)
+                            & \quad \with{\top} \top, v_s, v_n, v_b, v_u)
 \end{align}
 With these functions in place, the transfer functions for the array-read and write nodes can be defined. For $n = \mathit{array}_r(t_{ar},t_{key},t_{tar})$ a value is read from an array in at temporary variable $t_{ar}$ as mentioned above. The query is always joined with $\text{Value}(\text{Null}(\top))$ since an entry might not be set. The transfer function is defined as
 \begin{align}
@@ -239,13 +239,22 @@ Writing to a set of locations is more of the same. For $n = \mathit{array}_w(h_{
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = &\letin{l' = \text{HLoc}(\delta, n, 0)} \notag\\
                             &\letin{s_t' = s_t[t_{tar}\mapsto s_t(t_{val})]}\notag\\
-                            &\letin{s_h' = s_h[\notag\\
+                            &\letin{s_h' =  s_h[\notag\\
+                            &\quad\quad\forall l \in s_h(h_{var}).\notag\\
+                            &\quad\quad\quad\forall l'' \in \mathit{readArray}(s_h(l), s_t(t_{key}), s_h).\notag\\
+                            &\quad\quad\quad\quad l''\mapsto s_h(l'') \sqcup s_t(t_{val})]}\notag\\
+                            &\letin{s_h'' = s_h'[\notag\\
                             &\quad l' \mapsto s_t(t_{val}), \notag\\
                             &\quad \forall l \in s_{ht}(h_{var}).\notag\\
-                            &\quad l\mapsto \mathit{writeArray}(s_h(l), s_t(t_{key}), \{l'\})]\notag\\
+                            &\quad l\mapsto \mathit{writeArray}(s_h'(l), s_t(t_{key}), \{l'\})]\notag\\
                             &}\notag\\
-                            &(s_l, s_g, s_h', s_t', s_{ht})
+                            &(s_l, s_g, s_h'', s_t', s_{ht})
 \end{align}
+
+\todo{Not only all locations}
+
+Notice how all locations in the heap are changed if the value is written to a $\top$ array. That is because a $\top$ array could posibly point to all heap locations, including itself. Since we are not supporting references in array initialization, this is only relevant for this case of array write. 
+
 Writing a value, as a set of locations, to an array, also as a set of locations, is done in the same manner as the previous function. Thus for  $n = \mathit{array}_w(h_{var}, t_{key},h_{val},t_{tar})$ the transfer function is defined as 
 \begin{align}
     f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = &\letin{s_t' = s_t[t_{tar}\mapsto s_t(s_h(s_{ht}(h_{val})))]}\notag\\
@@ -314,7 +323,7 @@ f_{n,\delta_{\mathit{call}}, \delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\math
                                                 &\quad\quad \with{TVar} s_t(c_i)\notag\\
                                                 &\quad\quad \with{THVar} s_h(\text{HLoc}(n,\delta_{\mathit{call}}, i))]\notag\\
                                                 &}\notag\\
-                                                &(s_l,s_g,s_h', s_t, s_{ht}[h_{val}\mapsto L])
+                                                &l_{call}[\delta_{call}\mapsto (s_l,s_g,s_h', s_t, s_{ht}[h_{val}\mapsto L])]
 \end{align}
 where the $\mathit{exitNode} : \text{FunctionName} \rightarrow \text{ExitNode}$ function, given a function name, returns the corresponding exit node. These functions will return an lattice containing all local values, temps and local scope, from the call-context and the global values, global scope and heap, from the exit-context. The possible result of the function-call is gathered from the exit-node and saved in either temporary- or heap-temporary-variables, depending on the function being pass by value or by reference respectivey. In the latter case the position of the \emph{exit-argument} is again used to decide which heap locations to save the value, if the function returns a value rather than references. Since the number of arguments  in any function definition, the number of return statements in any function body, and the number of initialized arrays in the start lattice in practice is finite, so is the number of heap-locations. 
 \subsection{Other transfer functions}
