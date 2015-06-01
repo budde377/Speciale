@@ -232,12 +232,13 @@ $\top$   & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f
 \label{tab:abstract_modulus1}
 \end{table}
 
-Comparison operations are defined directly on values since different types can be compared with each other courtesy of type translation. PHP has an ordered definition of how values are compared depending on their type which can be seen in table \ref{tab:comparisons}.
+Comparison operations are defined directly on values since different types can be compared with each other courtesy of type translation. PHP has an ordered definition of how values are compared depending on their type which can be seen in table \ref{tab:comparisons}. Any combination of operations not present in the table considered unspecified and yields a boolean $\top$ value. 
 
 For performance reasons the analysis do not try to compare all different combinations of possible types when performing abstract comparison operations. If either value have multiple possible types the result is the boolean $\top$-element. Otherwise the comparison operators follow the order of table \ref{tab:comparisons} for coercion of values and comparison of specific types are specified in the tables in appendix \ref{app:abstract_operators}.
 
 Arrays are first of all compared by size. Equal sized arrays with different keys are incomparable and otherwise the arrays are compared by their values. Since the array lattice have no notion of size it is not possible to reason about the results of array comparisons. The only possible sound result is the boolean $\top$-element.
 
+\todo{How about increment/decrement?}
 
 \begin{table}[htbp]
 \centering

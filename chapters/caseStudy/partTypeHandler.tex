@@ -1,5 +1,5 @@
 \section{Keeping track of instances}
-
+This case demonstrates the opposite of the case in section \ref{sec:directoryContent}. In lines \ref{ln:mapStart} and \ref{ln:mapEnd} the arrays associated with ``keyArray'' and ``valueArray'' are used in a map context by writing to a string index. Then in lines \ref{ln:appendStart} and \ref{ln:appendEnd} the array append operation is used with both arrays. When detecting the latter the analysis presents the user with an error as seen in figure \ref{fig:typeHandlerScreenshot} turning the attention of the user to the fact that she is about to append to an array previously used in a map context. The program incidentally functions correctly even though half the program intends to use the array associated with ``keyArray'' as a map and the other half as a list. Maintaining this code is difficult since the intention of the code is not clear and putting attention to that enables the mistake to be fixed right away.
 
 \begin{program}
 \begin{lstlisting}
@@ -9,14 +9,14 @@ function createInstance($string, $instance, $value)
 {
     global $keyArray,$valueArray;
 
-    if (!isset($keyArray[$string])) {
-        $keyArray[$string] = [];
-        $valueArray[$string] = [];
+    if (!isset($keyArray[$string])) { 
+        $keyArray[$string] = [];%*\label{ln:mapStart}*)
+        $valueArray[$string] = [];%*\label{ln:mapEnd}*)
     } else if(($k = array_search($instance, $keyArray, true)) !== false){
         return $this->valueArray[$k];
     }
-    $keyArray[] = $instance;
-    return $valueArray[] = $value;
+    $keyArray[] = $instance;%*\label{ln:appendStart}*)
+    return $valueArray[] = $value;%*\label{ln:appendEnd}*)
 }
 createInstance("test", "test2", "testValue");
 \end{lstlisting}
@@ -26,7 +26,7 @@ createInstance("test", "test2", "testValue");
 
 \begin{figure}
 \centering
-\includegraphics{chapters/caseStudy/typeHandlerError}
-\caption{}
+\includegraphics[scale=0.6]{chapters/caseStudy/typeHandlerError}
+\caption{Error message provided when using array append with a map array}
 \label{fig:typeHandlerScreenshot}
 \end{figure}
