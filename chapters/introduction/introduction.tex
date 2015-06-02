@@ -59,6 +59,8 @@ The widely used array data structure in PHP has very few restrictions making it 
 \section{Motivation}
 Our hypothesis is that arrays keep to a specific use-pattern during its lifetime. If the hypothesis holds a statical analysis can be employed to detect and thereby prevent cross-use of the patterns which in turn will lead to a more clear intention of the code and in the end higher maintainability of the program code.
 
+\todo{add a list of bad practices that hinders clear intention and lowers maintainability}
+
 \section{Structure of this thesis}
 Chapter \ref{ch:background} provides the necessary background knowledge of the PHP language to understand why arrays are difficult to apply existing methods to. In chapter \ref{ch:study} a dynamic analysis is conducted to identify use-patterns and test the hypothesis about use-patterns of arrays. Chapter \ref{ch:analysis} use patterns and knowledge gained in the previous chapter to define and implement a static analysis of PHP arrays which detects suspicious use of arrays. The static analysis implementation is evaluated in chapter \ref{ch:evaluation} and relevant related work is described in chapter \ref{ch:relatedWork}. The last two chapters \ref{ch:conclusion} and \ref{ch:futureWork} concludes our thesis and describes possible future work identified.
 

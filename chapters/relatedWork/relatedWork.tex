@@ -1,32 +1,19 @@
 \section{Dynamic features}
-In this thesis a lot of the dynamic features of PHP have not been covered. \todo{describe related work that cover dynamic features}.
+In this thesis a lot of the dynamic features of PHP have not been covered even though \citeA{featureUsage13} and \citeA{dynamicfeatures15} confirms that dynamic features are used in most PHP programs.
 
-\section{Evolution of Dynamic Feature Usage in PHP}
-Purpose: examine dynamic feature usage in WordPress and MediaWiki.
+Programs composed of multiple files using \texttt{require} and \texttt{include} are considered by \citeA{includesResolution} which provides a technique for statically resolving includes in PHP. Using first a file-centered contextless alogrithm to find possible file matches and afterwards refining the results with a context sensitive program-centered alogrithm.
 
-Method: static analysis of occurences relative to total lines of code
+WeVerca the framework developed by \citeA{weverca14} abstract away the dynamic dispatch and variable variables uses by providing the control-flow as well as the heap shape and dynamic data access directly to the user of the framework. WeVerca uses the Phalanger parser which currently supports PHP features up to PHP 5.4 with support for newer features in development. With the aim of PHP 5.6 support for the analysis in this thesis WeVerca was discarded as an option early on.
 
-Important points: Differentiating between test code, maintenance code and actual end-user visible code. E.g. test code use more dynamic features in MediaWiki.
+\section{Static Analysis}
+JavaScript is similar to PHP in many ways. The static analysis provided by this thesis is inspired by TAJS \citeA{tajs09}, a type analysis for JavaScript. \todo{talk about differences between TAJS and TAPAS}
 
-Conclusion: A decrease in eval and create\_function usage as language features are added that can replace typical use cases for those features. Increase in magic methods use and variable property use.
-\citeA{dynamicfeatures15}
+Pixy \citeA{pixy06} is a static analysis tool aimed at detecting security vulnerabilities. The tool is limited to PHP 4 which is a long out-dated version of PHP neither developed nor supported anymore.
 
-\section{Type Analysis for JavaScript}
-\todo{write summary}
-\citeA{tajs09}
+\section{PHP References}
+The concept of references in PHP complicates reasoning about PHP programs. In \citeA{copyOnWrite09} the copy-on-write practice exhibited by the official PHP interpreter in investigated and compared to the stated copy-on-assignment semantics of the PHP documentation.
 
-\section{WeVerca}
-\todo{write summary}
-Using PHP 4
-\citeA{weverca14}
-
-\section{A static analyser for finding dynamic programming errors}
-Purpose: finding pointer errors, memory leaks and resource leaks
-
-Method: Simulating paths and modelling functions with guards and constraints
-
-Important points: keeping exact values as much as possible, using predicates when exact values are unknown
-\citeA{bush00}
+References in PHP arrays are also treated by \citeA{associativeArrays14} implementing a data-flow analysis using the concept of aliases to handle references.
 
 \section{Static Approximation of Dynamically Generated Web Pages}
 \todo{write summary}
@@ -47,21 +34,6 @@ Important points: keeping exact values as much as possible, using predicates whe
 \section{Sound and Precise Analysis of Web Applications for Injection Vulnerabilities}
 \todo{write summary}
 \citeA{wassermann07}
-
-\section{Pixy: A Static Analysis Tool for Detecting Web Application Vulnerabilities}
-\todo{write summary}
-Using PHP 4
-\citeA{pixy06}
-
-\section{An Empirical Study of PHP Feature Usage}
-Purpose: which features are used in real applications
-
-Method: corpus of most popular PHP applications (framework, e-commerce, learning platform, forum software), analyse feature usage and distribution
-
-Conclusions: eval is used in real contexts
-
-Application release dates range from 2010 to 2012. The analyser code is available so it might be interesting to run the analysis on newer versions of the same applications see how results have changed.
-\citeA{featureusage13}
 
 \section{Alias Analysis for Object-Oriented Programs}
 \todo{write summary}
