@@ -1,9 +1,24 @@
-PHP is a recursive acronym meaning PHP: Hypertext Processor. As one of the first dedicated web development server-side languages it has built a huge user base over the past 20 years. A survey\citeA{w3techs} shows that 82\% of websites use PHP. Whereas PHP is used for both high traffic websites like Facebook and Wikipedia and low traffic websites, the nearest contestants tends to be used for high traffic sites. The simplicity and availability of the language allows for creating small websites with PHP even with no prior programming experience. The wide range of easy-to-use content management systems, forum application and blogging platforms also enables the use of PHP for a variety of users. All these facts makes it impossible to expect well-structured and organized use of the language and all of its possibilities.
+PHP is a recursive acronym meaning PHP: Hypertext Processor. As one of the first dedicated web development server-side languages it has built a huge user base over the past 20 years. A survey\citeA{w3techs} shows that 82\% of websites use PHP. Whereas PHP is used for both high traffic websites like Facebook and Wikipedia and low traffic websites, the nearest contestants tends to be used for high traffic sites. The simplicity and availability of the language allows for creating small websites with PHP even with no prior programming experience. %The wide range of easy-to-use content management systems, forum application and blogging platforms also enables the use of PHP for a variety of users. All these facts makes it impossible to expect well-structured and organized use of the language and all of its possibilities.
+\section{Program structure}
+With the introduction of an object model with PHP 5 in 2005 followed a trend to organize PHP programs in an object oriented manner. 
 
-\section{Arrays in PHP}
+For better organization of code, in 2009, namespaces were introduced (PHP 5.3) and the PHP Framework Interoperability Group, which aims to formulate standards on autoloading, coding style, logging, etc. was created. \todo{ref}. Utilizing these tools and standards, many modern frameworks are managing dependencies to other frameworks and libraries through package managers such as Composer \todo{ref}. This manager also handles autoloading of classes, which in practice removes the task of manually loading PHP files using the \texttt{include "file.php";} or \texttt{require "file.php";} statement. 
+
+These statements allows dynamically loading of dependencies, by taking an expression as argument, and resolving these statically has been subject for some research \todo{ref}. With autoloading and a proper program structure (as advocated by PHP-FIG) resolving dependencies statically becomes trivial.
+
+With increasing complexity of follows a need for quality assurance and testing. PHPUnit is a framework, written in PHP and available via. composer, that facilitates unit-testing. This framework is widely used and for example supports testing with databases and browser output through selenium integration. \todo{ref}. 
+
+\todo{write about hack?}
+
+
+
+\section{Language features}
+PHP is a ever-changing language, with a new syntax and language features being introduced in every version. Features such as Objects, introduced and modified throughout PHP 5 , anonymous functions, introduced in PHP 5.3, variadic functions, introduced in PHP 5.6, etc. Furthermore PHP supports a large number of alias features, i.e. features that semantically are the same, but has different syntax, e.g. array initialization can be written as \texttt{array($\cdots$)} or \texttt{[$\cdots$]}, boolean operators can be written as \texttt{\&\&}, \texttt{||} or \texttt{AND}, \texttt{OR}, array access can be denoted with brackets, \texttt{\$a['key']}, or curly-brackets \texttt{\$a\{'key'\}}, etc. In the rest of this section follows the description of some of the language features that has proven interesting when designing our analysis.
+
+\subsection{Arrays in PHP}
 The language construct which is called \texttt{array} in PHP is an ordered map. Since keys of these ordered maps can be either integer, string or a combination and values can be any combination of types it is possible to use arrays as many different collection types e.g. maps, lists, queues, stacks, trees, dictionaries and probably any other collection-like type that exists.
 
-\section{Scoping}
+\subsection{Scoping}
 \label{sec:backg_scoping}
 The scoping of PHP is rather simple; the only existing local scope is inside of function bodies. All blocks inherit their parent scope and thus the developer need not worry about at which block level a variable is first declared or used. The developer should only be aware when declaring functions. PHP offers the \texttt{global} keyword to allow access to variables defined in the global scope inside of function bodies. A few variables are always accessible inside the local function scope these are called \texttt{superglobals} and consists of \texttt{\$\_POST} and \texttt{\$\_GET} for fetching user input from HTTP POST and HTTP GET requests respectively, \texttt{\$\_SERVER} for accessing server environment information and a few others. Listing \ref{lst:superglobals} shows an example of using \texttt{superglobals}.
 \todo{Other super-globals}
@@ -29,7 +44,7 @@ echo "Hello $username"; // Result: Hello Admin
 A superglobal to be aware of is the \texttt{\$GLOBALS} array which is an array containing all global variables with the variable names as keys. This array can be used to access global variables in function scope without using the \texttt{global} keyword.
 
 
-\section{References}
+\subsection{References}
 \label{sec:backg_references}
 Many languages have a notion of pointers and provides the ability for variables to be a pointer to some value. In PHP the concept of references can easily be confused with pointers, however references are not pointers. Variables names and their content is treated as different things in PHP meaning that variables names are in fact just names for a specific content. Making a reference in PHP corresponds to giving the same content another name. Assigning a variable that is already a reference as a reference of another variable will remove the binding to the original content and bind the variable to the new content. The PHP concept of references also mean that it is not possible to change a reference by a reference as shown in listing \ref{lst:reference-reference}.
 
