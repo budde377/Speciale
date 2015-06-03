@@ -1,10 +1,10 @@
-The possibilities of the PHP array data structure allows for many different kinds of use ranging from lists over maps to trees and tables. The purpose of the dynamic analysis in this chapter is to detect patterns of array-usage in order to be able to identify a few more restrictive data types contained within the way PHP arrays are used. The results of the analysis are used to choose suitable abstraction for the static analysis in chapter \ref{ch:analysis}. The first section of this chapter describes basic definitions used in the dynamic analysis to detect patterns. With the definitions in place a hypothesis for the analysis is formed in section \ref{sec:dynhypothesis} followed by a discussion of implementation details in section \ref{sec:studyImplementation}. Section \ref{sec:analysisResults} presents the results of the dynamic analysis and section \ref{sec:studyConclusion} draws the conclusion of the analysis.
+The PHP array data structure allows for many different kinds of use ranging from lists over maps to trees and tables. The purpose of the dynamic analysis in this chapter is to detect patterns of array-usage in order to be able to identify some more restrictive data types contained within the way PHP arrays are used. The results of the analysis are used to choose a suitable abstraction for the static analysis in chapter \ref{ch:analysis}. The first section of this chapter describes basic definitions used in the dynamic analysis to detect patterns. With the definitions in place a hypothesis for the analysis is formed in section \ref{sec:dynhypothesis} followed by a discussion of implementation details in section \ref{sec:studyImplementation}. Section \ref{sec:analysisResults} presents the results of the dynamic analysis and section \ref{sec:studyConclusion} draws the conclusion of the analysis.
 
 \begin{definition}
 Let $a$ be an array containing values of the same type, where all integer keys from 0 to $count(a)-1$ exists. Then $a$ can be considered an array of type list.
 \end{definition}
 
-An example of an array used as a list can be seen as figure \ref{lst:list_array}, where an element is appended to the list and shifted off the beginning of the list. The values of the \texttt{\$numbers} array all share the same type, integers, and the keys, though never directly manipulated, are, at initialization, from 0 to 2. The following operations all preserve the type consensus of the values and the type of the keys. 
+An example of an array used as a list can be seen in program \ref{lst:list_array}, where an element is appended to the list and shifted off the beginning of the list. The values of the \texttt{\$numbers} array all share the same type (integers) and the keys, though never directly manipulated, range at initialization from 0 to 2. The following operations all preserve the type consensus of the values and the type of the keys. 
 
 \begin{program}[ht]
 \begin{lstlisting}
@@ -16,7 +16,7 @@ $first = array_shift($numbers); // $numbers = [2,3,4]
 \label{lst:list_array}
 \end{program}
 
-Besides the \texttt{array\_shift} function and the array append operation, $v[]$, the PHP library contains many other library functions for manipulating lists. E.g. \texttt{array\_push}, \texttt{array\_pop}, \texttt{sort}, etc.
+Besides the \texttt{array\_shift} function and the array append operation, $v[]$, the PHP library contains many other library functions for manipulating lists, e.g. \texttt{array\_push}, \texttt{array\_pop}, \texttt{sort}, etc.
 
 Arrays can also explicitly define keys, which can be either a string or an integer. 
 
@@ -24,7 +24,7 @@ Arrays can also explicitly define keys, which can be either a string or an integ
 Let $a$ be an array containing values of the same type, where all integer keys from 0 to $count(a)-1$ does not exists. Then $a$ can be considered an array of type map.
 \end{definition}
 
-As the name suggests, maps can be used as a mapping from a string/integer to a value. In figure \ref{lst:map_array} the \texttt{\$text\_to\_int} array is a mapping from strings containing some numbers to its corresponding integer representation. 
+As the name suggests, maps can be used as a mapping from a string/integer to a value. In program \ref{lst:map_array} the \texttt{\$text\_to\_int} array is a mapping from strings containing some numbers to its corresponding integer representation. 
 
 \begin{program}[ht]
 \begin{lstlisting}
@@ -44,22 +44,22 @@ $values = array_values($text_to_int);
 \label{lst:map_array}
 \end{program}
 
-If given an map-array, the values or keys can be fetched using the functions \texttt{array\_values} or \texttt{array\_keys} respectively. These functions returns an array of list type. 
+If given a map-array, the values or keys can be fetched using the functions \texttt{array\_values} or \texttt{array\_keys} respectively. These functions return an array of type list. 
 
-Finally arrays can be treated as objects, i.e. the entries can be viewed as properties of arbitrary type. These arrays could be replaced by the \texttt{stdClass} which mainly is used for its dynamic properties, just like arrays. Some of the build in arrays of PHP can be considered objects, this include the \texttt{\$\_SERVER} array\footnote{\url{http://php.net/manual/en/reserved.variables.server.php}}. This array contains server and execution environment information, which are of different types, e.g. \texttt{\$\_SERVER['argv']} is an array of arguments passed to the interpreter, and \texttt{\$\_SERVER['REQUEST\_TIME']} is an integer UNIX timestamp of the start of the request. 
+Finally arrays can be treated as objects, i.e. the entries can be viewed as properties of arbitrary type. These arrays could be replaced by the \texttt{stdClass} which mainly is used for its dynamic properties, just like arrays. Some of the build-in arrays of PHP can be considered objects, including the \texttt{\$\_SERVER} array\footnote{\url{http://php.net/manual/en/reserved.variables.server.php}}. This array contains server and execution environment information, which are of different types, e.g. \texttt{\$\_SERVER['argv']} is an array of arguments passed to the interpreter, and \texttt{\$\_SERVER['REQUEST\_TIME']} is an integer UNIX timestamp of the start of the request. 
 
 \begin{definition}
-Let $a$ be an array containing values of different type. Then $a$ can be considered an array of type object.
+Let $a$ be an array containing values of different types. Then $a$ can be considered an array of type object.
 \end{definition}
 
 
 \section{Hypothesis}
 \label{sec:dynhypothesis}
-Our hypothesis is that any given array throughout its lifespan, from initialization to last usage, can be viewed as one, and only one, of the above mentioned types. I.e. either as a list, a map or an object. It is also expected that the arrays in general are acyclic and that that append, push, pop, shift and unshift operations are only used on arrays of type list.
+We hypothesize that any given array throughout its lifespan from initialization to last usage can be viewed as one, and only one, of the above mentioned types, i.e. either as a list, map or an object. It is also expected that the arrays in general are acyclic and that that \emph{append}, \textit{push}, \textit{pop}, \textit{shift}, and \textit{unshift} operations are only used on arrays of type list.
 
 If the hypothesis holds it should be possible to statically analyse the code to identify these types and detect errors related to misuse of the arrays e.g. using maps as lists or vice versa. The hypothesis is tested against a corpus consisting of ten widely used open source frameworks, by performing a dynamic analysis of the code.
 
-The frameworks chosen all implement some kind of test suite written in PHPUnit\footnote{\url{https://phpunit.de/}}. A unit testing framework for PHP progrms similar to JUnit for Java programs. By running the test suites on a modified PHP interpreter\footnote{https://github.com/Silwing/php-src}, we are able log and later analyze the structure and usage of the arrays. By using test suites instead of manually inspecting the frameworks through e.g. a browser, the aim is to gain a higher code coverage. This follows from the assumption that the developers are using code coverage as a metric of the quality of the test-suite. The corpus consists of the following open source frameworks:
+The frameworks chosen all implement some kind of test suite written in PHPUnit\footnote{\url{https://phpunit.de/}}, a unit testing framework for PHP programs similar to JUnit for Java programs. By running the test suites on a modified PHP interpreter\footnote{https://github.com/Silwing/php-src}, we are able log and later analyze the structure and usage of the arrays. By using test suites instead of manually inspecting the frameworks through e.g. a browser, the aim is to gain a higher code coverage. This follows from the assumption that the developers are using code coverage as a metric of the quality of the test-suite. The corpus consists of the following open source frameworks:
 
 \begin{itemize}
     \item \emph{WordPress}: A blogging system and a content management system\citeB{wordpress}.
@@ -68,7 +68,7 @@ The frameworks chosen all implement some kind of test suite written in PHPUnit\f
     \item \emph{Joomla}: A content management system \citeB{joomla}.
     \item \emph{CodeIgniter}: A lightweight framework for building web applications\citeB{codeigniter}.
     \item \emph{phpBB}: A forum platform\citeB{phpbb}.
-    \item \emph{Symfony 2}: A framework used in many major systems, such as phpBB, magento and Drupal\citeB{symfony2}.
+    \item \emph{Symfony 2}: A framework used in many major systems, such as phpBB, Magento and Drupal\citeB{symfony2}.
     \item \emph{Magento 2}: An e-commerce platform\citeB{magento2}.
     \item \emph{Zend Framework}: A framework for web development focused on simplicity, reusability and performance\citeB{zendframework}.
     \item \emph{Part}: A lightweight content management system developed by one of the authors of this thesis\citeB{part}.
@@ -94,11 +94,11 @@ The frameworks chosen all implement some kind of test suite written in PHPUnit\f
 \label{sec:studyConclusion}
 The purpose of the dynamic analysis was to determine whether PHP array usage can be split into semantic categories and if arrays stay in one category during their lifetime. 
 
-The results show that generally arrays keep the same type during their lifetime. Further more the usage of specific array operations proved almost exclusive for lists. This information can be used to define unexpected behavior reported by the static analysis.
+The results show that generally arrays keep the same type during their lifetime. Furthermore, the usage of specific array operations proved almost exclusive for lists. This information can be used to define unexpected behavior reported by the static analysis.
 
-A significant amount of arrays turned out to be objects with list-keys by the initial definition. These objects indicates that the object type is not providing significant information in itself, and shows the possibility that the definitions of maps and lists consume the object type; i.e. letting maps and lists allow values of different type.
+A significant amount of arrays turned out to be objects with list-keys by the initial definition. These objects indicate that the object type is not providing significant information in itself, and show the possibility that the definitions of maps and lists consume the object type, i.e. letting maps and lists allow values of different type.
 
-Almost every framework in the corpus contains some cyclic arrays why the static analysis have to take the possibility of recursive types into consideration. However the small amount of cyclic arrays indicate that an imprecise approach will have a minimal impact on the overall precision.
+Almost every framework in the corpus contains cyclic arrays, hence the static analysis has to take the possibility of recursive types into consideration. However, the small amount of cyclic arrays indicate that an imprecise approach will have a minimal impact on the overall precision.
 
 
 \begin{comment}

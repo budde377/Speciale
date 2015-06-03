@@ -1,11 +1,11 @@
 Since the analysis is performed by a modified interpreter, there are some imposed limitations on the achievable precision. 
 
 \begin{itemize}
-\item  \texttt{array\_init} does not capture the type of the array at initialization. This implies that the type of arrays initialized without being assigned or manipulated afterwards are not captured by the analysis. In \ref{lst:dis_code} line \ref{line:print}, the call to \texttt{print\_r} does yield an \texttt{array\_init} line in the log \ref{lst:dis_code_out} but with no type, depth 1 and size 0. The size should be 3 and the type; List.
+\item  \texttt{array\_init} does not capture the type of the array at initialization. This implies that the type of arrays initialized without being assigned or manipulated afterwards are not captured by the analysis. In figure \ref{lst:dis_code} line \ref{line:print}, the call to \texttt{print\_r} does yield an \texttt{array\_init} line in the log \ref{lst:dis_code_out} but with no type, depth 1 and size 0. The size should be 3 and the type List.
 
-\item Detecting the type does rely on the type of the values read or written to the arrays. This implies that there is no reasoning about entries or arrays never read or written. This might produce some false positives.
+\item Detecting the type relies on the type of the values read or written to the arrays. This implies that there is no reasoning about entries or arrays never read or written. This might produce some false positives.
 
-\item Callables can be written as anonymous functions, strings, or arrays, containing an instance and a string. This analysis will fail to classify arrays containing callables, written differently, correctly, thus introducing false negatives. E.g in example \ref{lst:callables}; \texttt{\$callable1}, \texttt{\$callable3} and \texttt{\$callable4} are all valid callables, however \texttt{\$callable2} is not, since \texttt{\$a->f2()} is a private function.
+\item Callables can be written as anonymous functions, strings, or arrays, containing an instance and a string. This analysis will fail to classify arrays containing callables, initialized differently, correctly, thus introducing false negatives. E.g in example \ref{lst:callables}; \texttt{\$callable1}, \texttt{\$callable3} and \texttt{\$callable4} are all valid callables, however \texttt{\$callable2} is not, since \texttt{\$a->f2()} is a private function.
 
 \begin{program}
 \centering
@@ -39,7 +39,7 @@ $callable4 = function() use ($a){
 \label{lst:callables}
 \end{program}
 
-\item Multiple operations of the same type on different arrays leads to sharing of IDs. Following the limited information available to distinguish operations, operations such as assign to an multidimensional array leads to sharing it between the array and its sub-arrays, see \ref{lst:dis_code} line \ref{line:assign}. This follows from the value first being assigned to the sub-array which then is assigned to the super-array. This leads to false negatives and could be solved if the interpreter kept character location information in addition line number and file.   
+\item Multiple operations of the same type on different arrays leads to sharing of IDs. Following the limited information available to distinguish operations, operations such as assign to an multidimensional array leads to sharing it between the array and its sub-arrays, (see figure \ref{lst:dis_code} line \ref{line:assign}). This follows from the value first being assigned to the sub-array which then is assigned to the super-array. This leads to false negatives and could be solved if the interpreter kept character location information in addition to line number and file name.   
 
 \end{itemize}
 

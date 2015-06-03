@@ -1,4 +1,4 @@
-Table \ref{tab:cyclic_arrays} shows that across all frameworks in the corpus less than 1\% of the arrays are detected as being cyclic. Cyclic arrays are created using the the PHP reference operator, \texttt{\&}, which must be used explicitly. Due to the explicit reference operator cyclic arrays does not occur as an unintentional side effect of something else\todo{something else?}. The largest amount of cyclic arrays detected in the corpus is PhpMyAdmin with a total of 10 cyclic arrays out of 3,373 identified arrays. By assuming that arrays are acyclic the static analysis would not have to take recursive types into consideration. Since the results shows that almost every framework contains some cyclic arrays the static analysis must handle recursive types in some way. The small amount of cyclic arrays however does imply that an imprecise handling of recursive types should not impact the overall precision by much.
+Table \ref{tab:cyclic_arrays} shows that across all frameworks in the corpus less than 1\% of the arrays are detected as being cyclic. Cyclic arrays are created using the the PHP reference operator, \texttt{\&}, which must be used explicitly. Due to the explicit reference operator, cyclic arrays do not occur as an unintentional side effect of something else\todo{something else?}. The largest amount of cyclic arrays detected in the corpus is in PhpMyAdmin with a total of 10 cyclic arrays out of 3,373 identified arrays. By assuming that arrays are acyclic, the static analysis would not have to take recursive types into consideration. Since the results show that almost every framework contains some cyclic arrays, the static analysis must handle recursive types in some way. The small amount of cyclic arrays, however, does imply that an imprecise handling of recursive types should not impact the overall precision much.
 \todo{Rewrite this with new findings. See comment.}
 \begin{comment}
 NG cyclic arrays are the cyclic arrays that are NOT the \$GLOBAL array, which is recursive. 
@@ -25,9 +25,9 @@ Zend Framework 2 & 4381 & 3 & 2
 \label{tab:cyclic_arrays}
 \end{table}
 
-Figure \ref{fig:array_types} shows the distribution of array types for the frameworks.  Between 4\% and 12\% of the arrays are uncategorizable these include false uncategorizables originating from flaws in the array identification. If multiple categorizable arrays from different categories are identified as a single array it might end up in the uncategorizable part of the distribution.
+Figure \ref{fig:array_types} shows the distribution of array types for the frameworks.  Between 4\% and 12\% of the arrays are uncategorizable. These include false uncategorizables originating from flaws in the array identification. If multiple categorizable arrays from different categories are identified as a single array it might end up in the uncategorizable part of the distribution.
 
-The Object group marked with List is by the definition categorized as objects, but they might fit better into the List category, as lists of a top level type. \todo{elaborate}
+The Object group marked with List is by definition categorized as objects, but they might fit better into the List category, as lists of a top level type. \todo{elaborate}
 
 \begin{table}[htbp]
 \begin{adjustbox}{center}
@@ -58,7 +58,7 @@ Zend Framework 2&	30.99\%	&   35.07\% &	1.08\%	&   19.78\% &	6.25\%	&   0.00\%  
 \label{fig:array_types}
 \end{figure}
 
-Figure \ref{fig:type_operations} shows the distribution of operations on the arrays, over the different array types from figure \ref{fig:array_types}. Write and append corresponds to the language features for writing to arrays:
+Figure \ref{fig:type_operations} shows the distribution of operations on the arrays over the different array types from figure \ref{fig:array_types}. Write and append correspond to the language features for writing to arrays:
 
 \begin{lstlisting}
 $a = [];
@@ -66,9 +66,9 @@ $a[0] = 42; // array write
 $a[] = 1337; // array append
 \end{lstlisting}
 
-These operations are by far the most used. The built-in push function is equivalent to the append operation if given only a single argument. The documentation recommends the append operation in such situations for performance reasons which aligns with the use of append over push in the figure. The operation on arrays of map and object type, consists almost entirely of write operations whereas arrays of type list have some write operation but mostly append operations. This indicates that append is a good predictor for arrays in the list category.
+These operations are by far the most used. The built-in push function is equivalent to the append operation if given only a single argument. The documentation recommends the append operation in such situations for performance reasons, which aligns with the use of append over push in the figure. The operation on arrays of map and object type consists almost entirely of write operations, whereas arrays of type list have some write operation but mostly append operations. This indicates that append is a good predictor for arrays in the list category.
 
-The distribution of operations support the claim that the List-marked objects fit better into the list category than the object category since multiple list operations are frequently used with these arrays.
+The distribution of operations support the claim that the List-marked objects fit better into the list category than the object category, since multiple list operations are frequently used with these arrays.
 
 \begin{figure}[htbp]
 \centering
