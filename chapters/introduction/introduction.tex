@@ -57,25 +57,9 @@ private function createInstance($string, $instance, callable $callback)
 The widely used array data structure in PHP has very few restrictions making it difficult to reason about with program analysis. This thesis will identify possible use-patterns for arrays in PHP and how to detect them in static analysis. An interprocedural data flow type analysis is proposed to detect suspicious cross-use of the identified patterns.
 
 \section{Motivation}
+Creating code that seemingly works is one thing and for languages like PHP that can be done in many different ways. However creating code that conveys a clear purpose and is easily maintainable later on is a whole other world. The latter is preferable most of the time. Because the range of possibles uses of PHP arrays is very large they are not conveying a clear purpose in and of themselves. Creators of PHP programs thus has to ensure themselves the clarity of their use of arrays. 
+
 Our hypothesis is that arrays keep to a specific use-pattern during its lifetime. If the hypothesis holds a statical analysis can be employed to detect and thereby prevent cross-use of the patterns which in turn will lead to a more clear intention of the code and in the end higher maintainability of the program code.
 
-\todo{add a list of bad practices that hinders clear intention and lowers maintainability}
-
 \section{Structure of this thesis}
-Chapter \ref{ch:background} provides the necessary background knowledge of the PHP language to understand why arrays are difficult to apply existing methods to. In chapter \ref{ch:study} a dynamic analysis is conducted to identify use-patterns and test the hypothesis about use-patterns of arrays. Chapter \ref{ch:analysis} use patterns and knowledge gained in the previous chapter to define and implement a static analysis of PHP arrays which detects suspicious use of arrays. The static analysis implementation is evaluated in chapter \ref{ch:evaluation} and relevant related work is described in chapter \ref{ch:relatedWork}. The last two chapters \ref{ch:conclusion} and \ref{ch:futureWork} concludes our thesis and describes possible future work identified.
-
-\begin{comment}
-
-\section{Methodology}
-To establish whether our three array types are accurate we dynamically analyse a range of popular open source PHP applications. We want to find operations that can be used to predict what type of array we are dealing with early in our static analysis.
-
-
-\subsection{Metric}
-%\subsection{Evaluation}
-\todo{In order to evaluate our results, we need to compare the performance of our tool against other similar tools wrt. the number of bugs found (real and false positives) and speed/scalability.}
-
-\subsection{Benchmarks}
-
-\subsection{Iterative process}
-
-\end{comment}
+Chapter \ref{ch:background} provides the necessary background knowledge of the PHP language to understand why arrays are difficult to apply existing methods to. In chapter \ref{ch:study} a dynamic analysis is conducted on a corpus of real PHP applications to identify use-patterns and test the hypothesis about use-patterns of arrays. Chapter \ref{ch:analysis} use patterns and knowledge gained in the previous chapter to define and implement a static analysis of PHP arrays which detects suspicious use of arrays. The static analysis implementation is evaluated in chapter \ref{ch:evaluation} by studying interesting cases found in or inspired by the corpus used in the dynamic analysis. Related work is discussed in chapter \ref{ch:relatedWork}. The last two chapters \ref{ch:conclusion} and \ref{ch:futureWork} concludes our thesis and describes possible future work identified.
