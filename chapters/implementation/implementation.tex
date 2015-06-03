@@ -9,7 +9,6 @@ The lattices are defined by interfaces and the elements are implemented as immut
 The transfer functions are implemented notoriously as introduced in section \ref{sec:transferf}, with added statements for reporting of suspicious behaviour, to the IDE through \texttt{Annotation}'s. Reporting does not effect the outcome of the analysis and is made possible by the references to the \texttt{PSIElements} in the nodes of the control-flow-graph. The analysis reports the following
 \begin{itemize}
 \item Appending on definite map yields error
-\item Using the function \texttt{array\_pop} on a definite map yields error
 \item Merging a list with a map and visa versa yields error
 \item Definite string write on list yields error
 \item Adding new type to array yields warning

@@ -1,5 +1,5 @@
 \section{Joining array values}
-This case is inspired by \todo{what?} and shows how the analysis 
+This case is inspired by \todo{what?} and shows how the analysis yields an error when using the array function \texttt{array\_pop} on a map type array. The program seen in listing \ref{lst:arrayPopExample} builds a map from a person to an animal while also adding in a separator. The separators are then used when the map values are turned into a string using the \texttt{implode} function. The map can afterwards be used to refer to which animal belong to which person. To remove the unwanted separator at the end of the map \texttt{array\_pop} is used to remove the last element of the array. The analysis then alerts the user to the fact that \texttt{array\_pop} is used with a map which is suspicious. The separator should instead be specified as the first argument for \texttt{implode} which avoids the use of \texttt{array\_pop} altogether.
 
 \begin{program}
 \begin{lstlisting}
