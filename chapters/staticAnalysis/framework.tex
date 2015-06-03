@@ -5,21 +5,26 @@
 %\todo{Write about initial lattice (Super globals + hloc)}
 %\todo{All Variables should map to NULL initially}
 %\todo{How is the lattice compared properly with an infinite domain of variables set to NULL}
-In order to perform a data flow analysis on a P0 program, the embellished monotone framework is used \todo{ref}. Given a control flow graph, $G = (V,E,s,t)$, an instance of the monotone framework, $(L, \mathcal{F}, F, E', \iota, f)$, with data flow equations, $A :  \mathcal{N} \times \Delta \rightarrow L$, 
+In order to perform a data flow analysis on a P0 program, the embellished monotone framework, as introduced by Nielson, Nielson and Hanikin, is used \todo{ref}. A monotone data-flow analysis is a tuple, $(L, \mathcal{F})$, where $L$ is a lattice and $\mathcal{F}$ is a monotone function space on $L$.
+
+Given a program, an corresponding instance of the data-flow analysis can be expressed as a six-tuple, $(L, \mathcal{F}, F, E', \iota, f)$. Here $L$ and $\mathcal{F}$ are the lattice and function space of the analysis, $F$ is a set of tuples expressing the between labels, $E'$ is the set of external labels, $\iota$ is the initial lattice element of the external labels, and $f$ is a mapping from labels to functions in $\mathcal{F}$. Labels are in this analysis defined as the product of nodes and context, $\mathcal{L} = \mathcal{N}\times \Delta$. From an instance, the data-flow equations, $A = \mathcal{L} \rightarrow L$, are defined as
 \begin{align}
 	A_\bullet ((n, \delta)) = \begin{cases} 
-		f_{(n, \delta, (\delta, c))}(A_\circ((\delta, c)), A_\circ((n, \delta))) &\text{if $n=\mathit{return}_c(\_)$}\\
-		f_{(n, \delta)}(A_\circ(l))& \text{else}
+		f_{(n, \delta, (\delta, c))}(A_\circ(( c, \delta)), A_\circ((n, \delta))) &\text{if $n=\mathit{return}_c(\_)$}\\
+		f_{(n, \delta)}(A_\circ((n, \delta)))& \text{else}
 		\end{cases}
-\end{align}
-\begin{align}
-	A_\circ (l) = \bigsqcup \{A_\bullet(l') | (l', l) \in F\} \sqcup \iota_{E'}^l
 \end{align}
 where 
 \begin{align}
+	A_\circ (l) = \bigsqcup \{A_\bullet(l') | (l', l) \in F\} \sqcup \iota_{E'}^l
+\end{align}
+and
+\begin{align}
 \iota_{E'}^l = \begin{cases} \iota & \text{if }l\in E' \\  \bot &\text{else} \end{cases}
 \end{align}
-can be derived. Here $L = \text{AnalysisLattice}$, $\mathcal{F}$ is the set of transfer functions in in the analysis, closed under composition, $f$ is defined throughout section \ref{sec:transferf}, $F : (\mathcal{N} \times \Delta) \times (\mathcal{N} \times \Delta)$ is defined as 
+intuitively $A_\bullet$ expresses the abstract state immediately after \emph{preforming} the given label and $A_\circ$ the state just before. Solving these equations preforms the data-flow analysis. 
+
+Given a control flow graph, $G = (V,E,s,t)$, an instance of the analysis, where $L = \text{AnalysisLattice}$ and $\mathcal{F}$ is the function space of the transfer functions, can be derived. Here $f$ is defined throughout section \ref{sec:transferf}, $F : \mathcal{L} \times \mathcal{L}$ is defined as 
 \begin{align}
 F = &\{((n, \delta), (n', \delta')) | (n,n') \in E \wedge\delta \in \Delta \notag\\
 &\quad \wedge \mathit{validSuccessor}(n, n')\notag\\
@@ -33,9 +38,21 @@ where
 		(\delta, n) &\text{if }n=\mathit{call}(\_)\\
 		\delta &\text{else} 
 	\end{cases}
-\end{align} and $\mathit{validSuccessor}$ is as defined in definition \ref{def:validsuc}. 
+\end{align} The predicate $\mathit{validSuccessor}$ is defined by definition \ref{def:validsuc}, and in is necessary because of the ambiguity associated with potentially multiple outgoing edges of the $\mathit{exit}$ node, which indicates that the flow may go form a exit node to an arbitrary result node.
 
-The set of external nodes is $E' = \{s\}$, the initial lattice element is the element where the empty context, $\Lambda$, maps to the state, $s_\iota = (\bot, g_\iota, h_\iota, \bot, \bot)$. Here the global scope, $g_\iota$ models the super-globals as
+This is naturally not the case. A successor, $w$, to a node, $v$, is only valid iff. $v$ is an exit node and $w$ is the return node corresponding to the call node of the current function-call, or if $v$ is not an exit node.
+
+\begin{definition}
+\label{def:validsuc}
+The predicate $\mathit{validSuccessor} : \mathcal{L} \times \mathcal{L}$, is defined as
+\begin{align}
+\mathit{validSuccessor}(n, \delta, n', \delta') \Leftrightarrow &(n = \mathit{exit}(\_) \wedge n' = \mathit{result}_c(\_) \wedge \delta  = (\delta' c)) \notag\\
+&\quad\vee n \neq \mathit{exit}(\_)
+\end{align}
+\end{definition}
+
+
+The set of external nodes is $E' = \{s\}$, the initial lattice element, $\iota$, is the element where the empty context, $\Lambda$, maps to the state, $s_\iota = (\bot, g_\iota, h_\iota, \bot, \bot)$. Here the global scope, $g_\iota$ models the super-globals as
 \begin{align*}
 g_\iota = 	[&\texttt{\$GLOBALS}\mapsto \{\text{HLoc}(\Lambda, s, 0)\},\notag\\
 			 &\texttt{\$\_SERVER}\mapsto \{\text{HLoc}(\Lambda, s, 1)\},\notag\\
@@ -63,4 +80,6 @@ h_\iota = [	&\text{HLoc}(\Lambda, s, i\in[0,2])\mapsto \text{Value}(\text{Array}
 			&\_ \mapsto \text{Value}(\text{Null}(\top))]
 \end{align*}
 the last entry maps all other locations to the null value. 
+
+\todo{Elaborate on decision of super-globals}
 

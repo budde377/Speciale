@@ -18,18 +18,18 @@ As described, in section \ref{sec:backg_scoping}, the scoping rules of PHP are v
 \begin{align}
 \text{Locals} = \text{Globals} = \text{Scope} = \text{Var} \rightarrow \mathcal{P}(\text{HLoc})
 \end{align}
-The scopes are defined as maps from variable names, {\bf Var}, to power-set of heap locations $\mathcal{P}(\text{\bf HLoc})$. While PHP supposedly performs deep copies of values on assignments, letting the scope be a map from variable names to values would not facilitate feature of assigning references to and from variables and array entries. This is done using the \texttt{\&} operator and makes the heap abstraction is necessary. The heap allows values to be used by multiple variables and arrays which enables properly propagation of changes. 
+The scopes are defined as maps from variable names, { Var}, to power-set of heap locations $\mathcal{P}(\text{ HLoc})$. While PHP supposedly performs deep copies of values on assignments, letting the scope be a map from variable names to values would not facilitate feature of assigning references to and from variables and array entries. This is done using the \texttt{\&} operator and makes the heap abstraction is necessary. The heap allows values to be used by multiple variables and arrays which enables properly propagation of changes. 
 \begin{align}
 \text{Heap} = \text{HLoc} \rightarrow \text{Value}
 \end{align}
-The {\bf Temps} and {\bf HeapTemps} are for storing intermediate results. Since these results cannot be referenced there is no need to store them in the heap. By keeping them in a seperate lattice, they can be strongly updated and does not have to, and should not, be passed when switching context, since they are in every respect local to the current context. A single temporary storage mapping from temporary variables to a sum-lattice of values and power-set lattice was considered, this however would involve special handling of $\top$ and $\bot$ elements, which is avoided by this method. 
+The { Temps} and { HeapTemps} are for storing intermediate results. Since these results cannot be referenced there is no need to store them in the heap. By keeping them in a seperate lattice, they can be strongly updated and does not have to, and should not, be passed when switching context, since they are in every respect local to the current context. A single temporary storage mapping from temporary variables to a sum-lattice of values and power-set lattice was considered, this however would involve special handling of $\top$ and $\bot$ elements, which is avoided by this method. 
 \begin{align}
 \text{Temps} = \text{TVar} \rightarrow \text{Value}
 \end{align}
 \begin{align}
 \text{HeapTemps} = \text{THVar} \rightarrow \mathcal{P}(\text{HLoc})
 \end{align}
-The necessity for the latter lattice follows from the fact that reference assignments may be nested, which requires intermediate results shared between nodes in the control-flow graph. The sets of temporary variables, {\bf TVar} and {\bf THVar}, are both finite, following from the control-flow-graph being finite.
+The necessity for the latter lattice follows from the fact that reference assignments may be nested, which requires intermediate results shared between nodes in the control-flow graph. The sets of temporary variables, { TVar} and { THVar}, are both finite, following from the control-flow-graph being finite.
 
 The heap locations are allocation site abstractions wrt. context, node, and a natural number. The natural number allows the creation of multiple location per node, which is necessary in e.g. $\mathit{call}$-nodes. Adding the natural number as a factor makes the set of allocation sites possibly infinite, in practise however the set is finite. 
 \begin{align}

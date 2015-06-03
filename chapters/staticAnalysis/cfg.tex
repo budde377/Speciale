@@ -21,15 +21,14 @@ There are seventeen different nodes, all introduced below
 \item{$\mathit{bop_{\oplus}}(t_l,t_r, t_{tar})$, $\mathit{sop_{\oplus}}(t_l,t_r, t_{tar})$, $\mathit{uop_{\circ}}(t, t_{tar})$, $\mathit{inc_{\circ}}(h, t_{tar})$:} These nodes indicates binary, short-circuit-binary, uanry, and increment/decrement operations, respectively. The operations of the first three are all performed on temporary storage, while the forth is performed on the heap. The last argument, $t_{tar}$, indicates where the result of performing the operation should be stored. E.g. $\texttt{1+2}$ is a binary operation ($\mathit{bop}$) returning $\texttt{3}$, this value should be stored in temporary storage at $t_{tar}$. 
 \item{$\mathit{if}(t)$:} This node has one incoming and two outgoing edges, representing the choice of one branch or the other, when evaluating $t$. 
 \item{$\mathit{constRead}(c, t_{tar})$:} This node representing reading a constant into the temporary storage, at $t_{tar}$. The constant can be strings, booleans, null, ints etc.
-\item{$\mathit{varRead}(\texttt{\$v}, c_{tar})$, $\mathit{var}_w(\texttt{\$v}, c_{val}, t_{tar})$:} These nodes indicates reading from and writing to a variable, \texttt{\$v}, respectively. Depending on the context the target of the read and value of the write can either be a temporary or temporary heap storage. 
-\item{$\mathit{array}_i(t_{tar})$:} This node represents initializing an empty array in the temporary storage, at $t_{tar}$.
-\item{$\mathit{array}_a(t_{val}, t_{ar})$, $\mathit{array}_a(h_{var}, c_{val}, t_{tar})$, $\mathit{array}_a(h_{var}, h_{tar})$:} With three different signatures, this node represents appending to an array, in temporary storage, in the heap, and in a read-context. Normally PHP will not allow appending without a value, but in this case, the reference of the appended entry is placed in temporary heap storage, and thus accessible for later modification. The $c_{val}$ variable in the second node indicates that both values and references can be appended to an array.
-\item{$\mathit{array}_r(h_{ar}, t_{key}, c_{tar})$:} Reading from an array on the heap, with value key at $t_{key}$. The result can either be references to the entry or values at the given key, hence the $c_{tar}$ variable. 
-\item{$\mathit{array}_w(t_{val}, t_{ar})$, $\mathit{array}_w(h_{ar}, c_{val}, t_{tar})$:} Writing to an array in temporary storage or in the heap, respectively. Just as append, the value written can be either references or a value, hence the $c_{val}$ variable.
-\item{$\mathit{call}_{\mathit{fn}}(c_1, \cdots, c_n)$, $\mathit{exit}(c_1, \cdots, c_n))$, $\mathit{result}_{c}(c_{tar})$:} Calling a function is performed with the $\mathit{call}$ node. This holds the name, $\mathit{fn}$, of the function being called (which can always be resolved). For every call node, $c$, there is a single result node, $\mathit{result}_c$. This restores the calling context and handles passing of the result. The node immediately before the result node is an $\mathit{exit}$ node, which is unique to and last node of the function being called. This node holds variable names pointing to the possible values returned by the function. 
+\item{$\mathit{varRead}(\texttt{\$v}, c_{tar})$, $\mathit{varWrite}(\texttt{\$v}, c_{val}, t_{tar})$:} These nodes indicates reading from and writing to a variable, \texttt{\$v}, respectively. Depending on the context the target of the read and value of the write can either be a temporary or temporary heap storage. 
+\item{$\mathit{arrayInit}(t_{tar})$:} This node represents initializing an empty array in the temporary storage, at $t_{tar}$.
+\item{$\mathit{arrayAppend}(t_{val}, t_{ar})$, $\mathit{arrayAppend}(h_{var}, c_{val}, t_{tar})$, $\mathit{arrayAppend}(h_{var}, h_{tar})$:} With three different signatures, this node represents appending to an array, in temporary storage, in the heap, and in a read-context. Normally PHP will not allow appending without a value, but in this case, the reference of the appended entry is placed in temporary heap storage, and thus accessible for later modification. The $c_{val}$ variable in the second node indicates that both values and references can be appended to an array.
+\item{$\mathit{arrayRead}(h_{ar}, t_{key}, c_{tar})$:} Reading from an array on the heap, with value key at $t_{key}$. The result can either be references to the entry or values at the given key, hence the $c_{tar}$ variable. 
+\item{$\mathit{arrayWrite}(t_{val}, t_{ar})$, $\mathit{arrayWrite}(h_{ar}, c_{val}, t_{tar})$:} Writing to an array in temporary storage or in the heap, respectively. Just as append, the value written can be either references or a value, hence the $c_{val}$ variable.
+\item{$\mathit{call}_{\mathit{fn}}(c_1, \cdots, c_n)$, $\mathit{exit}(c_1, \cdots, c_n)$, $\mathit{result}_{c}(c_{tar})$:} Calling a function is performed with the $\mathit{call}$ node. This holds the name, $\mathit{fn}$, of the function being called (which can always be resolved). For every call node, $c$, there is a single result node, $\mathit{result}_c$. This restores the calling context and handles passing of the result. The node immediately before the result node is an $\mathit{exit}$ node, which is unique to and last node of the function being called. This node holds variable names pointing to the possible values returned by the function. 
 \item{$nop$:} This node does nothing and is only there for structural purposes. It is in the control-flow-graphs denoted as a small node with no label.
 \end{description}
-
 \begin{graph}
 \centering
 \begin{adjustbox}{max size={1\textwidth}{.25\textheight}, margin = 10pt}\begin{tikzpicture}[node distance = 2cm, auto]
@@ -46,7 +45,7 @@ There are seventeen different nodes, all introduced below
 \begin{adjustbox}{max size={1\textwidth}{.25\textheight}, margin = 10pt}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
 	\node [entry] (en) {};
- 	\node [node, right of=en, label={270:$\mathit{const_r}(\texttt{1},t_1)$}] (c1) {};
+ 	\node [node, right of=en, label={270:$\mathit{constRead}(\texttt{1},t_1)$}] (c1) {};
  	\node [subtree, right of =c1] (t1){$\subt{\texttt{2+3}}(t_2)$};
  	\node [node, right of=t1, label={270:$\mathit{bop}_+(t_1,t_2, t)$}] (bop1) {};
 	\node [exit, right of=bop1] (ex) {};
@@ -308,7 +307,7 @@ For a variable read, $e = \texttt{\$v}$ for some variable \texttt{\$v}, or a con
     \node [entry] (en) {};
     \node [subtree, below of=en] (e1) {$\subt{T}(c_{ar})$};
     \node [subtree, below of=e1] (e2) {$\subt{E_{key}}(t_{key})$};
-    \node [node, below of=e2, label={0:$\mathit{array}_r(c_{ar},t_{key},c_{tar})$}] (rd) {};
+    \node [node, below of=e2, label={0:$\mathit{arrayRead}(c_{ar},t_{key},c_{tar})$}] (rd) {};
     \node [exit, below of=rd] (ex) {};
     
     % Draw edges
@@ -320,14 +319,14 @@ For a variable read, $e = \texttt{\$v}$ for some variable \texttt{\$v}, or a con
 \subcaptionbox{Array initialize\label{graph:flowai}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
-    \node [node, below of=en, label={0:$\mathit{array}_i(t_{ar})$}] (ai) {};
+    \node [node, below of=en, label={0:$\mathit{arrayInit}(t_{ar})$}] (ai) {};
     \node [dots, left of=ai] (dots1) {$\vdots$};
     \node [subtree, below of=dots1] (e1) {$\subt{E_1}(t_1)$};
-    \node [node, right of=e1, label={45:$\mathit{array}_a(t_1, t_{ar})$}] (app) {};
+    \node [node, right of=e1, label={45:$\mathit{arrayAppend}(t_1, t_{ar})$}] (app) {};
 	\node [dots, right of=app] (dots2) {$\vdots$};
     \node [subtree, below of=dots2] (e2) {$\subt{E_2}(t_2)$};
     \node [subtree, left of=e2] (e3) {$\subt{E_3}(t_2)$};
-	\node [node, left of=e3, label={-85:$\mathit{array}_w(t_2, t_3, t_{ar})$}] (aw) {};
+	\node [node, left of=e3, label={-85:$\mathit{arrayWrite}(t_2, t_3, t_{ar})$}] (aw) {};
 	\node [exit, below of=aw] (ex) {};
 
     % Draw edges
@@ -347,15 +346,7 @@ For a variable read, $e = \texttt{\$v}$ for some variable \texttt{\$v}, or a con
 \hspace*{\fill}
 \end{graph}
 
-For function calls, $e = \mathit{fn}\texttt{(}T_1,\cdots, T_n\texttt{)}$, the result variable is a temporary variable, $c_{tar}:\text{Temps}$, the arguments are either an expression, $T_i : \syn{expr}$ and $c_i : \text{Temps}$, or an reference expression, $T_i : \syn{rexpr}$ and $c_i : \text{HeapTemps}$, depending on the signature of $\mathit{fn}$. If the argument is pass-by-reference i.e. the variable, $v_i$ is denoted with a \texttt{\&} in the signature, then the expression must be a reference expression, if not, then the argument is an expression. This follows from the program being a valid P0 program. The function graph will be as graph \ref{graph:flowcall}, where the start node, exit node, and function body are the unique nodes of the $\mathit{fn}$ function i.e. they are not copied. This ensures that the graph is finite, but forces the introduction of the notion \emph{valid successors}. Multiple, say $n$, calls to the same function will yield a graph with $n$ edges to the start node and from the exit node, thus indicating that the flow may jump to an arbitrary exit. This is naturally not the case and a successor, $w$, to a node, $v$, is thereby only valid iff. $v$ is an exit node and $w$ is the return node corresponding to the call node of the current function-call, or if $v$ is not an exit node (See def. \ref{def:validsuc}). Notice the dashed line going directly from the call node to the return node. This indicates that the call node may pass information directly to the return node, typically information regarding the local context before calling $\mathit{fn}$.
-\begin{definition}
-\label{def:validsuc}
-The predicate $\mathit{validSuccessor} : (\mathcal{N}\times \Delta) \times (\mathcal{N} \times \Delta)$, is defined as
-\begin{align}
-\mathit{validSuccessor}(n, \delta, n', \delta') \Leftrightarrow &(n = \mathit{exit}(\_) \wedge n' = \mathit{result}_c(\_) \wedge \delta  = (\delta' c)) \notag\\
-&\quad\vee n \neq \mathit{exit}(\_)
-\end{align}
-\end{definition}
+For function calls, $e = \mathit{fn}\texttt{(}T_1,\cdots, T_n\texttt{)}$, the result variable is a temporary variable, $c_{tar}:\text{Temps}$, the arguments are either an expression, $T_i : \syn{expr}$ and $c_i : \text{Temps}$, or an reference expression, $T_i : \syn{rexpr}$ and $c_i : \text{HeapTemps}$, depending on the signature of $\mathit{fn}$. If the argument is pass-by-reference i.e. the variable, $v_i$ is denoted with a \texttt{\&} in the signature, then the expression must be a reference expression, if not, then the argument is an expression. This follows from the program being a valid P0 program. The function graph will be as graph \ref{graph:flowcall}, where the start node, exit node, and function body are the unique nodes of the $\mathit{fn}$ function i.e. they are not copied. This ensures that the graph is finite, but multiple, say $n$, calls to the same function will yield a graph with $n$ edges to the start node and from the exit node. Notice the dashed line going directly from the call node to the return node. This indicates that the call node may pass information directly to the return node, typically information regarding the local context before calling $\mathit{fn}$.
 
 \begin{graph}
 \captionsetup{justification=centering}
@@ -398,7 +389,7 @@ Finally the expression can be an assignment. There are two types of assignments,
     \node [subtree, below of=en] (ve) {$\subt{R}(h_{var})$};
     \node [subtree, below of=ve] (e1) {$\subt{E}(t_{key})$};
     \node [subtree, below of=e1] (e2) {$\subt{T}(c_{val})$};
-    \node [node, below of=e2, label={0:$\mathit{array}_w(h_{var}, t_{key},c_{val},t_{tar})$}] (rd) {};
+    \node [node, below of=e2, label={0:$\mathit{arrayWrite}(h_{var}, t_{key},c_{val},t_{tar})$}] (rd) {};
     \node [exit, below of=rd] (ex) {};
     
     % Draw edges
@@ -414,7 +405,7 @@ Finally the expression can be an assignment. There are two types of assignments,
     \node [entry] (en) {};
     \node [subtree, below of=en] (ve) {$\subt{R}(h_{var})$};
     \node [subtree, below of=ve] (e1) {$\subt{T}(c_{val})$};
-    \node [node, below of=e1, label={0:$\mathit{array}_a(h_{var}, c_{val},t_{tar})$}] (rd) {};
+    \node [node, below of=e1, label={0:$\mathit{arrayAppend}(h_{var}, c_{val},t_{tar})$}] (rd) {};
     \node [exit, below of=rd] (ex) {};
     
     % Draw edges
@@ -428,7 +419,7 @@ Finally the expression can be an assignment. There are two types of assignments,
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (ve) {$\subt{R}(h_{var})$};
-    \node [node, below of=ve, label={0:$\mathit{array}_a(h_{var},h_{tar})$}] (rd) {};
+    \node [node, below of=ve, label={0:$\mathit{arrayAppend}(h_{var},h_{tar})$}] (rd) {};
     \node [exit, below of=rd] (ex) {};
     
     % Draw edges
@@ -441,7 +432,7 @@ Finally the expression can be an assignment. There are two types of assignments,
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e2) {$\subt{T}(c_{val})$};
-    \node [node, below of=e2, label={0:$\mathit{var}_w(\texttt{\$$$v},c_{val},t_{tar})$}] (ass) {};
+    \node [node, below of=e2, label={0:$\mathit{varWrite}(\texttt{\$$$v},c_{val},t_{tar})$}] (ass) {};
     \node [exit, below of=ass] (ex) {};
     
     % Draw edges
@@ -479,7 +470,7 @@ Since PHP supports nested assignments e.g. \texttt{\$a[]['foo']  = \&func()[]}, 
 	\node [subtree, below of =en](t1) {	 $\subt{\texttt{\$$$a[]}}(h_{var})$};
 	\node [subtree, below of =t1](t2) {$\subt{\texttt{'foo'}}(t_{key})$};
 	\node [subtree, below of =t2](t3) { $\subt{\texttt{func()[]}}(h_{val})$};
-	\node [node, below of =t3, label={-45:$array_w(h_{var}, t_{key}, h_{val}, t)$}] (ass) {};
+	\node [node, below of =t3, label={-45:$\mathit{arrayWrite}(h_{var}, t_{key}, h_{val}, t)$}] (ass) {};
 	\node [exit, below of=ass] (ex) {};
     % Draw edges
     \path [line] (en) -> (t1);
@@ -493,11 +484,11 @@ Since PHP supports nested assignments e.g. \texttt{\$a[]['foo']  = \&func()[]}, 
     % Place nodes
 	\node [entry] (en) {};
 	\node [subtree, below of =en](t1) {	 $\subt{\texttt{\$$$a}}(h_{var'})$};
-	\node [node, below of = t1, label={-45:$array_a(h_{var'}, h_{var})$}] (aa) {};
-	\node [node, below of = aa, label={-45:$const_r(\texttt{'foo'}, t_{key})$}] (cr) {};		
+	\node [node, below of = t1, label={-45:$\mathit{arrayAppend}(h_{var'}, h_{var})$}] (aa) {};
+	\node [node, below of = aa, label={-45:$\mathit{constRead}(\texttt{'foo'}, t_{key})$}] (cr) {};		
 	\node [subtree, below of =cr](t3) { $\subt{\texttt{func()}}(h_{val'})$};
-	\node [node, below of = t3, label={-45:$array_a(h_{val'}, h_{val})$}] (aa2) {};
-	\node [node, below of =aa2, label={-45:$array_w(h_{var}, t_{key}, h_{val}, t)$}] (ass) {};
+	\node [node, below of = t3, label={-45:$\mathit{arrayAppend}(h_{val'}, h_{val})$}] (aa2) {};
+	\node [node, below of =aa2, label={-45:$\mathit{arrayWrite}(h_{var}, t_{key}, h_{val}, t)$}] (ass) {};
 	\node [exit, below of=ass] (ex) {};
     % Draw edges
     \path [line] (en) -> (t1);
@@ -512,15 +503,15 @@ Since PHP supports nested assignments e.g. \texttt{\$a[]['foo']  = \&func()[]}, 
 \begin{adjustbox}{max size={.33\textwidth}{.33\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
 	\node [entry] (en) {};
-	\node [node, below of =en, label = {-45: $var_r(\texttt{\$$$a}, h_{var'})$}](t1) {};
-	\node [node, below of = t1, label={-45:$array_a(h_{var'}, h_{var})$}] (aa) {};
-	\node [node, below of = aa, label={-45:$const_r(\texttt{'foo'}, t_{key})$}] (cr) {};		
+	\node [node, below of =en, label = {-45: $\mathit{varRead}(\texttt{\$$$a}, h_{var'})$}](t1) {};
+	\node [node, below of = t1, label={-45:$\mathit{arrayAppend}(h_{var'}, h_{var})$}] (aa) {};
+	\node [node, below of = aa, label={-45:$\mathit{constRead}(\texttt{'foo'}, t_{key})$}] (cr) {};		
 	\node [node, below of =cr, label={-45:$call_{\texttt{func}}()$}](call) {};
 	\node [node, below of =call, label={-45:$result_{call_{\texttt{func}}()}(h_{val'})$}](t3) {};
 	\node [entry, right of =call] (fn) {};
-	\node [node, below of = t3, label={-45:$array_a(h_{val'}, h_{val})$}] (aa2) {};
+	\node [node, below of = t3, label={-45:$\mathit{arrayAppend}(h_{val'}, h_{val})$}] (aa2) {};
 	\node [entry, right of =t3] (fex) {};
-	\node [node, below of =aa2, label={-45:$array_w(h_{var}, t_{key}, h_{val}, t)$}] (ass) {};
+	\node [node, below of =aa2, label={-45:$\mathit{arrayWrite}(h_{var}, t_{key}, h_{val}, t)$}] (ass) {};
 	\node [exit, below of=ass] (ex) {};
     % Draw edges
     \path [line] (en) -> (t1);
