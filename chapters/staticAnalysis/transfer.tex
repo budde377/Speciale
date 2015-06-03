@@ -6,7 +6,7 @@
 \newcommand{\with}[1]{\texttt{with }#1\text{: }}
 \newcommand{\coerce}[2]{c_{\text{#1}, \text{#2}}}
 \newcommand{\default}{\texttt{default: }}
-Each node in the control flow graph has a corresponding transfer function. Most of the transfer functions are defined on {\bf State} instead of {\bf AnalysisLattice} i.e they can be defined as $f_{n,\delta} : \text{State} \rightarrow \text{State}$ rather than $f_{n,\delta} : \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$. This eases the notation and given a state-transfer-function, $f_{n,\delta}'$, the corresponding lattice-transfer function, $f_{n,\delta}$, can be defined as
+Each node in the control flow graph has a corresponding transfer function. Most of the transfer functions are defined on { State} instead of { AnalysisLattice} i.e they can be defined as $f_{n,\delta} : \text{State} \rightarrow \text{State}$ rather than $f_{n,\delta} : \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$. This eases the notation and given a state-transfer-function, $f_{n,\delta}'$, the corresponding lattice-transfer function, $f_{n,\delta}$, can be defined as
 
 \begin{align}
 f_{n,\delta}(l) = l[\delta\mapsto f'_{n, \delta}(l(\delta))]

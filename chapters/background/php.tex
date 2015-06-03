@@ -2,14 +2,13 @@ PHP is a recursive acronym meaning PHP: Hypertext Processor. As one of the first
 \section{Program structure}
 With the introduction of an object model with PHP 5 in 2005 followed a trend to organize PHP programs in an object oriented manner. 
 
-For better organization of code, in 2009, namespaces were introduced (PHP 5.3) and the PHP Framework Interoperability Group, which aims to formulate standards on autoloading, coding style, logging, etc. was created. \todo{ref}. Utilizing these tools and standards, many modern frameworks are managing dependencies to other frameworks and libraries through package managers such as Composer \todo{ref}. This manager also handles autoloading of classes, which in practice removes the task of manually loading PHP files using the \texttt{include "file.php";} or \texttt{require "file.php";} statement. 
+For better organization of code, in 2009, namespaces were introduced (PHP 5.3) and the PHP Framework Interoperability Group, which aims to formulate standards on autoloading, coding style, logging, etc. was created. \todo{ref}. Utilizing these tools and standards, many modern frameworks are managing dependencies to other frameworks and libraries through package managers such as Composer \todo{ref}. Normally these dependencies are hosted open-source on GitHub, made available for composer on packagist. Composer also handles autoloading of classes, which in practice removes the task of manually loading PHP files using the \texttt{include "file.php";} or \texttt{require "file.php";} statement. 
 
 These statements allows dynamically loading of dependencies, by taking an expression as argument, and resolving these statically has been subject for some research \todo{ref}. With autoloading and a proper program structure (as advocated by PHP-FIG) resolving dependencies statically becomes trivial.
 
-With increasing complexity of follows a need for quality assurance and testing. PHPUnit is a framework, written in PHP and available via. composer, that facilitates unit-testing. This framework is widely used and for example supports testing with databases and browser output through selenium integration. \todo{ref}. 
+With increasing complexity follows a need for quality assurance and testing. PHPUnit is a framework, written in PHP and available via. composer, that facilitates unit-testing. This framework is widely used and e.g. supports testing with databases and browser output through selenium integration. PHPUnit is also used for generating coverage information for code-analysers, such as code climate, and is natively supported, as a metric of quality, by continuous integration tools, such as travis CI. \todo{ref}. 
 
-\todo{write about hack?}
-
+Travis CI is an online service, free for open-source projects, just as GitHub and Code Climate. It observers GitHub repositories and runs an advanced check on every new committed version, emulating multiple different deployment environments wrt. operating system, PHP interpreter version, web-server, etc. Emulating different environments locally can be done with vagrant which lowers development environment setup time by automating the process, making it possible for developers develop to a production environment.
 
 
 \section{Language features}

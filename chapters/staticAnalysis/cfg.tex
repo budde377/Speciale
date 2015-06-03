@@ -12,16 +12,16 @@
 Given a P0 program, $p : \syn{program}$, parsed to a abstract syntax tree, the control flow graph can be constructed recursively. Most of the nodes takes arguments. Here $h$ denotes variables of type HeapTemps, $t$ variables of type Temps, and $c$ variables of either type. Subgraphs are denoted by a grey rectangles with letters $\subt{S}$, $\subt{E}(t)$, $\subt{R}(h)$, $\subt{V}(h)$, and $\subt{T}(c)$ which denotes subgraph of statement $S$, expression $E$ with the resulting value stored in variable $t$, reference expression $R$ with resulting heap-location-set stored in $h$, variable expression $V$ with resulting heap-location-set stored in $h$, or either expression with the result stored in $c$ respectively. For a given argument, $c$, to the subgraph, the variable corresponds to the target variable, $c_{tar}$, in the subgraph. E.g. let  $E = \texttt{1+(2+3)}$ then the graph of $\subt{E}(t)$ is recursively constructed as in graph \ref{graph:exexpr}. Notice how the argument, $t$, passed to the graph is the third argument of the last $\mathit{bop}_+(\_)$ node.
 \begin{definition}
 \label{def:cfg}
-A control-flow-graph $G = (V,E, s, t)$ where $V$ is a set of nodes, $E$ is a set of node pairs representing an edge between two nodes, $s\in V$ is a start node and $t\in V$ is an exit node. When illustrated as a graph, the entry node is marked with an ingoing edge with no origin and the exit node is marked with an outgoing edge with no target. E.g. in example graph \ref{graph:exexpr}, $s = \mathit{const}_r(1, t_1)$ and $t = \mathit{bop}_+(t_1, t_2, t)$.
+A control-flow-graph $G = (V,E, s, t)$ where $V$ is a set of nodes, $E$ is a set of node pairs representing an edge between two nodes, $s\in V$ is a start node and $t\in V$ is an exit node. When illustrated as a graph, the entry node is marked with an ingoing edge with no origin and the exit node is marked with an outgoing edge with no target. E.g. in example graph \ref{graph:exexpr}, $s = \mathit{constRead}(1, t_1)$ and $t = \mathit{bop}_+(t_1, t_2, t)$.
 \end{definition}
 
 There are seventeen different nodes, all introduced below
 \begin{description}
 \item{$\mathit{start}$:} This node indicates the start of a program and is the first node of any program or function body. 
-\item{$\mathit{bop}(t_l,t_r, t_{tar})$, $\mathit{sop}(t_l,t_r, t_{tar})$, $\mathit{uop}(t, t_{tar})$, $\mathit{inc}(h, t_{tar})$:} These nodes indicates binary, short-circuit-binary, uanry, and increment/decrement operations, respectively. The operations of the first three are all performed on temporary storage, while the forth is performed on the heap. The last argument, $t_{tar}$, indicates where the result of performing the operation should be stored. E.g. $\texttt{1+2}$ is a binary operation ($\mathit{bop}$) returning $\texttt{3}$, this value should be stored in temporary storage at $t_{tar}$. 
+\item{$\mathit{bop_{\oplus}}(t_l,t_r, t_{tar})$, $\mathit{sop_{\oplus}}(t_l,t_r, t_{tar})$, $\mathit{uop_{\circ}}(t, t_{tar})$, $\mathit{inc_{\circ}}(h, t_{tar})$:} These nodes indicates binary, short-circuit-binary, uanry, and increment/decrement operations, respectively. The operations of the first three are all performed on temporary storage, while the forth is performed on the heap. The last argument, $t_{tar}$, indicates where the result of performing the operation should be stored. E.g. $\texttt{1+2}$ is a binary operation ($\mathit{bop}$) returning $\texttt{3}$, this value should be stored in temporary storage at $t_{tar}$. 
 \item{$\mathit{if}(t)$:} This node has one incoming and two outgoing edges, representing the choice of one branch or the other, when evaluating $t$. 
-\item{$\mathit{const}_r(c, t_{tar})$:} This node representing reading a constant into the temporary storage, at $t_{tar}$. The constant can be strings, booleans, null, ints etc.
-\item{$\mathit{var}_r(\texttt{\$v}, c_{tar})$, $\mathit{var}_w(\texttt{\$v}, c_{val}, t_{tar})$:} These nodes indicates reading from and writing to a variable, \texttt{\$v}, respectively. Depending on the context the target of the read and value of the write can either be a temporary or temporary heap storage. 
+\item{$\mathit{constRead}(c, t_{tar})$:} This node representing reading a constant into the temporary storage, at $t_{tar}$. The constant can be strings, booleans, null, ints etc.
+\item{$\mathit{varRead}(\texttt{\$v}, c_{tar})$, $\mathit{var}_w(\texttt{\$v}, c_{val}, t_{tar})$:} These nodes indicates reading from and writing to a variable, \texttt{\$v}, respectively. Depending on the context the target of the read and value of the write can either be a temporary or temporary heap storage. 
 \item{$\mathit{array}_i(t_{tar})$:} This node represents initializing an empty array in the temporary storage, at $t_{tar}$.
 \item{$\mathit{array}_a(t_{val}, t_{ar})$, $\mathit{array}_a(h_{var}, c_{val}, t_{tar})$, $\mathit{array}_a(h_{var}, h_{tar})$:} With three different signatures, this node represents appending to an array, in temporary storage, in the heap, and in a read-context. Normally PHP will not allow appending without a value, but in this case, the reference of the appended entry is placed in temporary heap storage, and thus accessible for later modification. The $c_{val}$ variable in the second node indicates that both values and references can be appended to an array.
 \item{$\mathit{array}_r(h_{ar}, t_{key}, c_{tar})$:} Reading from an array on the heap, with value key at $t_{key}$. The result can either be references to the entry or values at the given key, hence the $c_{tar}$ variable. 
@@ -60,9 +60,9 @@ There are seventeen different nodes, all introduced below
 \begin{adjustbox}{max size={1\textwidth}{.25\textheight}, margin = 10pt}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
 	\node [entry] (en) {};
- 	\node [node, right of=en, label={270:$\mathit{const_r}(\texttt{1},t_1)$}] (c1) {};
- 	\node [node, right of=c1, label={90:$\mathit{const_r}(\texttt{2},t_3)$}] (c2) {};
- 	\node [node, right of=c2, label={270:$\mathit{const_r}(\texttt{3},t_4)$}] (c3) {};
+ 	\node [node, right of=en, label={270:$\mathit{constRead}(\texttt{1},t_1)$}] (c1) {};
+ 	\node [node, right of=c1, label={90:$\mathit{constRead}(\texttt{2},t_3)$}] (c2) {};
+ 	\node [node, right of=c2, label={270:$\mathit{constRead}(\texttt{3},t_4)$}] (c3) {};
  	\node [node, right of=c3, label={90:$\mathit{bop}_+(t_3,t_4, t_2)$}] (bop1) {};
  	\node [node, right of=bop1, label={270:$\mathit{bop}_+(t_1,t_2, t)$}] (bop2) {};
 	\node [exit, right of=bop2] (ex) {};
@@ -205,7 +205,7 @@ function &refRet(&$a){
 \subcaptionbox{\texttt{return}-statement\label{graph:floweret}}{\begin{adjustbox}{max size={.3\textwidth}{.25\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
-    \node [node, below of=en, label={45:$\mathit{const}_r(\texttt{null}, t_{tar})$}] (const) {};
+    \node [node, below of=en, label={45:$\mathit{constRead}(\texttt{null}, t_{tar})$}] (const) {};
     \node [node, below of=const, label={45:$\mathit{exit}(\cdots, t_{tar}, \cdots)$}] (exitn) {};
     \node [emptynode, below of=exitn ] (end) {};
     \node [exit, below of=end] (ex) {};
@@ -299,7 +299,7 @@ Let $e : \syn{expr}$ then, by ignoring the trivial parenthesized expression case
 \hspace*{\fill}
 \end{graph}
 
-For a variable read, $e = \texttt{\$v}$ for some variable \texttt{\$v}, or a constant read, e.g. $e = \texttt{"foo"}$, the graph is a single $\mathit{var}_r(\texttt{\$v}, t_{tar})$ or $\mathit{const}_r(\texttt{"foo"}, t_{tar})$ node respectively. For an array read expression, $e = E_{ar}\texttt[E_{key}\texttt{]}$, the sub array expression, $E_{ar}$, should be evaluated before the key expression, $E_{key}$, and the graph then becomes like graph \ref{graph:flowaread}, where $T$ is the graph corresponding to $E_{ar}$ and $c_{ar}, c_{tar} : \text{Temps}$. If the expression is an array initialization, $e = \texttt{[}\cdots, E_1, \cdots, E_2\texttt{=>}E_3\texttt{]}$, then an array is first initialized in temporary storage after the entries are either appended or written to the array. Hence graph \ref{graph:flowai}.
+For a variable read, $e = \texttt{\$v}$ for some variable \texttt{\$v}, or a constant read, e.g. $e = \texttt{"foo"}$, the graph is a single $\mathit{varRead}(\texttt{\$v}, t_{tar})$ or $\mathit{constRead}(\texttt{"foo"}, t_{tar})$ node respectively. For an array read expression, $e = E_{ar}\texttt[E_{key}\texttt{]}$, the sub array expression, $E_{ar}$, should be evaluated before the key expression, $E_{key}$, and the graph then becomes like graph \ref{graph:flowaread}, where $T$ is the graph corresponding to $E_{ar}$ and $c_{ar}, c_{tar} : \text{Temps}$. If the expression is an array initialization, $e = \texttt{[}\cdots, E_1, \cdots, E_2\texttt{=>}E_3\texttt{]}$, then an array is first initialized in temporary storage after the entries are either appended or written to the array. Hence graph \ref{graph:flowai}.
 \begin{graph}
 \captionsetup{justification=centering}
 \hspace*{\fill}
@@ -539,4 +539,4 @@ Since PHP supports nested assignments e.g. \texttt{\$a[]['foo']  = \&func()[]}, 
 \label{graph:exassign}
 \end{graph}
 
-The subtrees which takes a $h : \text{HeapTemp}$ variable are called reference- and variable-expressions. Where the only difference between the two is that reference expressions may contain function references. As seen in the previous example they resolve heap-locations rather than values. For $r = \mathit{fn} \texttt{(}c_1, \cdots, c_n\texttt{)}$ the graphs corresponds to graph \ref{graph:flowcall}, with heap-locations as result, i.e. $c_{tar} : \text{HeapTemps}$. For the variable read, $r = \texttt{\$v}$, the graphs is a single $\mathit{var}_r(\texttt{\$v}, h_{tar})$ node. When the expression is an array-read, $r= R_{ar}[E_{key}]$, the graph corresponds to that of \ref{graph:flowaread} with $c_{ar},c_{tar} : \text{HeapTemps}$ and $T$ being the graph of $R_{ar}$. Finally for the append operation, $r = R_{ar}[]$, the graphs corresponds that of graph \ref{graph:flowaappend2}.
+The subtrees which takes a $h : \text{HeapTemp}$ variable are called reference- and variable-expressions. Where the only difference between the two is that reference expressions may contain function references. As seen in the previous example they resolve heap-locations rather than values. For $r = \mathit{fn} \texttt{(}c_1, \cdots, c_n\texttt{)}$ the graphs corresponds to graph \ref{graph:flowcall}, with heap-locations as result, i.e. $c_{tar} : \text{HeapTemps}$. For the variable read, $r = \texttt{\$v}$, the graphs is a single $\mathit{varRead}(\texttt{\$v}, h_{tar})$ node. When the expression is an array-read, $r= R_{ar}[E_{key}]$, the graph corresponds to that of \ref{graph:flowaread} with $c_{ar},c_{tar} : \text{HeapTemps}$ and $T$ being the graph of $R_{ar}$. Finally for the append operation, $r = R_{ar}[]$, the graphs corresponds that of graph \ref{graph:flowaappend2}.
