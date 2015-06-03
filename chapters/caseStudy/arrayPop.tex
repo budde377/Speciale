@@ -1,0 +1,28 @@
+\section{Joining array values}
+This case is inspired by \todo{what?} and shows how the analysis 
+
+\begin{program}
+\begin{lstlisting}
+$people = ["John", "Jane", "Alice", "Bob"];
+$animals = ["Dog", "Cat", "Bird", "Fish"];
+$animalMap = [];
+
+for($i = 0; $i < count($people); $i++) {
+    $animalMap[$people[$i]] = $animals[$i];
+    $animalMap[$i] = ", ";
+}
+
+array_pop($animalMap);
+$animalString = implode("", $animalMap);
+echo "The people have the following animals: " . $animalString;
+\end{lstlisting}
+\caption{Joining array values to a string}
+\label{lst:arrayPopExample}
+\end{program}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[scale=0.6]{chapters/caseStudy/popError}
+\caption{Using the pop function on a map array}
+\label{fig:arrayPopScreenshot}
+\end{figure}
