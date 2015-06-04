@@ -105,6 +105,7 @@ rb.enable_debug_file="/path/to/output/csv/file"
 \end{figure}
 
 \subsection{Limitations}
+\label{sec:limitations}
 Since the analysis is performed by a modified interpreter, there are some imposed limitations on the achievable precision. 
 
 \begin{itemize}
@@ -112,7 +113,7 @@ Since the analysis is performed by a modified interpreter, there are some impose
 
 \item Detecting the type of arrays relies on the type of the values read from or written to the arrays. This implies that there is no reasoning about arrays never read or written. Some of these arrays may fall into the uncategorized category but remain undetected by the analysis.
 
-\item Callables can be written as anonymous functions, strings, or arrays, containing an instance and a string. This analysis will fail to classify arrays containing callables, initialized differently, correctly, thus introducing false negatives. E.g in example \ref{lst:callables}; \texttt{\$callable1}, \texttt{\$callable3} and \texttt{\$callable4} are all valid callables, however \texttt{\$callable2} is not, since \texttt{\$a->f2()} is a private function.
+\item Callables can be written as anonymous functions, strings, or arrays containing either an instance or a string representing a class name together with string represent a function name. Arrays of callables should be considered lists however this analysis will classify them as objects. Example \ref{lst:callables} shows different types of callables.
 
 \begin{program}
 \centering
@@ -120,10 +121,6 @@ Since the analysis is performed by a modified interpreter, there are some impose
 class A{
 
     public function f1(){
-        ...
-    }
-
-    private function f2(){
         ...
     }
 
@@ -136,7 +133,7 @@ function f(){
 $a = new A();
 
 $callable1 = [$a, "f1"];
-$callable2 = [$a, "f2"];
+$callable2 = ["A", "f1"];
 $callable3 = "f";
 $callable4 = function() use ($a){
     ...
@@ -146,7 +143,7 @@ $callable4 = function() use ($a){
 \label{lst:callables}
 \end{program}
 
-\item Multiple operations of the same type on different arrays leads to sharing of IDs. Following the limited information available to distinguish operations, operations such as assign to an multidimensional array leads to sharing it between the array and its sub-arrays, (see figure \ref{lst:dis_code} line \ref{line:assign}). This follows from the value first being assigned to the sub-array which then is assigned to the super-array. This leads to false negatives and could be solved if the interpreter kept character location information in addition to line number and file name.   
+\item Multiple operations of the same type on different arrays leads to sharing of IDs. Following the limited information available to distinguish operations, operations such as assign to an multidimensional array leads to sharing it between the array and its sub-arrays, (see figure \ref{lst:dis_code} line \ref{line:assign}). This follows from the value first being assigned to the sub-array which then is assigned to the super-array. Combining multiple arrays may lead to uncategorizable arrays even if each array is categorizable. A possible solution would be if the interpreter kept character location information in addition to line number and file name.   
 
 \end{itemize}
 

@@ -6,4 +6,4 @@ The results show that generally arrays keep the same type during their lifetime.
 
 A significant amount of arrays turned out to be objects with list-keys by the initial definition. These objects indicate that the object type is not providing significant information in itself, and show the possibility that the definitions of maps and lists consume the object type, i.e. letting maps and lists allow values of different type.
 
-Almost every framework in the corpus contains cyclic arrays, hence the static analysis has to take the possibility of recursive types into consideration. However, the small amount of cyclic arrays indicate that an imprecise approach will have a minimal impact on the overall precision.
+Almost every framework in the corpus contains cyclic arrays however these are nearly exclusively uses of the superglobal \texttt{\$GLOBALS} which is a special case of array even without considering its cyclic structure. The hypothesis therefore mostly holds and a naive approach can be taken to handle cyclic arrays in the static analysis.
