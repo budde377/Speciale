@@ -6,7 +6,10 @@ In order to create a inter-procedural analysis, the analysis lattice is defined 
 \begin{align}
 \text{AnalysisLattice} = \Delta \rightarrow \text{State}
 \end{align}
-This is a map from a context to an abstract state, where the context, $\Delta$ consists of a list of call-sites, represented as the call nodes in the control flow graph, with length bounded by $k>0$. 
+This is a map from a context to an abstract state, where the context, $\Delta$ consists of a list of call-sites, represented as the call nodes in the control flow graph, with length bounded by $k>0$. The bound $k$ must be greater than zero, since the context is chosen to decide between local and global scope. 
+
+If the context was bounded by $k=0$ this would entail that all variables would be updated in the global scope, which with the current analysis isn't sound. In the analysis the only strong update of the heap is preformed when writing to a variable pointing to no locations, which is sound because the variable has not been initialized, hence can not have been referenced. By only using the global scope, performing an strong update with a not-null value will indicate that the variable can't be \texttt{null}. This is true for the function body, but in the global scope the variable is uninitialized, i.e. \texttt{null}, hence the analysis would be unsound.
+
 \begin{align}
 \Delta = \text{CallNode}_*^{\leq k}
 \end{align}

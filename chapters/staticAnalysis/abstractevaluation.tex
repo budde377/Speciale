@@ -191,16 +191,7 @@ where $\texttt{- -} : \text{Number}\rightarrow\text{Number}$ is defined by table
 
 In table \ref{tab:binop} logical \texttt{AND} and \texttt{OR} operators have two different notations. This is due to PHP specifying different precedence for the two notations. The textual operators bind weaker than assignments whereas the symbol operators bind stronger than assignments. Since the AST for the analysis is provided this difference have no direct impact on the analysis implementation.
 
-For numeric operators the definitions use the following variables:
-
-\begin{align*}
-x, y &\in \mathbb{Z} \wedge x, y > 0 \\
-a, b &\in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})
-\end{align*}
-
-\todo{Then why is $b\in\mathbb{Z}$ below}
-
-\todo{Example}
+For numeric operators the variables $x$, $y$, $a$, and $b$ are used. $x$ and $y$ denote an integer larger than zero, $x, y \in \mathbb{Z} \wedge x, y > 0$ and $a$, $b$ is a double smaller than zero or not a integer, $a, b \in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})$. Or an uInt number and notUInt number respectively, e.g. with this notion the addition $x+a$ would be an addition of a uInt number ($x$) and a notUInt number ($a$).
 
 
 Table \ref{tab:abstract_subtraction1} defines abstract subtraction. Numbers in uInt are split into 0 and all other numbers while numbers in notUInt are split into negative and positive numbers. These splits are made to heighten the precision of the operator. 0 is the right-identity of subtraction which is used in the 0-column of table \ref{tab:abstract_subtraction1} to get uInt instead of $\top$. Subtracting negative numbers correspond to adding the absolute value of the number. For uInt this means that adding negative integers results in uInt instead of $\top$.
