@@ -1,21 +1,13 @@
 \section{Coercion}
 \label{sec:coercion}
-\todo{description first, definition afterwards. More description of interesting cases of coercion}
-In order to mimic the ability of coercing values the following functions
-\begin{align*}
-c_{\alpha, \beta} : \alpha \rightarrow \beta
-\end{align*}
-where $\alpha \in \{ \text{Value}, \text{Array}, \text{Number}, \text{String}, \text{Null}, \text{Boolean}\}$ and {
-\def\OldComma{,}
-    \catcode`\,=13
-    \def,{%
-      \ifmmode%
-        \OldComma\discretionary{}{}{}%
-      \else%
-        \OldComma%
-      \fi%
-    }% 
-$\beta \in \{\text{Number}, \text{Value}, \text{String}, \text{Index}, \text{Boolean}\}$ } are defined as 
+
+In order to fully utilize the benefits of a dynamic typed language, PHP supports coercion from most types to scalars (strings, numbers, boolean, etc.). Coercion is primarily used when performing binary-, unary-operators, and when accessing arrays. Coercion to an array index must be treated as a separate case because it behaves differently from string or number coercion. E.g. accessing an array with key \texttt{\$key}, \texttt{\$a[\$key]}, if \texttt{\$key = 42} or \texttt{\$key = "42"} then the entry at integer $42$ is accessed, which is similar to string-to-number coercion. The same entry is accessed with \texttt{\$key = 42.1} or \texttt{\$key = 4.34E1}, because keys must be either integers or strings. Accessing with \texttt{\$key = "42.1"} accesses the entry with string key \texttt{"42.1"}. 
+
+Since there is no language specification, these coercion rules has largely been discovered by manual inspection, using different operators, e.g. number coercion has been explored by adding values of various types together, with the binary \texttt{+}-operator, and string coercion with the string-concat \texttt{.}-operator.
+
+Coercion on abstract values can be performed using the $c_{\alpha, \beta} : \alpha \rightarrow \beta$ function, where $\alpha \in \{ \text{Value}, \text{Array}, \text{Number}, \text{String}, \text{Null}, \text{Boolean}\}$ and $\beta \in \{\text{Number}, \text{Value}, \text{String}, \text{Index}, \text{Boolean}\}$. 
+
+Coercing to and from Value's is defined by the following functions
 \begin{align*}
 c_{\alpha,\text{Value}}(v) &=   \begin{cases} 
        (v, \bot, \bot, \bot, \bot) & \text{ if $\alpha = $ Array} \\
@@ -24,15 +16,15 @@ c_{\alpha,\text{Value}}(v) &=   \begin{cases}
        (\bot, \bot, \bot,v,  \bot) & \text{ if $\alpha = $ Boolean} \\
        (\bot, \bot, \bot, \bot, v) & \text{ if $\alpha = $ Null} \\
   \end{cases}\\
-  c_{\text{Value}, \alpha}((v_1, v_2, v_3, v_4, v_5)) &= 
-  c_{\text{Array}, \alpha}(v_1) \sqcup c_{\text{String}, \alpha}(v_2) \\ 
-  &\sqcup c_{\text{Number}, \alpha}(v_3) \sqcup c_{\text{Boolean},\alpha }(v_4) \sqcup c_{\text{Null}, \alpha}(v_5)\\
+  c_{\text{Value}, \beta}((v_1, v_2, v_3, v_4, v_5)) &= 
+  c_{\text{Array}, \beta}(v_1) \sqcup c_{\text{String}, \beta}(v_2) \\ 
+  &\sqcup c_{\text{Number}, \beta}(v_3) \sqcup c_{\text{Boolean},\beta}(v_4) \sqcup c_{\text{Null}, \beta}(v_5)\\
 \end{align*}
-
-{\tiny
+where 
+{\scriptsize
 \begin{align*}
 c_{\text{Array},\text{String}}(v) &= \begin{cases}
-"Array" & \text{if $v \neq \bot$}\\
+\texttt{"Array"} & \text{if $v \neq \bot$}\\
 \bot & \text{else}
 \end{cases} & 
 c_{\text{Null},\text{String}}(v) &=\begin{cases} 
@@ -40,37 +32,37 @@ c_{\text{Null},\text{String}}(v) &=\begin{cases}
        \bot & \text{else}
   \end{cases}\\
 c_{\text{Number},\text{String}}(v) &=\begin{cases} 
-       uIntStr & \text{if $v = uInt$ }\\
-       notUIntStr & \text{if $v = notUInt$  }\\
+       \text{uIntStr} & \text{if $v = $uInt }\\
+       \text{notUIntStr} & \text{if $v = $notUInt  }\\
        \top & \text{if $v = \top$  }\\
        \bot & \text{if $v = \bot$  }\\
-       string(v) & \text{else}\\
+       \mathit{string}(v) & \text{else}\\
   \end{cases} &
 c_{\text{Bool},\text{String}}(v) &=\begin{cases} 
-       "" & \text{if $v = false$}\\
-       "1" & \text{if $v = true$}\\
+       \texttt{""} & \text{if $v = $false}\\
+       \texttt{"1"} & \text{if $v = $true}\\
        v & \text{else}
   \end{cases}\\
 c_{\text{Array}, \text{Bool}}(v) &= \begin{cases} 
-       false & \text{if $v = emptyArray$ }\\
+       \text{false} & \text{if $v = $emptyArray }\\
        \bot & \text{ if $v = \bot$}\\
        \top & \text{else}\\
   \end{cases} &
 c_{\text{Null}, \text{Bool}}(v) &= \begin{cases} 
-       false & \text{if $v = \top$}\\
+       \text{false} & \text{if $v = \top$}\\
        \bot & \text{else}
   \end{cases}\\
 c_{\text{Number}, \text{Bool}}(v) &=\begin{cases} 
-       false & \text{ if $v = 0$} \\
+       \text{false} & \text{ if $v = 0$} \\
        \bot & \text{ if $v = \bot$}\\
-       \top & \text{ if $v = uInt \vee v = \top$}\\
-       true & \text{else}
+       \top & \text{ if $v = $uInt$ \vee v = \top$}\\
+       \text{true} & \text{else}
   \end{cases} &
 c_{\text{String}, \text{Bool}}(v) &= \begin{cases} 
-       false & \text{ if $v = "" \vee v = "0"$} \\
+       \text{false} & \text{ if $v = \texttt{""} \vee v = \texttt{"0"}$} \\
        \bot & \text{ if $v = \bot$}\\
-       \top & \text{ if $v = uIntString \vee v = \top$}\\
-       true & \text{else}
+       \top & \text{ if $v = \text{uIntString} \vee v = \top$}\\
+       \text{true} & \text{else}
   \end{cases}\\
 c_{\text{Null}, \text{Number}}(v) &= \begin{cases} 
        0 & \text{if $v = \top$}\\
@@ -78,15 +70,15 @@ c_{\text{Null}, \text{Number}}(v) &= \begin{cases}
   \end{cases} &
   c_{\text{Array}, \text{Number}}(v) &= \bot \\
 c_{\text{Bool}, \text{Number}}(v) &=\begin{cases} 
-       1 & \text{if $v = true$}\\
-       0 & \text{if $v = false$}\\
-       uInt & \text{if $v = \top$}\\
+       1 & \text{if $v = $true}\\
+       0 & \text{if $v = $false}\\
+       \text{uInt} & \text{if $v = \top$}\\
        \bot & \text{if $v = \bot$}
   \end{cases} &
 c_{\text{String}, \text{Number}}(v) &=\begin{cases} 
-       num(v) & \text{if $isNumber(v)$}\\
-       uInt & \text{if $v = uIntString$ }\\
-       \top & \text{if $v = notUIntString$  }\\
+       \mathit{num}(v) & \text{if $\mathit{isNumber}(v)$}\\
+       \text{uInt} & \text{if $v = $uIntString }\\
+       \top & \text{if $v = $notUIntString  }\\
        \top & \text{if $v = \top$}\\
        \bot & \text{if $v = \bot$}\\
        0 & \text{else}
@@ -94,49 +86,30 @@ c_{\text{String}, \text{Number}}(v) &=\begin{cases}
   c_{\text{Array}, \text{Index}}(v) &= \bot &
 c_{\text{Bool}, \text{Index}}(v) &= c_{\text{Bool}, \text{Number}}(v)\\
 c_{\text{Number}, \text{Index}}(v) &= \begin{cases} 
-        int(v) & \text{if $isInteger(v)$}\\
+        \mathit{int}(v) & \text{if $\mathit{isNumber}(v)$}\\
         \bot & \text{if $v = \bot $}\\
         \top & \text{else} 
   \end{cases} &
 c_{\text{String}, \text{Index}}(v) &= \begin{cases} 
-       int(v) & \text{if $isInteger(v)$}\\
+       \mathit{int}(v) & \text{if $\mathit{isInteger}(v)$}\\
        v & \text{if $isString(v)$}\\
        \top & \text{else}
 \end{cases}\\
 c_{\text{Null}, \text{Index}}(v) &= \begin{cases} 
-       "" & \text{if $v = \top$}\\
+       \texttt{""} & \text{if $v = \top$}\\
        \bot & \text{else}
       \end{cases} &
 c_{\alpha, \alpha} (v) &= v
 \end{align*}
 }
-Here $int$, $num$, and $string$ are creating an integer, number, and string respectively.
+and $\mathit{int}$, $\mathit{num}$, and $\mathit{string}$ are creating an integer, number, and string respectively, in the obvious way. E.g. $\mathit{int}(42.1) = 42$, $\mathit{string}(1337) = \texttt{"1337"}$, and $\mathit{number}(\texttt{"1337"}) = 1337$. Furthermore the predicates $\mathit{isNumber}$, $\mathit{isInteger}$, $\mathit{isString}$ holds if and only if the value can be interpreted as a number, integer, or string respectively. E.g. $\mathit{isNumber}(\texttt{"42.1"})$ holds while $\mathit{isInteger}(\texttt{"42.1"})$ does not.
 
-A few things are worth noticing about coercion in PHP. 
-\begin{itemize}
-\item Any array coerced to a string will result in the string literal ``Array''
-\item Null is coerced to the empty string
-\item Both the empty string and the string literal ``0'' are coerced to boolean \texttt{false}
-\item Boolean \texttt{false} is coerced to the empty string
-\item An empty array is coerced to boolean \texttt{false}
-\end{itemize}. 
+A few interesting cases of coercion in PHP include; Any array coerced to a string will result in the string \texttt{"Array"}, \texttt{null} is string-coerced to the empty string, both the empty string and the string literal \texttt{"0"} are boolean-coerced to boolean \texttt{false}, boolean \texttt{false} is string-coerced to the empty string, and An empty array is boolean-coerced to boolean \texttt{false}.
 \section{Abstract evaluation}
 \label{sec:abseval}
-This section lists the supported binary and unary operators and the abstract evaluation of those operators for the analysis lattice. Insight on the abstract evaluation can be found in this section. Appendix \ref{app:abstract_operators} provides definition tables for all abstract operators for reference.
 
-The binary and unary operations supported are listed in table \ref{tab:binop} and \ref{tab:unop} respectively. Numeric, boolean and string operators can be generalized to values by using the coercion function from the previous section. E.g. given values $x$ and $y$
-\begin{align*}
-    x \oplus y =  c_{\beta, \text{Value}}(c_{\text{Value}, \alpha}(x) \oplus c_{\text{Value},\alpha}(y))
-\end{align*}
-where $\oplus : \alpha \times \alpha \rightarrow \beta$. Likewise can the unary operation be generalized to values 
-\begin{align*}
-    \circ x = c_{\alpha, \text{Value}}(\circ (c_{\text{Value}, \alpha}(x)))
-\end{align*}
-where $\circ : \alpha \rightarrow \alpha $.
+In order to maintain some precision when evaluating binary- and unary-operators, a table is created for each operation defining the result of the evaluating a given input abstractly. These tables are available in appendix \ref{app:abstract_operators}, with some interesting cases presented below.
 
-\todo{examples}
-
-In table \ref{tab:binop} logical \texttt{AND} and \texttt{OR} operations have two different notations. This is due to PHP specifying different precedence for the two notations. The textual operators bind weaker than assignments whereas the symbol operators bind stronger than assignments. Since the AST for the analysis is provided this difference have no direct impact on the analysis implementation.
 
 \begin{table}
 \centering
@@ -165,7 +138,7 @@ Operator & Name & Signature\\
 \texttt{x XOR y} & Exclusive or & \\\hline
 \texttt{x . y} & String concatenation & $ \text{String} \times \text{String} \rightarrow \text{String}$ \\\hline
 \end{tabular}
-\caption{Binary operations\label{tab:binop}}
+\caption{Binary operators\label{tab:binop}}
 \end{table}
 
 \begin{table}
@@ -174,14 +147,49 @@ Operator & Name & Signature\\
 Operator & Name & Signature\\
 \hline\hline
 \texttt{! x} & Negation & $\text{Boolean} \rightarrow \text{Boolean}$\\\hline
-\texttt{-- x} & Decrement & \multirow{5}{*}{ $\text{Number} \rightarrow \text{Number}$}\\
-\texttt{+ + x} & Increment &\\
-\texttt{x - -} & Decrement & \\
-\texttt{x + + } & Increment & \\
+\texttt{- - x} & Pre-decrement & \multirow{5}{*}{ $\text{Value} \rightarrow \text{Value}$}\\
+\texttt{x - -} & Post-decrement & \\
+\texttt{+ + x} & Pre-increment &\\
+\texttt{x + + } & Post-increment & \\
 \texttt{- x} & Unary Minus & \\\hline
 \end{tabular}
-\caption{Unary operations\label{tab:unop}}
+\caption{Unary operators\label{tab:unop}}
 \end{table}
+
+The binary and unary operators supported are listed in table \ref{tab:binop} and \ref{tab:unop} respectively. Associated with them is their signature, indicating on which values they are defined. The operators are generalized to values by using the coercion function from the previous section. E.g. given values $x$ and $y$
+\begin{align*}
+    x \oplus y =  c_{\beta, \text{Value}}(c_{\text{Value}, \alpha}(x) \oplus c_{\text{Value},\alpha}(y))
+\end{align*}
+where $\oplus : \alpha \times \alpha \rightarrow \beta$. Likewise can the unary operation be generalized to values 
+\begin{align*}
+    \circ x = c_{\alpha, \text{Value}}(\circ (c_{\text{Value}, \alpha}(x)))
+\end{align*}
+where $\circ : \alpha \rightarrow \alpha $. E.g., performing addition \texttt{41 + true} first coerces the right side to \texttt{1} yielding \texttt{42} as result of the addition. 
+\begin{comment}
+Notice how the signature of the decrement is different from increment. This follows from the \emph{feature} that decrementing a variable containing \texttt{null} is not coerced to 0 and then decremented, but instead leaves the variable unchanged. This leads to the abstract decrement operation $\texttt{- -}: \text{Value}\rightarrow\text{Value}$.
+\begin{align*}
+		\texttt{- -} (v_a, v_s, v_n, v_b, v_u) =
+		& (\bot, \bot, \notag\\
+		&\quad\texttt{- -}(\coerce{Array}{Number}(v_a)\notag\\
+		&\quad\quad\sqcup\coerce{String}{Number}(v_s) \notag\\
+		&\quad\quad\sqcup v_n \notag\\
+		&\quad\quad\sqcup \coerce{Boolean}{Number}(v_b)), \bot, v_u)
+\end{align*}
+where $\texttt{- -} : \text{Number}\rightarrow\text{Number}$ is defined by table \ref{tab:abs_dec_inl}.
+
+\begin{table}
+
+\centering
+\begin{tabular}{l|ccccc}
+\texttt{- -} 	& $\bot$ 	& $n$ 	& uInt		& notUInt	&$\top$ \\\hline
+			 	& $\bot$ 	& $n-1$	& $\top$	& notUInt	&$\top$	
+\end{tabular}
+\caption{Abstract pre- and post-decrement\label{tab:abs_dec_inl}}
+
+\end{table}
+\end{comment}
+
+In table \ref{tab:binop} logical \texttt{AND} and \texttt{OR} operators have two different notations. This is due to PHP specifying different precedence for the two notations. The textual operators bind weaker than assignments whereas the symbol operators bind stronger than assignments. Since the AST for the analysis is provided this difference have no direct impact on the analysis implementation.
 
 For numeric operators the definitions use the following variables:
 
@@ -189,6 +197,11 @@ For numeric operators the definitions use the following variables:
 x, y &\in \mathbb{Z} \wedge x, y > 0 \\
 a, b &\in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})
 \end{align*}
+
+\todo{Then why is $b\in\mathbb{Z}$ below}
+
+\todo{Example}
+
 
 Table \ref{tab:abstract_subtraction1} defines abstract subtraction. Numbers in uInt are split into 0 and all other numbers while numbers in notUInt are split into negative and positive numbers. These splits are made to heighten the precision of the operator. 0 is the right-identity of subtraction which is used in the 0-column of table \ref{tab:abstract_subtraction1} to get uInt instead of $\top$. Subtracting negative numbers correspond to adding the absolute value of the number. For uInt this means that adding negative integers results in uInt instead of $\top$.
 
@@ -210,8 +223,10 @@ $\top$                          & $\bot$ & $\top$  & $\top$  & $\top$  & $\top$ 
 \caption{Abstract Subtraction}
 \label{tab:abstract_subtraction1}
 \end{table}
+\todo{Add examples on subtraction}
 
-For division and modulo operations an error can occur trying to divide by 0. PHP handles division by 0 by returning the boolean \texttt{false} value instead of a number. This is the reason that division and modulo operators are functions from numbers to a value as opposed to the rest of the numeric operators. The shorthand $f$ is used for the boolean \texttt{false} value to keep the table smaller. Only the uInt part of the number lattice can contain 0 which restricts the amount of possible \texttt{false} returns for division. However as seen in table \ref{tab:abstract_modulus1} the amount of possible \texttt{false} values are high for the modulus operator. This is because PHP handles modulus for decimal numbers by removing the decimal part which means $-0.5 \Rightarrow 0$ and $0.8 \Rightarrow 0$. The result of the modulus operator is always an integer and the sign is dictated by the sign of the left-hand operand which can be seen in the table by the $\top$-element column not consisting solely of $\top$-element results.
+
+For division and modulo operators an error can occur trying to divide by 0. PHP handles division by 0 by returning the boolean \texttt{false} value instead of a number. For this reason division and modulo operators are functions from numbers to a value as opposed to the rest of the numeric operators. The shorthand $f$ is used for the boolean \texttt{false} value to keep the table smaller. Only the uInt part of the number lattice can contain 0 which restricts the amount of possible \texttt{false} returns for division. However as seen in table \ref{tab:abstract_modulus1} the amount of possible \texttt{false} values are high for the modulus operator. This is because PHP handles modulus for decimal numbers by removing the decimal part which means $-0.5 \Rightarrow 0$ and $0.8 \Rightarrow 0$. The result of the modulus operator is always an integer and the sign is dictated by the sign of the left-hand operand which can be seen in the table by the $\top$-element column not consisting solely of $\top$-element results.
 
 \begin{table}[htbp]
 \centering
@@ -232,9 +247,9 @@ $\top$   & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f
 \label{tab:abstract_modulus1}
 \end{table}
 
-Comparison operations are defined directly on values since different types can be compared with each other courtesy of type translation. PHP has an ordered definition of how values are compared depending on their type which can be seen in table \ref{tab:comparisons}. Any combination of operations not present in the table considered unspecified and yields a boolean $\top$ value. 
+Comparison operators are defined directly on values since different types can be compared with each other courtesy of type translation. PHP has an non-complete ordered definition of how values are compared depending on their type which can be seen in table \ref{tab:comparisons}. Any combination of operators not present in the table considered unspecified and yields a boolean $\top$ value. 
 
-For performance reasons the analysis do not try to compare all different combinations of possible types when performing abstract comparison operations. If either value have multiple possible types the result is the boolean $\top$-element. Otherwise the comparison operators follow the order of table \ref{tab:comparisons} for coercion of values and comparison of specific types are specified in the tables in appendix \ref{app:abstract_operators}.
+For performance reasons the analysis do not try to compare all different combinations of possible types when performing abstract comparison operators. If either value have multiple possible types the result is the boolean $\top$-element. Otherwise the comparison operators follow the order of table \ref{tab:comparisons} for coercion of values and comparison of specific types are specified in the tables in appendix \ref{app:abstract_operators}.
 
 Arrays are first of all compared by size. Equal sized arrays with different keys are incomparable and otherwise the arrays are compared by their values. Since the array lattice have no notion of size it is not possible to reason about the results of array comparisons. The only possible sound result is the boolean $\top$-element.
 

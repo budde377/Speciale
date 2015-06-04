@@ -4,7 +4,6 @@ The following definitions are used for all tables in this appendix.
 x, y &\in \mathbb{Z} \wedge x, y > 0 \\
 a, b &\in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})
 \end{align*}
-
 Furthermore the shortshand $f$ is used for the boolean \texttt{false} value.
 
 \begin{table}[htbp]
@@ -20,7 +19,7 @@ $a$     & $\bot$& $a$       & $a+y$ & $\top$& $a+b$ & $\top$    & $\top$ \\
 notUInt & $\bot$& notUInt   & $\top$& $\top$& $\top$& $\top$    & $\top$ \\
 $\top$  & $\bot$& $\top$    & $\top$& $\top$& $\top$& $\top$    & $\top$ \\
 \end{tabular}
-\caption{Abstract Addition}
+\caption{Abstract addition}
 \label{tab:abstract_addition}
 \end{table}
 
@@ -39,7 +38,7 @@ notUInt                         & $\bot$ & notUInt & notUInt & notUInt & $\top$ 
 $\top$                          & $\bot$ & $\top$  & $\top$  & $\top$  & $\top$                          & $\top$  & $\top$  & $\top$
 \end{tabular}
 }
-\caption{Abstract Subtraction}
+\caption{Abstract subtraction}
 \label{tab:abstract_subtraction}
 \end{table}
 
@@ -56,7 +55,7 @@ $a$     & $\bot$ & $0$    & $a \cdot y$ & $\top$  & $a \cdot b$ & $a \cdot b$ & 
 notUInt & $\bot$ & $0$    & $\top$      & $\top$  & $\top$      & $\top$      & $\top$  & $\top$ \\
 $\top$  & $\bot$ & $0$    & $\top$      & $\top$  & $\top$      & $\top$      & $\top$  & $\top$
 \end{tabular}
-\caption{Abstract Multiplication}
+\caption{Abstract multiplication}
 \label{tab:abstract_multiplication}
 \end{table}
 
@@ -73,7 +72,7 @@ $a$     & $\bot$ & $f$    & $\frac{a}{y}$    & $\top \sqcup f$          & $\frac
 notUInt & $\bot$ & $f$    & $\top$          & $\top \sqcup f$          & $\top$        & $\top$        & $\top$  & $\top \sqcup f$ \\
 $\top$  & $\bot$ & $f$    & $\top \sqcup f$ & $\top \sqcup f$          & $\top$        & $\top$        & $\top$  & $\top \sqcup f$
 \end{tabular}
-\caption{Abstract Division}
+\caption{Abstract division}
 \label{tab:abstract_division}
 \end{table}
 
@@ -92,7 +91,7 @@ notUInt  & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f
 $\top$   & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f$         & $\top$   & $\top\sqcup f$            & $\top \sqcup f$         
 \end{tabular}
 }
-\caption{Abstract Modulus}
+\caption{Abstract modulus}
 \label{tab:abstract_modulus}
 \end{table}
 
@@ -108,9 +107,10 @@ $a$     & $\bot$ & $1$    & $a^y$  & $\top$ & $a^b$  & $\top$  & $\top$ \\
 notUInt & $\bot$ & $1$    & $\top$ & $\top$ & $\top$ & $\top$  & $\top$ \\
 $\top$  & $\bot$ & $1$    & $\top$ & $\top$ & $\top$ & $\top$  & $\top$    
 \end{tabular}
-\caption{Abstract Exponentiation}
+\caption{Abstract exponentiation}
 \label{tab:abstract_exponentiation}
 \end{table}
+
 \begin{table}[htbp]
 \centering
 \begin{tabular}{cc}
@@ -171,7 +171,7 @@ $\top$ & $\bot$ & $\top$ & t & $\top$
 \end{tabular}
 }
 \end{tabular}
-\caption{Abstract operators for Booleans}
+\caption{Abstract comparison operators on booleans}
 \end{table}
 
 \begin{table}[htbp]
@@ -207,7 +207,7 @@ $\top$        & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$
 \begin{table}[htbp]
 \centering
 \begin{tabular}{l|cccccc}
-$\oplus$           & $\bot$ & y      & uIntString & s      & notUIntString & $\top$ \\\hline
+$\oplus\in \{<,>,\leq, \geq\}$           & $\bot$ & y      & uIntString & s      & notUIntString & $\top$ \\\hline
 $\bot$        & $\bot$ & $\bot$ & $\bot$     & $\bot$ & $\bot$        & $\bot$ \\
 x             & $\bot$ & $x\oplus y$ & $\top$     & $x\oplus s$    & $\top$        & $\top$ \\
 uIntString    & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$ \\
@@ -215,7 +215,7 @@ r             & $\bot$ & $r\oplus y$    & $\top$     & $r\oplus s$    & $\top$  
 notUIntString & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$ \\
 $\top$        & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$
 \end{tabular}
-\caption{Abstract Less Than (Equal) and Greater Than (Equal) for Strings, replace $\oplus$ with the respective operators}
+\caption{Abstract less than (or equal) and greater than (or equal) for on strings.}
 \label{tab:abstract_less_than_string}
 \end{table}
 
@@ -230,7 +230,7 @@ a       & $\bot$ & f      & f      & $a==b$ & $\top$  & $\top$ \\
 notUInt & $\bot$ & f      & f      & $\top$ & $\top$  & $\top$ \\
 $\top$  & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$
 \end{tabular}
-\caption{Abstract Equal for Numbers}
+\caption{Abstract equal on numbers}
 \label{tab:abstract_equal_number}
 \end{table}
 
@@ -245,23 +245,23 @@ a       & $\bot$ & t      & t      & a!=b   & $\top$  & $\top$ \\
 notUInt & $\bot$ & t      & t      & $\top$ & $\top$  & $\top$ \\
 $\top$  & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$
 \end{tabular}
-\caption{Abstract Not Equal for Numbers}
+\caption{Abstract not equal on numbers}
 \label{tab:abstract_not_equal_number}
 \end{table}
 
 \begin{table}[htbp]
 \centering
 \begin{tabular}{l|ccccccc}
-$<$     & $\bot$ & y      & uInt   & b < 0  & b      & notUInt & $\top$ \\\hline
+$\oplus\in\{<, \leq\}$     & $\bot$ & y      & uInt   & b < 0  & b      & notUInt & $\top$ \\\hline
 $\bot$  & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$  & $\bot$ \\
-x       & $\bot$ & x < y  & $\top$ & f      & x < b  & $\top$  & $\top$ \\
+x       & $\bot$ & x $\oplus$ y  & $\top$ & f      & x $\oplus$ b  & $\top$  & $\top$ \\
 uInt    & $\bot$ & $\top$ & $\top$ & f      & $\top$ & $\top$  & $\top$ \\
-a < 0   & $\bot$ & t      & t      & a < b  & a < b  & $\top$  & $\top$ \\
-a       & $\bot$ & a < y  & $\top$ & a < b  & a < b  & $\top$  & $\top$ \\
+a < 0   & $\bot$ & t      & t      & a $\oplus$ b  & a $\oplus$ b  & $\top$  & $\top$ \\
+a       & $\bot$ & a $\oplus$ y  & $\top$ & a $\oplus$ b  & a $\oplus$ b  & $\top$  & $\top$ \\
 notUInt & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$ \\
 $\top$  & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$
 \end{tabular}
-\caption{Abstract Less Than for Numbers, the table for Less Than/Equal corresponds to this one}
+\caption{Abstract less than (or equal) on numbers}
 \label{tab:abstract_less_than_equal_number}
 \end{table}
 
@@ -270,16 +270,16 @@ $\top$  & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$
 \begin{table}[htbp]
 \centering
 \begin{tabular}{l|ccccccc}
-$>$     & $\bot$ & y      & uInt   & b < 0  & b      & notUInt & $\top$ \\\hline
+$\oplus\in\{>, \geq\}$     & $\bot$ & y      & uInt   & b < 0  & b      & notUInt & $\top$ \\\hline
 $\bot$  & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$  & $\bot$ \\
-x       & $\bot$ & x > y  & $\top$ & t      & x > b  & $\top$  & $\top$ \\
+x       & $\bot$ & x $\oplus$ y  & $\top$ & t      & x $\oplus$ b  & $\top$  & $\top$ \\
 uInt    & $\bot$ & $\top$ & $\top$ & t      & $\top$ & $\top$  & $\top$ \\
-a < 0   & $\bot$ & f      & f      & a > b  & a > b  & $\top$  & $\top$ \\
-a       & $\bot$ & a > y  & $\top$ & a > b  & a > b  & $\top$  & $\top$ \\
+a < 0   & $\bot$ & f      & f      & a $\oplus$ b  & a $\oplus$ b  & $\top$  & $\top$ \\
+a       & $\bot$ & a $\oplus$ y  & $\top$ & a $\oplus$ b  & a $\oplus$ b  & $\top$  & $\top$ \\
 notUInt & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$ \\
 $\top$  & $\bot$ & $\top$ & $\top$ & $\top$ & $\top$ & $\top$  & $\top$
 \end{tabular}
-\caption{Abstract Greater Than for Numbers, the table for Greater Than/Equal corresponds to this one}
+\caption{Abstract greater than (or equal) on numbers}
 \label{tab:abstract_greater_than_equal_number}
 \end{table}
 
@@ -314,6 +314,42 @@ $\top$          & $\bot$ & $\top$ & $\top$ & $\top$
 \end{tabular}
 } &
 \end{tabular}
-\caption{Abstract Logical Operators for Booleans}
+\caption{Abstract logical binary boolean operators}
+\label{tab:abstract_logical}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\vspace{12pt}
+\subcaptionbox{Abstract pre- and post-increment\label{tab:abs_inc}}{
+\begin{tabular}{l|ccccc}
+\texttt{++} 	& $\bot$ 	& $n$ 	& uInt		& notUInt	&$\top$ \\\hline
+			 	& $\bot$ 	& $n+1$	& uInt		& $\top$	&$\top$	
+\end{tabular}
+} \\
+\vspace{12pt}
+\subcaptionbox{Abstract pre- and post-decrement\label{tab:abs_dec}}{
+\begin{tabular}{l|ccccc}
+\texttt{- -} 	& $\bot$ 	& $n$ 	& uInt		& notUInt	&$\top$ \\\hline
+			 	& $\bot$ 	& $n-1$	& $\top$	& notUInt	&$\top$	
+\end{tabular}
+} \\
+\vspace{12pt}
+\subcaptionbox{Unary minus\label{tab:abs_unmin}}{
+\begin{tabular}{l|ccccc}
+\texttt{-} 		& $\bot$ 	& $n$ 	& uInt		& notUInt	&$\top$ \\\hline
+			 	& $\bot$ 	& $-n$	& notUInt	& $\top$	&$\top$	
+\end{tabular}
+} \\
+\vspace{12pt}
+\subcaptionbox{Boolean negate \label{tab:abs_bolneg}}{
+\begin{tabular}{l|ccccc}
+\texttt{!} 		& $\bot$ 	& true 	& false		&$\top$ \\\hline
+			 	& $\bot$ 	& false & true		&$\top$	
+\end{tabular}
+} \\
+
+
+\caption{Abstract logical binary boolean operators}
 \label{tab:abstract_logical}
 \end{table}
