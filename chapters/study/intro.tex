@@ -21,7 +21,7 @@ Besides the \texttt{array\_shift} function and the array append operation, $v[]$
 Arrays can also explicitly define keys, which can be either a string or an integer. 
 
 \begin{definition}
-Let $a$ be an array containing values of the same type, where all integer keys from 0 to $count(a)-1$ does not exists. Then $a$ can be considered an array of type map.
+Let $a$ be an array containing values of the same type, where any integer key from 0 to $count(a)-1$ does not exists. Then $a$ can be considered an array of type map.
 \end{definition}
 
 As the name suggests, maps can be used as a mapping from a string/integer to a value. In program \ref{lst:map_array} the \texttt{\$text\_to\_int} array is a mapping from strings containing some numbers to its corresponding integer representation. 
@@ -51,54 +51,6 @@ Finally arrays can be treated as objects, i.e. the entries can be viewed as prop
 \begin{definition}
 Let $a$ be an array containing values of different types. Then $a$ can be considered an array of type object.
 \end{definition}
-
-
-\section{Hypothesis}
-\label{sec:dynhypothesis}
-We hypothesize that any given array throughout its lifespan from initialization to last usage can be viewed as one, and only one, of the above mentioned types, i.e. either as a list, map or an object. It is also expected that the arrays in general are acyclic and that that \emph{append}, \textit{push}, \textit{pop}, \textit{shift}, and \textit{unshift} operations are only used on arrays of type list.
-
-If the hypothesis holds it should be possible to statically analyse the code to identify these types and detect errors related to misuse of the arrays e.g. using maps as lists or vice versa. The hypothesis is tested against a corpus consisting of ten widely used open source frameworks, by performing a dynamic analysis of the code.
-
-The frameworks chosen all implement some kind of test suite written in PHPUnit\footnote{\url{https://phpunit.de/}}, a unit testing framework for PHP programs similar to JUnit for Java programs. By running the test suites on a modified PHP interpreter\footnote{https://github.com/Silwing/php-src}, we are able log and later analyze the structure and usage of the arrays. By using test suites instead of manually inspecting the frameworks through e.g. a browser, the aim is to gain a higher code coverage. This follows from the assumption that the developers are using code coverage as a metric of the quality of the test-suite. The corpus consists of the following open source frameworks:
-
-\begin{itemize}
-    \item \emph{WordPress}: A blogging system and a content management system\citeB{wordpress}.
-    \item \emph{phpMyAdmin}: An administration panel for managing MySQL database\citeB{phpmyadmin}.
-    \item \emph{MediaWiki}: The framework for creating wiki sites\citeB{mediawiki}.
-    \item \emph{Joomla}: A content management system \citeB{joomla}.
-    \item \emph{CodeIgniter}: A lightweight framework for building web applications\citeB{codeigniter}.
-    \item \emph{phpBB}: A forum platform\citeB{phpbb}.
-    \item \emph{Symfony 2}: A framework used in many major systems, such as phpBB, Magento and Drupal\citeB{symfony2}.
-    \item \emph{Magento 2}: An e-commerce platform\citeB{magento2}.
-    \item \emph{Zend Framework}: A framework for web development focused on simplicity, reusability and performance\citeB{zendframework}.
-    \item \emph{Part}: A lightweight content management system developed by one of the authors of this thesis\citeB{part}.
-\end{itemize}
-
-
-\section{Implementation}
-\label{sec:studyImplementation}
-\input{chapters/study/implementation}
-
-
-%\section{Feature usage analysis}
-%\label{sec:featureAnalysis}
-%\input{chapters/study/usage_analysis}
-
-\section{Results}
-\label{sec:analysisResults}
-
-\input{chapters/study/analysis_result}
-
-
-\section{Conclusion}
-\label{sec:studyConclusion}
-The purpose of the dynamic analysis was to determine whether PHP array usage can be split into semantic categories and if arrays stay in one category during their lifetime. 
-
-The results show that generally arrays keep the same type during their lifetime. Furthermore, the usage of specific array operations proved almost exclusive for lists. This information can be used to define unexpected behavior reported by the static analysis.
-
-A significant amount of arrays turned out to be objects with list-keys by the initial definition. These objects indicate that the object type is not providing significant information in itself, and show the possibility that the definitions of maps and lists consume the object type, i.e. letting maps and lists allow values of different type.
-
-Almost every framework in the corpus contains cyclic arrays, hence the static analysis has to take the possibility of recursive types into consideration. However, the small amount of cyclic arrays indicate that an imprecise approach will have a minimal impact on the overall precision.
 
 
 \begin{comment}

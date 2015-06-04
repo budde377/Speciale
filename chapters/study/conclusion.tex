@@ -1,0 +1,9 @@
+\section{Conclusion}
+\label{sec:studyConclusion}
+The purpose of the dynamic analysis was to determine whether PHP array usage can be split into semantic categories and if arrays stay in one category during their lifetime. 
+
+The results show that generally arrays keep the same type during their lifetime. Furthermore, the usage of specific array operations proved almost exclusive for lists. This information can be used to define unexpected behavior reported by the static analysis.
+
+A significant amount of arrays turned out to be objects with list-keys by the initial definition. These objects indicate that the object type is not providing significant information in itself, and show the possibility that the definitions of maps and lists consume the object type, i.e. letting maps and lists allow values of different type.
+
+Almost every framework in the corpus contains cyclic arrays, hence the static analysis has to take the possibility of recursive types into consideration. However, the small amount of cyclic arrays indicate that an imprecise approach will have a minimal impact on the overall precision.
