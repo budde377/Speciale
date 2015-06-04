@@ -1,33 +1,30 @@
-Table \ref{tab:cyclic_arrays} shows that across all frameworks in the corpus less than 1\% of the arrays are detected as being cyclic. Cyclic arrays are created using the the PHP reference operator, \texttt{\&}, which must be used explicitly. Due to the explicit reference operator, cyclic arrays do not occur as an unintentional side effect of something else\todo{something else?}. The largest amount of cyclic arrays detected in the corpus is in PhpMyAdmin with a total of 10 cyclic arrays out of 3,373 identified arrays. By assuming that arrays are acyclic, the static analysis would not have to take recursive types into consideration. Since the results show that almost every framework contains some cyclic arrays, the static analysis must handle recursive types in some way. The small amount of cyclic arrays, however, does imply that an imprecise handling of recursive types should not impact the overall precision much.
-\todo{Rewrite this with new findings. See comment.}
-\begin{comment}
-NG cyclic arrays are the cyclic arrays that are NOT the \$GLOBAL array, which is recursive. 
-Notice that no creation of cyclic arrays has been found, thus the last arrays might also be the globals array.
-The assumption of acyclic arrays is not totally wrong.
-\end{comment}
+Table \ref{tab:cyclic_arrays} shows that across all frameworks in the corpus less than 1\% (column 5) of the arrays are detected as being cyclic. Cyclic arrays can only be created by using the the PHP reference operator, \texttt{\&}, which must be used explicitly. Since PHP by default copies values on assignment cyclic arrays can not be created by simple assignments. The largest amount of cyclic arrays detected in the corpus is in PhpMyAdmin with a total of 10 cyclic arrays out of 3,373 identified arrays. By assuming that arrays are acyclic, the static analysis would not have to take recursive types into consideration. Since so few cyclic arrays were found a manual inspection of the code locations of the findings was possible. The manual inspections showed that almost all of the reported cyclic arrays are uses of the superglobal \texttt{\$GLOBALS} which is an array consisting of all variables defined in the global scope. This array also has a reference to itself which makes it a cyclic array. Only two of the frameworks in the corpus had cases where it was not immediately clear whether it was a use of the \texttt{\$GLOBALS} array: Zend Framework 2 and Symfony, these are noted in column 4 as ``NG Cyclic'' arrays. These few cases are function input parameters reported as cyclic which might in fact be the \texttt{\$GLOBALS} array passed to the function however it is not confirmed to always be the case. The \texttt{\$GLOBALS} array is a special case to handle even without taking its cyclic structure into account.
+
+Based on the results of the manual inspection the hypothesis of arrays being acyclic is true for almost all frameworks in the corpus.
+
 \begin{table}[htbp]
 \begin{center}
-\begin{tabular}{l| r  r  r}
-Framework & \# Arrays & \# Cyclic arrays & \# NG Cyclic arrays  \\ \hline \hline
-Code igniter & 331 & 0 & 0 \\
-Joomla & 1969 & 2 & 0\\ 
-Magento2 & 6942 & 0 & 0\\ 
-Mediawiki & 27368 & 1 & 0\\ 
-Part & 378 & 0 & 0\\ 
-phpBB & 2529 & 1 & 0\\
-PhpMyAdmin & 3373 & 10 & 0\\
-Symfony & 3707 & 6 & 6\\ %Ten found when running program, but only six were not errors
-Wordpress & 3054 & 1 & 0\\ 
-Zend Framework 2 & 4381 & 3 & 2
+\begin{tabular}{l| r  r  r  r}
+Framework & \# Arrays & \# Cyclic & \# NG Cyclic & \%  \\ \hline \hline
+Code igniter & 331 & 0 & 0 & 0.0\% \\
+Joomla & 1969 & 2 & 0 & 0.1\% \\ 
+Magento2 & 6942 & 0 & 0 & 0.0\%\\ 
+Mediawiki & 27368 & 1 & 0 & <0.1\%\\ 
+Part & 378 & 0 & 0 & 0.0\%\\ 
+phpBB & 2529 & 1 & 0 & <0.1\%\\
+PhpMyAdmin & 3373 & 10 & 0 & 0.3\%\\
+Symfony & 3707 & 6 & 6 & 0.2\%\\ %Ten found when running program, but only six were not errors
+Wordpress & 3054 & 1 & 0 & <0.1\%\\ 
+Zend Framework 2 & 4381 & 3 & 2 & 0.1\%
 \end{tabular}
 \end{center}
 \caption{Amount of cyclic arrays detected in the corpus}
 \label{tab:cyclic_arrays}
 \end{table}
 
-Figure \ref{fig:array_types} shows the distribution of array types for the frameworks.  Between 4\% and 12\% of the arrays are uncategorizable. These include false uncategorizables originating from flaws in the array identification. If multiple categorizable arrays from different categories are identified as a single array it might end up in the uncategorizable part of the distribution.
+Figure \ref{fig:array_types} shows the distribution of array types for the frameworks.  Between 4\% and 12\% of the arrays are uncategorizable. These include false uncategorizables originating from flaws in the array identification. If multiple categorizable arrays from different categories are identified as a single array the combined array possibly ends up in the uncategorizable part of the distribution.
 
-The Object group marked with List is by definition categorized as objects, but they might fit better into the List category, as lists of a top level type. \todo{elaborate}
+The Object group marked with List is by definition categorized as objects, but they might fit better into the List category, as lists of a top level type. Whereas string writes are good predictors for map type arrays and appending and list array functions are good predictors for list type arrays, no predictors have been found for the object type arrays. Without any predictors for an object-like array type it is not possible to define uses and misuses of such a structure. Instead the object-like array type can be absorbed partly by the list type and partly by the map type.
 
 \begin{table}[htbp]
 \begin{adjustbox}{center}
