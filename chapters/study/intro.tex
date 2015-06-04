@@ -1,6 +1,7 @@
 The PHP array data structure allows for many different kinds of use ranging from lists over maps to trees and tables. The purpose of the dynamic analysis in this chapter is to detect patterns of array-usage in order to be able to identify some more restrictive data types contained within the way PHP arrays are used. The results of the analysis are used to choose a suitable abstraction for the static analysis in chapter \ref{ch:analysis}. The first section of this chapter describes basic definitions used in the dynamic analysis to detect patterns. With the definitions in place a hypothesis for the analysis is formed in section \ref{sec:dynhypothesis} followed by a discussion of implementation details in section \ref{sec:studyImplementation}. Section \ref{sec:analysisResults} presents the results of the dynamic analysis and section \ref{sec:studyConclusion} draws the conclusion of the analysis.
 
 \begin{definition}
+\label{def:list}
 Let $a$ be an array containing values of the same type, where all integer keys from 0 to $count(a)-1$ exists. Then $a$ can be considered an array of type list.
 \end{definition}
 
@@ -21,10 +22,11 @@ Besides the \texttt{array\_shift} function and the array append operation, $v[]$
 Arrays can also explicitly define keys, which can be either a string or an integer. 
 
 \begin{definition}
-Let $a$ be an array containing values of the same type, where any integer key from 0 to $count(a)-1$ does not exists. Then $a$ can be considered an array of type map.
+\label{def:map}
+Let $a$ be an array containing values of the same type, where some integer key from 0 to $count(a)-1$ does not exists. Then $a$ can be considered an array of type map.
 \end{definition}
 
-As the name suggests, maps can be used as a mapping from a string/integer to a value. In program \ref{lst:map_array} the \texttt{\$text\_to\_int} array is a mapping from strings containing some numbers to its corresponding integer representation. 
+As the name suggests, maps can be used as a mapping from a string/integer to a value. In the dynamic analysis a map from pure integer keys is also denoted a sparse list. In program \ref{lst:map_array} the \texttt{\$text\_to\_int} array is a mapping from strings containing some numbers to its corresponding integer representation. 
 
 \begin{program}[ht]
 \begin{lstlisting}
@@ -44,11 +46,12 @@ $values = array_values($text_to_int);
 \label{lst:map_array}
 \end{program}
 
-If given a map-array, the values or keys can be fetched using the functions \texttt{array\_values} or \texttt{array\_keys} respectively. These functions return an array of type list. 
+If given a map-array, the values or keys can be fetched using the functions \texttt{array\_values} or \texttt{array\_keys} respectively. These functions return an array of the list type. 
 
 Finally arrays can be treated as objects, i.e. the entries can be viewed as properties of arbitrary type. These arrays could be replaced by the \texttt{stdClass} which mainly is used for its dynamic properties, just like arrays. Some of the build-in arrays of PHP can be considered objects, including the \texttt{\$\_SERVER} array\footnote{\url{http://php.net/manual/en/reserved.variables.server.php}}. This array contains server and execution environment information, which are of different types, e.g. \texttt{\$\_SERVER['argv']} is an array of arguments passed to the interpreter, and \texttt{\$\_SERVER['REQUEST\_TIME']} is an integer UNIX timestamp of the start of the request. 
 
 \begin{definition}
+\label{def:object}
 Let $a$ be an array containing values of different types. Then $a$ can be considered an array of type object.
 \end{definition}
 
