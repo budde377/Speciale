@@ -56,7 +56,7 @@ private function createInstance($string, $instance, callable $callback)
 \end{program}
 
 \section{Problem Statement}
-The widely used array data structure in PHP has very few restrictions making it difficult to reason about with program analysis. This thesis will identify possible use-patterns for arrays in PHP and how to detect them in static analysis. An \emph{interprocedural data-flow type-analysis} is proposed to detect suspicious cross-use of the identified patterns.
+The widely used array data structure in PHP has very few restrictions making it difficult to reason about with program analysis. This thesis will identify possible use-patterns for arrays in PHP and how to detect them using a static analysis. An \emph{interprocedural data-flow type-analysis} is proposed to detect suspicious cross-use of the identified patterns, and consequently evaluated on live code.
 
 \section{Motivation}
 Creating code that seemingly works is one thing and for languages like PHP that can be done in many different ways. However creating code that conveys a clear purpose and is easily maintainable later on is a whole other world. The latter is preferable most of the time. Because the range of possibles uses of PHP arrays is very large they are not conveying a clear purpose in and of themselves. Creators of PHP programs thus has to ensure themselves the clarity of their use of arrays. 
