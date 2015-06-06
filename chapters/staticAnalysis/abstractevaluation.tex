@@ -105,9 +105,12 @@ c_{\alpha, \alpha} (v) &= v
 and $\mathit{int}$, $\mathit{num}$, and $\mathit{string}$ are creating an integer, number, and string respectively, in the obvious way. E.g. $\mathit{int}(42.1) = 42$, $\mathit{string}(1337) = \texttt{"1337"}$, and $\mathit{number}(\texttt{"1337"}) = 1337$. Furthermore the predicates $\mathit{isNumber}$, $\mathit{isInteger}$, $\mathit{isString}$ holds if and only if the value can be interpreted as a number, integer, or string respectively. E.g. $\mathit{isNumber}(\texttt{"42.1"})$ holds while $\mathit{isInteger}(\texttt{"42.1"})$ does not.
 
 A few interesting cases of coercion in PHP include; Any array coerced to a string will result in the string \texttt{"Array"}, \texttt{null} is string-coerced to the empty string, both the empty string and the string literal \texttt{"0"} are boolean-coerced to boolean \texttt{false}, boolean \texttt{false} is string-coerced to the empty string, and An empty array is boolean-coerced to boolean \texttt{false}.
+
+
 \section{Abstract evaluation}
 \label{sec:abseval}
 
+\todo{Write about how the abstract operators are defined in P0 compared to PHP}
 In order to maintain some precision when evaluating binary- and unary-operators, a table is created for each operation defining the result of the evaluating a given input abstractly. These tables are available in appendix \ref{app:abstract_operators}, with some interesting cases presented below.
 
 

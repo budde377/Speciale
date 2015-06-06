@@ -1,0 +1,8 @@
+%First summary then overall conclusion
+
+The purpose of the dynamic analysis was to determine whether PHP arrayusage can be split into semantic categories and if arrays stay in one categoryduring their lifetime.The results show that generally arrays keep the same type during theirlifetime.  Furthermore, the usage of specific array operations proved almostexclusive for lists. This information can be used to define unexpected behaviorreported by the static analysis.A significant amount of arrays turned out to be objects with list-keys by theinitial definition. These objects indicate that the object type is not providingsignificant information in itself, and show the possibility that the definitions of21
+ maps and lists consume the object type, i.e. letting maps and lists allow valuesof different type.Almost every framework in the corpus contains cyclic arrays however theseare nearly exclusively uses of the superglobal \texttt{\$GLOBALS} which is a special caseof array even without considering its cyclic structure. The hypothesis thereforemostly holds and a naive approach can be taken to handle cyclic arrays in thestatic analysis.
+ 
+ 
+ 
+The widely used array data structure in PHP has very few restrictions making it difficult to reason about with program analysis. This thesis will identify possible use-patterns for arrays in PHP and how to detect them in static analysis. An \emph{interprocedural data-flow type-analysis} is proposed to detect suspicious cross-use of the identified patterns.

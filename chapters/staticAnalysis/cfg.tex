@@ -29,6 +29,7 @@ There are seventeen different nodes, all introduced below
 \item{$\mathit{call}_{\mathit{fn}}(c_1, \cdots, c_n)$, $\mathit{exit}(c_1, \cdots, c_n)$, $\mathit{result}_{c}(c_{tar})$:} Calling a function is performed with the $\mathit{call}$ node. This holds the name, $\mathit{fn}$, of the function being called (which can always be resolved). For every call node, $c$, there is a single result node, $\mathit{result}_c$. This restores the calling context and handles passing of the result. The node immediately before the result node is an $\mathit{exit}$ node, which is unique to and last node of the function being called. This node holds variable names pointing to the possible values returned by the function. 
 \item{$nop$:} This node does nothing and is only there for structural purposes. It is in the control-flow-graphs denoted as a small node with no label.
 \end{description}
+\todo{Describe all node-arguments}
 \begin{graph}
 \centering
 \begin{adjustbox}{max size={1\textwidth}{.25\textheight}, margin = 10pt}\begin{tikzpicture}[node distance = 2cm, auto]
