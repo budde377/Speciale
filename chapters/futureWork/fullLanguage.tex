@@ -1,6 +1,24 @@
 \section{Supporting the full PHP language}
 The static analysis developed in this thesis supports the subset of PHP, P0, as defined in chapter \ref{ch:analysis}.
-Section \ref{sec:langsubset} defines the restricted syntax of the P0, disallowing most dynamic features of PHP, and section \ref{sec:abseval} defines how abstract operators are restricted compared 
+Section \ref{sec:langsubset} defines the restricted syntax of the P0, disallowing most dynamic features of PHP, and section \ref{sec:abseval} defines how abstract operators are restricted in P0. Since variables are not restricted to a single type throughout a PHP program and there are no static types a lot of cross-type operations are allowed. P0 removes support for some of these cross-type operations because they are not defined in an intuitive way. To take an example the unary increment and decrement operators can be applied to strings. Listing \ref{lst:incDec} demonstrates how different strings are incremented. If the last character is a letter from a-y (always keeping the current case), that letter will be turned into the following letter in the alphabetical order. If the last letter is a z it will turn into an a as well as recursively applying the increment operation to the previous letter as well. If no previous letter exists an a will be prepended to the string. Any characters that is not a letter from a-z will stop the increment operation and stay as is. While this definition seems somewhat sensible intuitively the decrement operator should then do the opposite of increment, however that is not the case. Applying the decrement operators to a string never changes the initial string.
+
+\begin{program}
+\begin{lstlisting}
+$a = "a";
+$b = "Bob";
+$c = "Z";
+$d = "Hello World!";
+$a++; // Result: "b"
+$b++; // Result: "Boc"
+$c++; // Result: "AA"
+$d++; // Result: "Hello World"
+// Decrementing does nothing
+\end{lstlisting}
+\caption{Increment and decrement operators used with strings}
+\label{lst:incDec}
+\end{program}
+
+To be able to support all these operations in a sound way the official PHP Interpreter has to be 
 
 
 \todo{Adding variable-variables with expressing scope as array}
