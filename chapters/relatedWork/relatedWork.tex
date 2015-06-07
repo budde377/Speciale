@@ -5,6 +5,8 @@ Programs composed of multiple files using \texttt{require} and \texttt{include} 
 
 WeVerca the framework developed by \citeA{weverca14} abstract away the dynamic dispatch and variable variables uses by providing the control-flow as well as the heap shape and dynamic data access directly to the user of the framework. WeVerca uses the Phalanger parser which currently supports PHP features up to PHP 5.4 with support for newer features in development. With the aim of PHP 5.6 support for the analysis in this thesis WeVerca was discarded as an option early on.
 
+In \citeA{associativeArrays14} variable variables are supported by treating the global scope of PHP as an array with keys corresponding to the names of variables. Accessing variable variables is then a simple matter of how array access is handlded in general.
+
 \section{Static Analysis}
 JavaScript is similar to PHP in many ways. The static analysis provided by this thesis is inspired by TAJS \citeA{tajs09}, a type analysis for JavaScript. \todo{talk about differences between TAJS and TAPAS}
 
@@ -13,7 +15,7 @@ Pixy \citeA{pixy06} is a static analysis tool aimed at detecting security vulner
 \section{PHP References}
 The concept of references in PHP complicates reasoning about PHP programs. In \citeA{copyOnWrite09} the copy-on-write practice exhibited by the official PHP interpreter in investigated and compared to the stated copy-on-assignment semantics of the PHP documentation.
 
-References in PHP arrays are also treated by \citeA{associativeArrays14} implementing a data-flow analysis using the concept of aliases to handle references.
+References in PHP arrays are also treated by \citeA{associativeArrays14} implementing a data-flow analysis using the concept of aliases to handle references. 
 
 \section{Static Approximation of Dynamically Generated Web Pages}
 \todo{write summary}

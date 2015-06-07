@@ -1,6 +1,9 @@
 \section{Supporting the full PHP language}
 The static analysis developed in this thesis supports the subset of PHP, P0, as defined in chapter \ref{ch:analysis}.
-Section \ref{sec:langsubset} defines the restricted syntax of the P0, disallowing most dynamic features of PHP, and section \ref{sec:abseval} defines how abstract operators are restricted in P0. Since variables are not restricted to a single type throughout a PHP program and there are no static types a lot of cross-type operations are allowed. P0 removes support for some of these cross-type operations because they are not defined in an intuitive way. To take an example the unary increment and decrement operators can be applied to strings. Listing \ref{lst:incDec} demonstrates how different strings are incremented. If the last character is a letter from a-y (always keeping the current case), that letter will be turned into the following letter in the alphabetical order. If the last letter is a z it will turn into an a as well as recursively applying the increment operation to the previous letter as well. If no previous letter exists an a will be prepended to the string. Any characters that is not a letter from a-z will stop the increment operation and stay as is. While this definition seems somewhat sensible intuitively the decrement operator should then do the opposite of increment, however that is not the case. Applying the decrement operators to a string never changes the initial string.
+Section \ref{sec:langsubset} defines the restricted syntax of the P0, disallowing most dynamic features of PHP, and section \ref{sec:abseval} defines how abstract operators are restricted in P0. 
+
+\subsection{Operators}
+Since variables are not restricted to a single type throughout a PHP program and there are no static types a lot of cross-type operations are allowed. P0 removes support for some of these cross-type operations because they are not defined in an intuitive way. To take an example the unary increment and decrement operators can be applied to strings. Listing \ref{lst:incDec} demonstrates how different strings are incremented. If the last character is a letter from a-y (always keeping the current case), that letter will be turned into the following letter in the alphabetical order. If the last letter is a z it will turn into an a as well as recursively applying the increment operation to the previous letter as well. If no previous letter exists an a will be prepended to the string. Any characters that is not a letter from a-z will stop the increment operation and stay as is. While this definition seems somewhat sensible intuitively the decrement operator should then do the opposite of increment, however that is not the case. Applying the decrement operators to a string never changes the initial string.
 
 \begin{program}
 \begin{lstlisting}
@@ -18,7 +21,12 @@ $d++; // Result: "Hello World"
 \label{lst:incDec}
 \end{program}
 
-To be able to support all these operations in a sound way the official PHP Interpreter has to be studied to create an overview of how each cross-type operation is implemented and thus defined.  
+To be able to support all these operations in a sound way the official PHP Interpreter has to be studied to create an overview of how each cross-type operation is implemented and thus defined. The official PHP Interpreter is the only definition of the PHP language yet, even though work on an official definition is in progress. Until the official definition of the language is done inspecting the interpreter source code is the only way to get a full overview of how operators are implemented and use that overview to create a full set of abstract operators from value lattice element to value lattice element.
 
+\subsection{Dynamic features}
+The language subset P0 does not support variable variables. One way of supporting variable variables is to change the definition of the local and global scope lattices. Instead of mapping from variable names they could be maps from strings to values allowing an abstract operation for look-up in the global and local variable scopes. Supporting variable variables have the possibility of impacting precision in cases containing many writes to variable variables with names that cannot be reasoned about statically. Any write to a $\top$-element string have to be joined when reading from all variables which lowers the precision of all variable reads.
 
-\todo{Adding variable-variables with expressing scope as array}
+\todo{write about dynamic functions}
+
+\subsection{Objects}
+This thesis have completely ignored a large part of PHP, namely the object model. To be able to handle real PHP application objects must be supported since almost every PHP application is at least partly object oriented. Since objects are dynamic as the rest of PHP, properties can be added and removed at execution time. To keep soundness of the analysis object properties can be modelled as a map array. This approach suffer from the same weakness as variable variables, that writes to $\top$-element property names lessens the precision of all other properties

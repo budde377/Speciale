@@ -350,9 +350,9 @@ For a variable read, $e = \texttt{\$v}$ for some variable \texttt{\$v}, or a con
 For function calls, $e = \mathit{fn}\texttt{(}T_1,\cdots, T_n\texttt{)}$, the result variable is a temporary variable, $c_{tar}:\text{Temps}$, the arguments are either an expression, $T_i : \syn{expr}$ and $c_i : \text{Temps}$, or an reference expression, $T_i : \syn{rexpr}$ and $c_i : \text{HeapTemps}$, depending on the signature of $\mathit{fn}$. If the argument is pass-by-reference i.e. the variable, $v_i$ is denoted with a \texttt{\&} in the signature, then the expression must be a reference expression, if not, then the argument is an expression. This follows from the program being a valid P0 program. The function graph will be as graph \ref{graph:flowcall}, where the start node, exit node, and function body are the unique nodes of the $\mathit{fn}$ function i.e. they are not copied. This ensures that the graph is finite, but multiple, say $n$, calls to the same function will yield a graph with $n$ edges to the start node and from the exit node. Notice the dashed line going directly from the call node to the return node. This indicates that the call node may pass information directly to the return node, typically information regarding the local context before calling $\mathit{fn}$.
 
 \begin{graph}
+\centering
 \captionsetup{justification=centering}
-\hspace*{\fill}
-\subcaptionbox{Function call \label{graph:flowcall}}{\begin{adjustbox}{max size={.3\textwidth}{.40\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
+\begin{adjustbox}{max size={.3\textwidth}{.40\textheight}}\begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
     \node [entry] (en) {};
     \node [subtree, below of=en] (e1) {$\subt{T_1}(c_1)$};
@@ -376,8 +376,8 @@ For function calls, $e = \mathit{fn}\texttt{(}T_1,\cdots, T_n\texttt{)}$, the re
     \path [line] (exit) -> (result);
     \path [line] (result) -> (ex);
     \draw [dashed, ->] (call) -- (-2, -8) |- (result);
-\end{tikzpicture}\end{adjustbox}}
-\hspace*{\fill}
+\end{tikzpicture}\end{adjustbox}
+\caption{Function call \label{graph:flowcall}}
 \end{graph}
 
 Finally the expression can be an assignment. There are two types of assignments, a regular value-assignment and a reference-assignment, using the \texttt{\&} operator. Each assignment can be split up in three categories, variable-, array-write-, and array-append-assignments, depending on the target (left side of the operation). Examples of these six operations can be seen in program \ref{lst:assignments}. Due to the distinction between temporary storage of values and heap-location-sets, these six cases must be handled individually. For value array write ($e = R\texttt{[$E_{key}$]=} E_{val}$), array append ($e = R\texttt{[]=} E_{val}$), and variable write ($e = \texttt{\$v=} E_{val}$), the graphs are as \ref{graph:flowawrite}, \ref{graph:flowaappend}, and \ref{fig:vwrite} respectively, where $T$ is the subgraph of the value expression $E_{val} : \syn{expr}$ and $c_{val} : \text{Temps}$ is the temporary variable holding the result. The reference assignments,  $e = R\texttt{[$e_{key}$]=\&} R_{val}$, $e = r\texttt{[]=\&} R_{val}$, and $e = \texttt{\$v=\&} R_{val}$, are similar, but with $T$ being the subgraph of the reference expression, $R_{val} : \syn{rexpr}$ and $c_{val} : \text{HeapTemp}$ the heap temporary variable holding the heap locations of the value.
