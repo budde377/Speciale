@@ -1,3 +1,8 @@
 \section{Summary}
 
-What have we done, how did we do it?
+In this chapter a subset of PHP has been defined, P0. This language focuses on arrays by supporting native arrays operations, such as array append, write, and initialization, and references. %Due the close relation between variables and arrays, i.e. scopes can by and large be considered as arrays, references has as an important feature 
+References are used to create more advanced arrays, e.g. cyclic arrays, and has proven as a source of precision loss, since they disables deep-copy of arrays, and in turn strong updates on the heap. 
+
+An interprocedural data-flow analysis has been designed in the monotone framework, yielding a method for creating control-flow-graphs, a lattice expressing abstract state, and a set of transfer-functions. By relying on the monotone framework, the analysis has been preformed using a straight forward implementation of the worklist-algorithm, as a plug-in in the development environment Intellij IDEA. 
+
+\todo{write about soundness and monotonicity}
