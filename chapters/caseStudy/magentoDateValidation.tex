@@ -1,5 +1,5 @@
 \section{Date Validation}
-Similarly to the previous case this case also concern mixing of map and list arrays. The case is inspired by the e-commerce platform Magento where code similar to the two functions seen in \ref{lst:dateValidation} can be found. The problem can easily be spotted when placing the two functions together as done here, however the original code is separated in two different files which conceals the problem.
+Similarly to the previous case this case also concern mixing of map and list arrays. The case is inspired by the e-commerce platform Magento where code similar to the two functions seen in program \ref{lst:dateValidation} can be found. The problem can easily be spotted when placing the two functions together as done here, however the original code is separated in two different files which conceals the problem.
 
 The difference from the previous example is that the mixing occurs in a library function \texttt{array\_merge}. Each library function has transfer function which implements an abstract version of that particular function. The \texttt{array\_merge} abstract function also detects possible merges of different types of arrays and warns the user like shown in figure \ref{fig:dateScreenshot}.
 
