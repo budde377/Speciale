@@ -1,33 +1,35 @@
 \section{Transfer functions}
 \label{sec:transferf}
-\newcommand{\letin}[1]{\texttt{let } #1 \texttt{in }}
+\newcommand{\letin}[1]{\texttt{let } #1 \texttt{ in }}
 \newcommand{\ifelse}[3]{\texttt{if }#1\texttt{ then } #2 \texttt{ else } #3}
 \newcommand{\match}[1]{\texttt{match }#1}
 \newcommand{\with}[1]{\texttt{with }#1\text{: }}
 \newcommand{\coerce}[2]{c_{\text{#1}, \text{#2}}}
 \newcommand{\default}{\texttt{default: }}
-Each node in the control flow graph has a corresponding transfer function. Most of the transfer functions are defined on { State} instead of {AnalysisLattice} i.e they can be defined as $f_{n,\delta} : \text{State} \rightarrow \text{State}$ rather than $f_{n,\delta} : \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$. This eases the notation and given a state-transfer-function, $f_{n,\delta}'$, the corresponding lattice-transfer function, $f_{n,\delta}$, can be defined as
+To propagate the lattice-elements between nodes in the control-flow graph, each node type has a corresponding transfer function. Most of the transfer functions are defined on State instead of {AnalysisLattice}, i.e they are defined as $f_{n,\delta} : \text{State} \rightarrow \text{State}$ rather than $f_{n,\delta} : \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$. This eases the notation. Given a state-transfer-function $f_{n,\delta}'$ the corresponding lattice-transfer function, $f_{n,\delta}$, can be defined as
 
 \begin{align}
 f_{n,\delta}(l) = l[\delta\mapsto f'_{n, \delta}(l(\delta))]
 \end{align}
-Where $n\in\mathcal{N}$ is a node in the control-flow graph and $\delta\in \Delta$ is the current context. The transfer functions are defined below.
+where $n\in\mathcal{N}$ is a node in the control-flow graph and $\delta\in \Delta$ is the current context. The transfer functions are defined in sections \ref{sec:operations} through \ref{sec:otherTransferFuncs}. In the definitions the 5-tuple $(s_l, s_g, s_h, s_t, s_{ht})$ is used to represent the five lattice-elements inside the State lattice-element given as input to the function.
 
 \subsection{Operations}
-Let $n = \mathit{bop}_\oplus(t_l,t_r,t_{tar})$ or $n =  \mathit{sop}_\oplus(t_l,t_r,t_{tar})$ then 
+\label{sec:operations}
+Let $n = \mathit{bop}_\oplus(t_l,t_r,t_{tar})$ or $n =  \mathit{sop}_\oplus(t_l,t_r,t_{tar})$. Then 
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = (s_l, s_g, s_h, s_t[t_{tar}\mapsto s(t_l)\oplus s(t_r)], s_{ht})
 \end{align}
-or $n = uop_\circ(t_{val},t_{tar})$ then
+Let $n = uop_\circ(t_{val},t_{tar})$. Then
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = (s_l, s_g, s_h, s_t[t_{tar}\mapsto \circ s(t_{val})], s_{ht})
 \end{align}
-The soundness of the binary, unary, and short-circuit operations follows from the subsequent implementation of the abstract evaluation. This is covered, in detail, in section \ref{sec:abseval}. These operations solely operates on the temporary variables which acts as intermediate storage for the result of a computation.  By not storing these in the heap every update is a strong update, which increases precision.
+The soundness of the binary, unary, and short-circuit operations follow from the subsequent implementation of the abstract evaluation. This is covered in detail in section \ref{sec:abseval}. These operations solely operates on the temporary variables which acts as intermediate storage for the result of a computation. By not storing these in the heap every update is a strong update, which increases precision.
 
 Since the increment and decrement operations have to read a set of possible locations and update the value of the locations, these are not performed on the temporary variables. Operations on the heap can never be performed by strong update, hence the new values must be joined with the old. The $updateLocations:\mathcal{P}(\text{HLoc}) \times \text{Heap} \times (\text{HLoc}\rightarrow\text{Value})\rightarrow \text{Heap}$ function writes a value to the heap using weak updates.
 \begin{align}
 updateLocations(L,h, v) = h[\forall l \in L. l \mapsto h(l)\sqcup v]
 \end{align}
+
 For $n = \mathit{inc}_\circ(h_{val},t_{tar})$ the transfer function is defined as
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) =     & \match{\circ}\notag\\
@@ -44,18 +46,19 @@ f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) =     & \match{\circ}\notag\\
                                 & \quad\quad\quad updateLocations(s_{ht}(h_{val}), s_h, l\rightarrow \circ s_h(l)),\notag\\
                                 & \quad\quad\quad s_t[t_{tar}\mapsto s_h(s_{ht}(h_{val}))], s_{ht})
 \end{align}
-Which updates the heap and the target temporary variable, $t_{tar}$.
+Which updates the heap and the target temporary variable $t_{tar}$.
 \subsection{Variables}
-When writing to a variable, as in the previous section, strong can never occur. The reason for this follows from how PHP performs deep-copy and is covered later in this chapter. The $\mathit{writeVar}: \text{Var} \times \text{Scope} \times \text{Heap} \times \text{Value} \rightarrow \text{Scope} \times \text{Heap}$ function writes to the heap while ensuring that the provided scope is updated accordingly. 
+When writing to a variable, as in the previous section, strong updates can never occur. The reason for this follows from how PHP performs deep-copy and is covered later in this chapter. The $\mathit{writeVar}: \text{Var} \times \text{Scope} \times \text{Heap} \times \text{Value} \rightarrow \text{Scope} \times \text{Heap}$ function writes to the heap while ensuring that the provided scope is updated accordingly. 
 \begin{align}
 \mathit{writeVar}_{n,\delta}(v,s,h,v_{val}) =  &\ifelse{s(v) = \emptyset}{\notag\\
-                            &\quad (s[v\mapsto\{\text{HLoc}(n,\delta, 0)\}],h[\text{HLoc}(n,\delta, 0)\mapsto v]) \notag\\
+                            &\quad (s[v\mapsto\{\text{HLoc}(n,\delta, 0)\}],h[\text{HLoc}(n,\delta, 0)\mapsto v_{val}]) \notag\\
                             &}{\notag\\
                             &\quad (s, updateLocations(s(v), h, v_{val}))}
 \end{align}
-With a separate { Locals} and { Globals} scope, the current scope, wrt. a variable, $v$, is decided by comparing the current context and the variable name. If the context is empty or if the variable is a super-global, then the current scope is the global scope, else it is the local scope. Deciding whether a variable is a super global, is done by the relation $\mathit{isSuperGlobal}$ which holds if and only if $v$ is eiter \texttt{\$\_GET}, \texttt{\$\_POST}, \texttt{\$\_SESSION}, \texttt{\$\_COOKIE}, \texttt{\$\_SERVER}, \texttt{\$\_REQUEST}, \texttt{\$\_FILES}, \texttt{\$\_ENV}, or \texttt{\$GLOBALS}.
+With a separate Locals and Globals scope, the current scope (with respect to a variable $v$) is decided by looking at the current context as well as the variable name. If the context is empty or if the variable is a super-global, then the current scope is the global scope, else it is the local scope. Deciding whether a variable is a superglobal is done by the predicate $\mathit{isSuperGlobal}$ which is true if and only if $v$ is either \texttt{\$\_GET}, \texttt{\$\_POST}, \texttt{\$\_SESSION}, \texttt{\$\_COOKIE}, \texttt{\$\_SERVER}, \texttt{\$\_REQUEST}, \texttt{\$\_FILES}, \texttt{\$\_ENV}, or \texttt{\$GLOBALS}.
 
-For instance in program \ref{lst:scope}, since the variable \texttt{\$a}, on line \ref{line:scope_locala} , is in a function body, the current scope is the local scope, since the variable \texttt{\$GLOBALS} on line \ref{line:scope_superglobal} is a super-global, it is in the global scope, and since the variable \texttt{\$c} is not in a function body, it is in the global scope. The variable \texttt{\$b}, on line \ref{line:scope_local_global} is also in the local scope. This follows from the fact the variable is only an alias for the corresponding global variable, e.g. it shares the same locations as the global value, but if a reference assignment is performed on \texttt{\$b}, e.g. \texttt{\$b = \&\$a}, it will only effect the local variable, as opposed to a reference assignment to a super-global.
+An example of how the scope is decided can be seen in program \ref{lst:scope}. The current scope of the variable \texttt{\$a} on line \ref{line:scope_locala} in a function body is the local scope. The variable \texttt{\$GLOBALS} on line \ref{line:scope_superglobal} is a superglobal, and so is in the global scope. The variable \texttt{\$c} is not in a function body, so it is in the global scope. The variable \texttt{\$b} on line \ref{line:scope_local_global} is also in the local scope. This follows from the fact that the variable is only an alias for the corresponding global variable, e.g. it shares the same locations as the global value, but if a reference assignment is performed on \texttt{\$b}, e.g. \texttt{\$b = \&\$a}, it will only affect the local variable, as opposed to a reference assignment to a super-global.
+
 \begin{program}
 \begin{lstlisting}
 <?php
@@ -70,7 +73,7 @@ var_dump($c);  %*\label{line:scope_globala}*)
 \label{lst:scope}
 \end{program}
 
-For $n = \mathit{varWrite}(v,t_{val},t_{tar})$ the transfer function is defined as
+For $n = \mathit{varWrite}(v,t_{val},t_{tar})$, the transfer function is defined as
 \begin{align}
 f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta = \Lambda \vee \mathit{isSuperGlobal}(v)}{\notag\\
                                             &\quad\letin{(g,h) = \mathit{writeVar}_{n,\delta}(v, s_g, s_h, s_t(t_{val}))}\notag\\
@@ -79,16 +82,16 @@ f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta = \Lambda \vee \math
                                             &\quad\letin{(l,h) = \mathit{writeVar}_{n,\delta}(v, s_l, s_h, s_t(t_{val}))}\notag\\
                                             &\quad (l,s_g,h,s_t[t_{tar}\mapsto s_t(t_{val})], s_{ht})}
 \end{align}
-and for $n = \mathit{varWrite}(v,h_{val},t_{tar})$ the transfer function is defined as
+and for $n = \mathit{varWrite}(v,h_{val},t_{tar})$, the transfer function is defined as
 \begin{align}
 f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta = \Lambda \vee \mathit{isSuperGlobal}(v)}{\notag\\
                                             &\quad (s_l,s_g[v\mapsto s_{ht}(h_{val})],s_h,s_t[t_{tar}\mapsto s_h(s_{ht}(h_{val}))], s_{ht})\notag\\
                                             &}{\notag\\
                                             &\quad (s_l[v\mapsto s_{ht}(h_{val})],s_g,s_h,s_t[t_{tar}\mapsto s_h(s_{ht}(h_{val}))], s_{ht})}
 \end{align}
-In the latter case the variable is always strongly updated. This is sound because the current language subset of PHP offers no ambiguity with regards to which variable currently being updated. Specifically because the infamous variable-variable feature has been omitted.
+In the latter case the variable is always strongly updated. This is sound, since the current language subset of PHP offers no ambiguity with respect to which variable is currently being updated, specifically because the infamous variable-variable feature is not supported.
 
-Besides resolving the scope, as above, reading a variable is quite straight forward. In order to be sound however, the transfer function does need to take uninitialized variables into account. When reading an uninitialized variable in PHP, the default value is \texttt{NULL}, therefor if reading to a temporary variable, the results should be $\text{Value}(\text{Null}(\top))$ if a variable, in the current scope, is not pointing to any locations. Else the result should be the joined value of the heap locations. For $n = \mathit{varRead}(v,t_{tar})$ the transfer function is defined as
+Besides resolving the scope as above, reading a variable is quite straight forward. In order to be sound, however, the transfer function needs to take uninitialized variables into account. When reading an uninitialized variable in PHP, the default value is \texttt{NULL}. Because of this, if the read is stored in a temporary variable and the variable is not set in the current scope, the result should be $\text{Value}(\text{Null}(\top))$. Otherwise the result should be the joined value of the heap locations pointed to by the variable. So for $n = \mathit{varRead}(v,t_{tar})$, the transfer function is defined as
 \begin{align}
 f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\letin{s = \notag\\
                                             &\quad\ifelse{\delta = \Lambda \vee \mathit{isSuperGlobal}(v)}{s_g}{s_l}\notag\\
@@ -98,11 +101,12 @@ f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\letin{s = \notag\\
                                             &}\notag\\
                                             &(s_l,s_g,s_h,s_t[t_{tar}\mapsto v], s_{ht})
 \end{align}
-When reading the locations of a variable, special care has to be shown when the variable is uninitialized. Since reading the same variable twice, with no intermediate modification, must return the same locations, the variable has to be initialized when first read. This is done by the $\mathit{initializeVariable}_{n,\delta} : \text{Var}\times\text{Scope}\rightarrow \text{Scope}$ function, which creates a new location in the provided scope, if none exists. 
+When reading the locations of a variable, special care has to be shown when the variable is uninitialized. Since reading the same variable twice with no intermediate modification must return the same locations, the variable has to be initialized when first read. This is done by the $\mathit{initializeVariable}_{n,\delta} : \text{Var}\times\text{Scope}\rightarrow \text{Scope}$ function, which creates a new location in the provided scope, if none exists. 
 \begin{align}
 \mathit{initializeVariable}_{n, \delta}(v,s) = \ifelse{s(v) = \emptyset}{s[v\mapsto \{\text{HLoc}(n,\delta, 0)\}]}{s}
 \end{align}
-For $n = \mathit{varRead}(v,h_{tar})$ the transfer function becomes
+For $n = \mathit{varRead}(v,h_{tar})$, the transfer function becomes
+
 \begin{align}
 f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta= \Lambda \vee \mathit{isSuperGlobal}(v)}{\notag\\
                                             &\quad\letin{ s_g' = \mathit{initializeVariable}_{n,\delta}(v,s_g)}\notag\\
@@ -115,32 +119,32 @@ f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) = &\ifelse{\delta= \Lambda \vee \mathi
 
 \subsection{Arrays}
 
-There are four types of array operations; initialize, read, write and append, with one, two, three and four different signatures respectively. For $n = \mathit{arrayInit}(t_{tar})$ the transfer function becomes
+There are four types of array operations; initialize, read, write, and append, with one, two, three, and four different signatures respectively. For $n = \mathit{arrayInit}(t_{tar})$ the transfer function becomes
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = (s_l, s_g, s_h, s_t[t_{tar}\mapsto \text{Value}(\text{emptyArray})], s_{ht})
 \end{align}
-which is trivially sound, since all it does is to initialize an empty array in the given temporary variable.
+which is trivially sound, since all it does is initializing an empty array in the given temporary variable.
 
 \subsubsection{Array initialization}
-Array initialization happens when writing the expression \texttt{[$\cdots$]} or \texttt{array($\cdots$)}, where the dots indicate initial content. Remember however that arrays need not be initialized explicitly. An array write or append to an uninitialized variable creates an array and writes to it. This does not yield a $\mathit{arrayInit}$ node in the CFG. The initial content is added to the array immediately after initialization by the following $\mathit{arrayAppend}(t_{val}, t_{ar})$ node and  the $\mathit{arrayWrite}(t_{val}, t_{key}, t_{ar})$ node.
+Array initialization happens when writing the expression \texttt{[$\cdots$]} or \texttt{array($\cdots$)}, where the dots indicate initial content. Remember however, that arrays need not be initialized explicitly. An array write or append to an uninitialized variable creates an array and writes to it. This does not yield an $\mathit{arrayInit}$ node in the control-flow graph. The initial content is added to the array immediately after initialization by the following $\mathit{arrayAppend}(t_{val}, t_{ar})$ node and  the $\mathit{arrayWrite}(t_{val}, t_{key}, t_{ar})$ node.
 
 \subsubsection{Array append}
-Appending a value, stored in the temporary values, to an array likewise stored in the temporary values, is performed by first storing the value in the heap, at some location, $l$. Thereafter the array is joined with an list-array of the set containing only $l$. While this implies that an append operation on a map-array results in the $\top$ array, thus loosing all precision, our hypothesis states that the append operation should only be performed on lists. Therefore this loss should not occur in a \emph{good} program. For $n = \mathit{arrayAppend}(t_{val},t_{ar})$ the transfer function becomes
+Appending a value stored in the temporary storage to an array likewise stored in the temporary storage is performed by first storing the value in the heap at some location $l$. Then the array is joined with a list-array containing only $l$. While this implies that an append operation on a map-array results in the $\top$-element array (thus loosing all precision) our hypothesis states that the append operation should only be performed on lists. Therefore, this loss should not occur in a \emph{good} program. Furthermore, cases where the result is the $\top$-element array can be reported to the user as suspicious use. For $n = \mathit{arrayAppend}(t_{val},t_{arr})$ the transfer function is defined in \ref{eq:append}. The 5-tupel $(v_a, v_s, v_n, v_b, v_u)$ unfolds the Value lattice-element returned from the look-up in the temporary storage $s_t$.
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = & \letin{\notag\\
-                                    & \quad (v_a,v_s,v_n,v_b,v_u) = s(t_{ar}), \notag\\
+                                    & \quad (v_a,v_s,v_n,v_b,v_u) = s_t(t_{arr}), \notag\\
                                     & \quad l = \text{HLoc}(\delta, n, 0)\notag\\
                                     &} \notag\\
                                     &(s_l,s_g,\notag\\
                                     &\quad s_h[l\mapsto s_t(t_{val})], \notag\\
-                                    &\quad s_t[t_{ar} \mapsto (v_a \sqcup \text{ArrayList}(\{l\}),v_s, v_n, v_b, v_u)],\notag\\
-                                    &\quad s_{ht})
+                                    &\quad s_t[t_{arr} \mapsto (v_a \sqcup \text{ArrayList}(\{l\}),v_s, v_n, v_b, v_u)],\notag\\
+                                    &\quad s_{ht}) \label{eq:append}
 \end{align}
-As mentioned earlier, this append node only occurs immediately after array initialization as a method for inserting initial content into an array. E.g. for the expression $[1,2,3]$ the numbers, $1$, $2$, and $3$ are appended to the array initialized by the brackets.
+As mentioned earlier, this append node only occurs immediately after array initialization as a method for inserting initial content into an array. E.g. for the expression $[1,2,3]$, the numbers $1$, $2$, and $3$ are appended to the array initialized by the brackets.
 
-Probably the most common use of array appends are in a normal assignment, e.g. \texttt{\$a[] = 42;} or \texttt{\$a['someKey'][] = 42;}. In this case the value, \texttt{42}, is stored in temporary storage, and the location of the array being modified is stored in the heap. The operation then becomes; appending a value on a set of locations, which is done in the same manner as the previous node. By for each possible array location joining the existing array with a list-array. Here however the value being appended is also added to the temporary variable $t_{tar}$, since this is what an append returns in PHP, e.g. \texttt{echo \$a[] = 42;} prints the number \texttt{42}. 
+Probably the most common use of array appends are in an ordinary assignment, e.g. \texttt{\$a[] = 42} or \texttt{\$a['someKey'][] = 42}. In this case the value, \texttt{42}, is stored in temporary storage, and the location of the array being modified is stored in the heap. The operation then becomes; appending a value on a set of locations, which is done in the same manner as the previous node using a newly created list-array lattice-element to join with. Here however the value being appended is also added to the temporary variable $t_{tar}$, since this is evaluation of the append-expression, e.g. \texttt{echo \$a[] = 42;} prints the number \texttt{42}. 
 
-For $n = \mathit{arrayAppend}(h_{var}, t_{val},t_{tar})$ the transfer function is defined as
+For $n = \mathit{arrayAppend}(h_{var}, t_{val},t_{tar})$, the transfer function is defined as
 \begin{align}
     f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = &\letin{l' = \text{HLoc}(\delta, n, 0)} \notag\\
                               &\letin{s_t' = s_t[t_{tar}\mapsto s_t(t_{val})]}\notag\\
@@ -153,9 +157,9 @@ For $n = \mathit{arrayAppend}(h_{var}, t_{val},t_{tar})$ the transfer function i
                               &(s_l, s_g, s_h', s_t', s_{ht})
 \end{align}
 
-Another type of append is in the context of a reference assignment, e.g. \texttt{\$a[] = \&\$b}. Here the locations pointed to by \texttt{\$b}, should be appended to the array(s) at \texttt{\$a}. I.e appending a value, in the form of a set of locations to a set of locations. This is done like before, the only difference being that the list-array of which the existing values are joined, does not contain a single new location, rather the set of locations corresponding to the value. Again the target variable in temporary storage must be set to the value assigned, not the location-set representing the value.
+Another type of append is in the context of a reference assignment, e.g. \texttt{\$a[] = \&\$b}. Here the locations pointed to by \texttt{\$b} should be appended to the array(s) at \texttt{\$a}, i.e appending a value, in the form of a set of locations to a set of locations. This is done like before, the only difference being that the list-array of which the existing values are joined, does not contain a single new location, rather the set of locations corresponding to the value. Again, the target variable in temporary storage must be set to the value assigned, not the location-set representing the value.
 
-For $n = \mathit{arrayAppend}(h_{var}, h_{val},t_{tar})$ the transfer function becomes
+For $n = \mathit{arrayAppend}(h_{var}, h_{val},t_{tar})$, the transfer function becomes
 \begin{align}
     f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = &\letin{s_t' = s_t[t_{tar}\mapsto s_h(s_{ht}(h_{val}))]}\notag\\
                               &\letin{s_h' = s_h[\notag\\
@@ -165,9 +169,9 @@ For $n = \mathit{arrayAppend}(h_{var}, h_{val},t_{tar})$ the transfer function b
                               &}\notag\\
                               &(s_l, s_g, s_h', s_t', s_{ht})
 \end{align}
-The final array-append operation occurs when an array is appended and immediately thereafter accessed, e.g. \texttt{\$a[]['key']} where a location is appended to the array at \texttt{\$a} and immediately  thereafter implicitly initialized and written to. As previously mentioned an array does not have to be explicitly initialized. The location, $l'$, is created and appended in the same was as previously to all possible array locations. Since the heap lattice element initializes new locations to $\text{Value}(\text{Null}(\top))$ it is important, and sound, to set $l'$ to $\text{Value}(\bot)$ since the location will be joined with another array immediately after. 
+The final array-append operation occurs when an array is appended and immediately thereafter accessed, e.g. \texttt{\$a[]['key']} where a location is appended to the array at \texttt{\$a} and immediately  thereafter implicitly initialized as an array and written to. As previously mentioned an array does not have to be explicitly initialized. The location $l'$ is created and appended in the same way as previously to all possible array locations. Since the heap lattice element initializes new locations to $\text{Value}(\text{Null}(\top))$, it is important and sound to set $l'$ to $\text{Value}(\bot)$, since the location will be joined with another array immediately after. 
 
-For $n = \mathit{arrayAppend}(h_{var}, h_{tar})$ the transfer function is defined as
+For $n = \mathit{arrayAppend}(h_{var}, h_{tar})$, the transfer function is defined as
 \begin{align}
     f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = &\letin{l' = \text{HLoc}(\delta, n, 0)}\notag\\
                               &\letin{s_{ht}' = s_{ht}[h_{tar} \mapsto \{l'\}]}\notag\\
@@ -191,13 +195,11 @@ $a[]["foo"] = 42;
 \end{program}
 \end{comment}
 \subsubsection{Array read and write}
-When writing or reading from an array, given a value, $v$, as key, the value must first be coerced to an array index. The easy approach would be to use the coercion function directly $\coerce{Value}{ArrayIndex}(v)$, introduced in the section \ref{sec:coercion}, which coerces and then joins all factors. This approach would for instance coerce the value $v = (\bot, \texttt{"foo"}, 4, \bot, \bot)$ to the index $i = \coerce{Array}{ArrayIndex}(\bot)\sqcup\cdots\sqcup\coerce{Null}{ArrayIndex}(\bot) = \texttt{"foo"} \sqcup 4 = \top $. 
+When writing or reading from an array, given a value $v$ as key, the value must first be coerced to an array index. The easy approach would be to use the coercion function $\coerce{Value}{ArrayIndex}(v)$ introduced in section \ref{sec:coercion} directly, which coerces and then joins all factors. This approach would for instance coerce the value $v = (\bot, \texttt{"foo"}, 4, \bot, \bot)$ to the index $i = \coerce{Array}{ArrayIndex}(\bot)\sqcup\cdots\sqcup\coerce{Null}{ArrayIndex}(\bot) = \texttt{"foo"} \sqcup 4 = \top $. 
 
-Another approach would be to consider a set of possible indices, $I$, rather than a single index, by coercing the factors individually and access the array with each index. For the previous example $v$ would yield the set $I = \{\bot, \texttt{"foo"}, 4\}$. Since the value will most likely contain at least one $\bot$ factor, the set of indices will also contain the $\bot$ array index, which will become a problem. 
+Another approach would be to consider a set of possible indices $I$ rather than a single index, by coercing the factors individually and accessing the array with each index. For the previous example $v$ would yield the set $I = \{\bot, \texttt{"foo"}, 4\}$. Since the value will most likely contain at least one $\bot$ factor, the set of indices will also contain the $\bot$ array index, which will become a problem. This becomes apparent when first considering how values are written to and read from map-arrays. Writing index $i$ with location set $L$ on some map-array, $a$, should ideally be done by joining the location set of each entry in $a$ with $L$ where $i$ is contained in the corresponding key, e.g. $a[\forall d \in dom(a)\wedge i \sqsubseteq d. d \mapsto a(d)\sqcup L]$. Updating a possibly infinite domain could be done lazily, but deciding containment of two lattices, where one has infinitely many changes, is not practically feasible. As a compromise the only entry updated in $a$ is key $i$ with the joined set $a(i)\sqcup L$. This compromise entails that when reading $i'$ from map-array $a$, the set of possible keys is all $d\in dom(a)$ where $d\sqsubseteq i' \vee i'\sqsubseteq d$, which is practically feasible. 
 
-The problem becomes apparent when first considering how values written to and read from map-arrays. Writing index $i$ with location set $L$ on some map-array, $a$, should ideally be done by joining the location set of each entry in $a$ with $L$ where $i$ is contained in the corresponding key. E.g. $a[\forall d \in dom(a)\wedge i \sqsubseteq d. d \mapsto a(d)\sqcup L]$. Updating a possibly infinite domain could be done lazily, but deciding containment of two lattices, where one has infinitely many changes, is not practically feasible. As a compromise the only entry updated in $a$ is key $i$ with the joined set $a(i)\sqcup L$. This compromise entails that when reading $i'$ from map-array $a$, the set of possible keys is all $d\in dom(a)$ where $d\sqsubseteq i'$ or $i'\sqsubseteq d$, which is practically feasible. 
-
-Returning to the problematic $\bot$ factors. Since most writes would contain a at least one $\bot$ factor, most writes would, with the second approach, write to the $\bot$ index, and since $\bot$ is contained in all indices, massive loss of precision is ensured. Therefore a third option is to only consider coerced factors, of the key value, that are not contained in other factors. This reduces the set of the previous example to $I = \{\texttt{"foo"}, 4\}$. These are the indices returned by the function $\mathit{indices}: \text{Value} \rightarrow \text{ArrayIndex}^*$
+Returning to the problematic $\bot$ factors, since most writes would contain a at least one $\bot$ factor, most writes would, with the second approach, write to the $\bot$ index, and since $\bot$ is contained in all indices, massive loss of precision occurs. Therefore a third option is to only consider coerced factors, of the key value, that are not contained in other factors. This reduces the set of the previous example to $I = \{\texttt{"foo"}, 4\}$. These are the indices returned by the function $\mathit{indices}: \text{Value} \rightarrow \text{ArrayIndex}^*$
 \newcommand{\is}{\texttt{ is }}
 \begin{align}
     \mathit{indices}(v) =    &\letin{(v_a,v_s, v_n, v_b, v_u) = v}\notag\\
@@ -208,7 +210,7 @@ Returning to the problematic $\bot$ factors. Since most writes would contain a a
                     &\quad\coerce{Null}{Index}(v_n) \}}\notag\\
                     &I \setminus \{j|i,j\in I \wedge j\sqsubseteq i \wedge i \neq j \}
 \end{align}
-Using the above function, we are able to generalize reading from an array as a function $\mathit{readArray}: \text{Value} \times \text{Value} \times \text{Heap} \rightarrow \mathcal{P}(L)$ which given a value, key, and heap returns a set of possible value locations. Reading an index from a list, returns the set of locations in the list, since no key information is kept. Reading from $\bot$ or { emptyMap} results in the empty set, since they contain no locations. Finally reading from $\top$ results in all possible locations, e.g. the top element of $\mathcal{P}(L)$, since an array can potentially point to every location in the heap, including itself.
+Using the above function we are able to generalize reading from an array as a function $\mathit{readArray}: \text{Value} \times \text{Value} \times \text{Heap} \rightarrow \mathcal{P}(L)$ which given a value, key, and heap returns a set of possible value locations. Reading an index from a list returns the set of locations in the list, since no key information is kept about list indices. Reading from $\bot$ or emptyMap results in the empty set, since those contain no locations. Finally, reading from $\top$ results in all possible locations, e.g. the top element of $\mathcal{P}(L)$, since an array can potentially point to every location in the heap, including itself.
 \begin{align}
 \mathit{readArray}(v,k,h) =            &\letin{(v_a,v_s,v_n,v_b,v_u) = v}\notag\\
                             &\match{v_a}\notag\\
@@ -220,33 +222,33 @@ Using the above function, we are able to generalize reading from an array as a f
                             &\quad\with{\bot} \emptyset
 \end{align}
 
-In the same manner can a the act of writing to an array be generalized to the function $\mathit{writeArray}: \text{Value} \times \text{Value} \times \mathcal{P}(L) \rightarrow \text{Value}$. Here writing to a $\top$ array results in a $\top$ array, writing to a map, updates the keys as discussed before, and writing to anything else either returns a list or a map depending on the type of keys being used. If some of the indices are strings then a map is returned, else a list is returned. 
+In the same manner, the act of writing to an array can be generalized to the function $\mathit{writeArray}: \text{Value} \times \text{Value} \times \mathcal{P}(L) \rightarrow \text{Value}$. Here writing to a $\top$ array results in a $\top$ array, writing to a map updates the keys as discussed before, and writing to anything else either returns a list or a map depending on the type of keys being used. If any of the indices are strings, then a map is returned otherwise a list is returned. The predicate $\mathit{isInteger}(i)$ holds iff $i$ is an integer.
 \begin{align}
 \mathit{writeArray}(v, k, L) =       & \letin{(v_a,v_s,v_n,v_b,v_u) = v}\notag\\
                             &\letin{m = \text{ArrayMap}([\forall i \in \mathit{indices}(k). i \mapsto L])}\notag\\
                             &(\match{v_a} \notag\\
                             & \quad \with{\text{ArrayList}(L')} \notag\\
-                            &\quad\quad \ifelse{\exists i \in \mathit{indices}(k).i \is \text{String}(\_)}{\notag\\
+                            &\quad\quad \ifelse{\exists i \in \mathit{indices}(k).\neg\mathit{isInteger}(i)}{\notag\\
                             &\quad\quad\quad \text{ArrayMap}([\top \mapsto L'])\sqcup m}{\notag\\
                             &\quad\quad\quad \text{ArrayList}(L\cup L')}\notag\\
                             & \quad \with{\text{ArrayMap}(m')} m'\sqcup m\notag\\
                             & \quad \with{\text{emptyArray}} \notag\\
-                            & \quad\quad\ifelse{\exists i \in \mathit{indices}(k).i \is \text{String}(\_)}{\notag\\
+                            & \quad\quad\ifelse{\exists i \in \mathit{indices}(k).\neg\mathit{isInteger}(i)}{\notag\\
                             &\quad\quad\quad m}{\text{ArrayList(L)}}\notag\\
                             & \quad \with{\bot}  \notag\\
-                            & \quad\quad\ifelse{\exists i \in \mathit{indices}(k).i \is \text{String}(\_)}{\notag\\
+                            & \quad\quad\ifelse{\exists i \in \mathit{indices}(k).\neq\mathit{isInteger}(i)}{\notag\\
                             &\quad\quad\quad m}{\text{ArrayList(L)}}\notag\\
                             & \quad \with{\top} \top, v_s, v_n, v_b, v_u)
 \end{align}
 
-With these functions in place, the transfer functions for the array-read and write nodes can be defined. For reading from an array in temporary storage, e.g. right side of the assignment \texttt{\$b = \$a['key']}, the node is $n = \mathit{arrayRead}(t_{ar},t_{key},t_{tar})$ where the value read from the array should be stored at $t_{tar}$. The query is always joined with $\text{Value}(\text{Null}(\top))$ since an entry might not be set. The transfer function is defined as
+With these functions in place, the transfer functions for the array-read and write nodes can be defined. For reading from an array in temporary storage, e.g. the right-hand side of the assignment \texttt{\$b = \$a['key']}, the node is $n = \mathit{arrayRead}(t_{arr},t_{key},t_{tar})$ where the value read from the array should be stored at $t_{tar}$. The query is always joined with $\text{Value}(\text{Null}(\top))$ since an entry might not be set. The transfer function is defined as
 \begin{align}
-f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) =   &\letin{L = \mathit{readArray}(s_t(t_{ar}), s_t(t_{key}) ,s_h)}\notag\\
+f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) =   &\letin{L = \mathit{readArray}(s_t(t_{arr}), s_t(t_{key}) ,s_h)}\notag\\
                                     &\letin{v = \text{Value}(\text{Null}(\top))\sqcup s_h(L)}\notag\\
                                     &  (s_l, s_g, s_h, s_t[t_{tar}\mapsto v], s_{ht})
 \end{align}
 
-Another array-read operation is when resolving the locations of an entry corresponding to a given key, e.g. resolving entry \texttt{\$a['foo']} in the assignment \texttt{\$a['foo'][] = 42}. This is done by joining the locations of each possible entry, adding a new location to each entry yielding an empty location-set. Updating empty entries ensures that subsequent modifications of the returned location-set is propagated to every possible array. For this operation the node is $n = \mathit{arrayRead}(h_{var},t_{key},h_{tar})$ and transfer function becomes
+Another array-read operation is resolving the locations of an entry corresponding to a given key, e.g. resolving entry \texttt{\$a['foo']} in the assignment \texttt{\$a['foo'][] = 42}. This is done by joining the locations of each possible entry, adding a new location to each entry yielding an empty location-set. Updating empty entries ensures that subsequent modifications of the returned location-set is propagated to every possible array. For this operation, the node is $n = \mathit{arrayRead}(h_{var},t_{key},h_{tar})$ and the transfer function becomes
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) =   &\letin{l = \text{HLoc}(\delta, n, 0)}\notag\\
                                     &\letin{s_{ht}' = s_{ht}[h_{tar} \mapsto \notag\\
@@ -265,15 +267,15 @@ where
 cardCheck(L, l) = \ifelse{L = \emptyset}{\{l\}}{L}
 \end{align}
 
-As mentioned earlier in this section, immediately after an explicit array initialization follows writing and appending the initial content of the array. E.g. for the array creation \texttt{['a'=>1, 'b'=>2]}, follows two array writes, one with value 1 at key \texttt{'a'} and with value 2 at key \texttt{'b'}, respectively. These writes are expressed with $n = \mathit{arrayWrite}(t_{key},t_{val},t_{ar})$ and are performed using the $\mathit{writeArray}$ function. Here the value, at temporary variable $t_{val}$ is stored in the heap at a new location, which is consequently written to the existing array. The transfer function is defined as
+All explicit array initializations initializes an empty array. Any initial data is added by subsequent array-appends (covered the section about array append) and array-write operations. For example initializing an array \texttt{['a'=>1, 'b'=>2]} two array-write operations follow, one for each entry. The transfer function for the corresponding control-flow node $n = \mathit{arrayWrite}(t_{key},t_{val},t_{arr})$ uses the $\mathit{writeArray}$ function. Here, the value at temporary variable $t_{val}$ is stored in the heap at a new location, which is consequently written to the existing array. The transfer function is defined as
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = & \letin{l' = \text{HLoc}(\delta, n, 0)}\notag\\
                             & \letin{v' = }\notag\\
                             &(s_l, s_g, s_h[l'\mapsto s_t(t_{val})], \notag\\
-                            &\quad s_t[t_{ar} \mapsto \mathit{writeArray}(s_t(t_{ar}), s_t(t_{key}), \{l'\})], s_{ht})
+                            &\quad s_t[t_{arr} \mapsto \mathit{writeArray}(s_t(t_{arr}), s_t(t_{key}), \{l'\})], s_{ht})
 \end{align}
 
-When the array is residing in the heap, rather than temporary storage, e.g. \texttt{\$a['key'] = 42;}, resolving the possible locations of the array must first be performed, thereafter the write operation can be performed. This is expressed with the node $n = \mathit{arrayWrite}(h_{var}, t_{key},t_{val},t_{tar})$ where the transfer function is
+When the array is residing in the heap rather than temporary storage, e.g. \texttt{\$a['key'] = 42}, the possible locations of the array must first be resolved, after that the write operation can be performed. This is expressed with the node $n = \mathit{arrayWrite}(h_{var}, t_{key},t_{val},t_{tar})$, where the transfer function is defined as
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = &\letin{l' = \text{HLoc}(\delta, n, 0)} \notag\\
                             &\letin{s_t' = s_t[t_{tar}\mapsto s_t(t_{val})]}\notag\\
@@ -288,10 +290,11 @@ f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = &\letin{l' = \text{HLoc}(\delta, n,
                             &}\notag\\
                             &(s_l, s_g, s_h'', s_t', s_{ht})
 \end{align}
-Writing a value to an array can be viewed as two cases; writing to an existing entry and writing to a new entry. The first case entails that the value, stored in the heap, should be updated and the other that a new location, pointing to the new value, should be added to the entry. In order to perform a sound write, both cases are performed. 
+
+Writing a value to an array can be viewed as two cases; writing to an existing entry and writing to a new entry. The first case entails that the value stored in the heap should be updated and the other that a new location pointing to the new value should be added to the entry. In order to perform a sound write, both cases are performed. 
 
 
-Writing to an array in the context of a reference assignment, e.g. \texttt{\$a['key'] = \&\$b;}, is performed by writing the set of locations pointed to by \texttt{\$b} to the entry at \texttt{'key'} in array \texttt{\$a}.  This is expressed with the node $n$ = $\mathit{arrayWrite}(h_{var}$, $t_{key}$,$h_{val}$,$t_{tar})$ where the transfer function is defined as 
+Writing to an array in the context of a reference assignment, e.g. \texttt{\$a['key'] = \&\$b;}, is performed by writing the set of locations pointed to by \texttt{\$b} to the entry at \texttt{'key'} in array \texttt{\$a}.  This is expressed with the node $n$ = $\mathit{arrayWrite}(h_{var}$, $t_{key}$,$h_{val}$,$t_{tar})$, where the transfer function is defined as 
 \begin{align}
     f_{n,\delta}((s_l, s_g, s_h, s_t, s_{ht})) = &\letin{s_t' = s_t[t_{tar}\mapsto s_t(s_h(s_{ht}(h_{val})))]}\notag\\
                               &\letin{s_h' = s_h[\notag\\
@@ -300,12 +303,12 @@ Writing to an array in the context of a reference assignment, e.g. \texttt{\$a['
                               &}\notag\\
                               &(s_l, s_g, s_h', s_t', s_{ht})
 \end{align}
-Notice that the this operation does not update the heap values as the previous functions. This is sound because assigning new locations are in practice overwriting old ones. If the array keys were to be exactly resolved a strong update could be performed here, just as the case with the reference assignment to variables.
+Notice that this operation does not update the heap values as the previous functions. This is sound because assigning new locations are in practice overwriting old ones. If the array keys were to be exactly resolved a strong update could be performed here, just as the case with the reference assignment to variables.
 
 
 The array operations might seem similar to the operations on variables just with another level of ambiguity. Viewing the scopes as map-arrays from strings to location-sets is not far from how PHP implements scopes and may provide a good intuition as to how and why the variable-variable feature is implemented. 
 
-Notice that no strong updates are performed on heap values This is in order to maintain soundness and follows from how PHP performs deep copy, which is described in section \ref{sec:backg_references}. By copying the references PHP opens the possibility for the modification of a deep-copied array through another variable/array, with no reference assignment from the array.  In order to be sound, the analysis has to assume that no arrays are deep copied, but instead shares the internal references of the original array. From this follows that no strong-updates can be performed on any location, because it might result in an update of an array which in practice never share the location of the variable. This issue is illustrated in program \ref{lst:strong_update_lst}. If strong updates were allowed, updating \texttt{\$c} in the last line would result in \texttt{\$a} rightfully and \texttt{\$b} wrongfully being updated to the list containing the number two, \texttt{[2]}, since the two arrays share the same internal locations. By only performing weak updates, the two arrays becomes a list of { UIntNumber} which is sound.
+Notice that no strong updates are performed on heap values. This is in order to maintain soundness and follows from how PHP performs deep copy, which is described in section \ref{sec:backg_references}. By copying the references, PHP opens the possibility for the modification of a deep-copied array through another variable or array, with no reference assignment from the array.  In order to be sound, the analysis has to assume that no arrays are deep copied, but instead shares the internal references of the original array. From this follows that no strong-updates can be performed on any location, because it might result in an update of an array which in practice never share the location of the variable. This issue is illustrated in program \ref{lst:strong_update_lst}. If strong updates were allowed, updating \texttt{\$c} in the last line would result in \texttt{\$a} rightfully and \texttt{\$b} wrongfully being updated to the list containing the number two (\texttt{2}) since the two arrays share the same internal locations. By only performing weak updates, the two arrays become lists of UIntNumber which is sound.
 \begin{program}
 \centering
 \begin{lstlisting}
@@ -317,12 +320,14 @@ $c = 2;
 \caption{  }
 \label{lst:strong_update_lst}
 \end{program}
+
+
 \subsection{Function calls}
-The transfer functions for function call, $\mathit{call}$ and $\mathit{result}$ nodes, differs from the other functions. For $n = \mathit{call}_{\mathit{fn}}(c_1,\dots,c_n)$ the transfer function $f_{n,\delta} : \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$ sets up the local scope for the function body of $\mathit{fn}$. This scope is initially empty with exception of the function arguments being set by reference or by value, depending on call arguments, $c_1, \dots, c_n$, being a { THVar} or a { TVar} respectively. 
+The transfer functions for function calls ($\mathit{call}$ and $\mathit{result}$ nodes) differ from the other functions. For $n = \mathit{call}_{\mathit{fn}}(c_1,\dots,c_n)$, the transfer function $f_{n,\delta} : \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$ sets up the local scope for the function body of $\mathit{fn}$. This scope is initially empty with exception of the function arguments being set by reference or by value, depending on whether the call arguments, $c_1, \dots, c_n$, are variable names in THVar or TVar. 
 
-If the argument is passed by reference, then the corresponding argument is set, in the local scope, to point at the provided heap locations. If the argument is passed by value, then the argument is pointing to a newly created heap location, which in turns points to the value. The second case is one of the reasons for HLoc being defined as a product of context, node, and a natural number. Without the third factor all, value-passed, arguments would be written to the same heap-location. This is avoided by setting the number in the heap location to the position of the argument in question. 
+If the argument is passed by reference, the corresponding argument is set in the local scope to point at the provided heap locations. If the argument is passed by value, then the argument is pointing to a newly created heap location, which in turn points to the value. The second case is one of the reasons for HLoc being defined as a product of context, node, and a natural number. Without the third factor all value-passed arguments would be written to the same heap-location. This is avoided by setting the number in the heap location to the position of the argument in question. 
 
-The global scope and heap is preserved in the new scope, while the temporary maps both are \emph{emptied}. The transfer function is defined as
+The global scope and heap is preserved in the new state, while the temporary maps both are \emph{emptied}. The transfer function is defined as
 \begin{align}
       f_{n,\delta}(l) =     &\letin{\delta' = \mathit{addCallNode}(\delta, n)}\notag\\
                             &\letin{(\_, s_g, s_h,s_t, \_) = l[\delta]}\notag\\
@@ -338,9 +343,9 @@ The global scope and heap is preserved in the new scope, while the temporary map
                             &}\notag\\
                             &(s_l, s_g, s_h',[], [])
 \end{align}
-where the $\mathit{addCallNode} : \Delta \times \text{CallNode} \rightarrow \Delta$ is deciding the target context from the current, the $\mathit{args} : \text{FunctionNames} \rightarrow (\text{Var} \times \mathbb{N})^*$ function, given a function name, returns a list of arguments expressed as pairs of variable names and positions, and $\mathit{startNode} : \text{FunctionNames} \rightarrow \text{StartNode}$, given a function name, returns the unique $\mathit{start}$ node of that function. The heap locations created are associated with the start node, rather than the call node, because of efficiency. 
+where the function $\mathit{addCallNode} : \Delta \times \text{CallNode} \rightarrow \Delta$ decides the target context from the current, the function $\mathit{args} : \text{FunctionNames} \rightarrow (\text{Var} \times \mathbb{N})^*$ given a function name returns a list of arguments expressed as pairs of variable names and positions, and the function $\mathit{startNode} : \text{FunctionNames} \rightarrow \text{StartNode}$ given a function name returns the unique $\mathit{start}$ node of that function. The heap locations created are associated with the start node rather than the call node for higher efficiency.
 
-After running a function it is the task of the transfer function of the result node, to restore the old execution context.  For $n = \mathit{result}_{\mathit{call}_{fn}}(\_)$ the transfer functions are defined as functions from two lattices to a single lattice: $f_{n,\delta_{\mathit{call}},\delta_{\mathit{exit}}}: \text{AnalysisLattice} \times \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$ where the first lattice is the lattice passed to the transfer function of the call node, ${\mathit{call}_{fn}}$ and $\delta_{\mathit{call}}$ is the original context. Depending on the argument of the $\mathit{result}$ node the transfer function is defined as either
+After execution of a function it is the task of the transfer function of the result node, to restore the old execution context. For $n = \mathit{result}_{\mathit{call}_{fn}}(\_)$, the transfer functions are defined as functions from two lattice-elements to a single lattice-element: $f_{n,\delta_{\mathit{call}},\delta_{\mathit{exit}}}: \text{AnalysisLattice} \times \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$, where the first lattice-element is the element passed to the transfer function of the call node ${\mathit{call}_{fn}}$ and $\delta_{\mathit{call}}$ is the original context. The second lattice-element is the usual element derived from incoming flow. Depending on the argument of the $\mathit{result}$ node, the transfer function is defined as either of \ref{eq:result1} and \ref{eq:result2}
 \begin{align}
 f_{n,\delta_{\mathit{call}}, \delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\mathit{exit}})=   &\letin{\mathit{exit}(c_1, \cdots, c_n) = \mathit{exitNode}(fn)}\notag\\
                                                 &\letin{(s_l, \_, \_, s_t, s_{ht}) = l_{\mathit{call}}(\delta_{\mathit{call}})}\notag\\
@@ -350,9 +355,9 @@ f_{n,\delta_{\mathit{call}}, \delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\math
                                                 &\quad\quad\quad\quad \with{TVar} s_t(c_i)\notag\\
                                                 &\quad\quad\quad\quad \with{THVar} s_h(s_{ht}(c_i))\notag\\
                                                 &}\notag\\
-                                                &(s_l,s_g,s_h, s_t[t_{val}\mapsto v], s_{ht})
+                                                &(s_l,s_g,s_h, s_t[t_{val}\mapsto v], s_{ht}) \label{eq:result1}
 \end{align}
-for $n = \mathit{result}_{\mathit{call}_{fn}}(t_{val})$ or for $n = \mathit{result}_{\mathit{call}_{fn}}(h_{val})$ as 
+let $n = \mathit{result}_{\mathit{call}_{fn}}(t_{val})$ or $n = \mathit{result}_{\mathit{call}_{fn}}(h_{val})$ as 
 \begin{align}
 f_{n,\delta_{\mathit{call}}, \delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\mathit{exit}})=   &\letin{\mathit{exit}(c_1, \cdots, c_n) = \mathit{exitNode}(fn)}\notag\\
                                                 &\letin{(s_l, \_, \_, s_t, s_{ht}) = l_{\mathit{call}}(\delta_{\mathit{call}})}\notag\\
@@ -367,16 +372,18 @@ f_{n,\delta_{\mathit{call}}, \delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\math
                                                 &\quad\quad \with{TVar} s_t(c_i)\notag\\
                                                 &\quad\quad \with{THVar} s_h(\text{HLoc}(n,\delta_{\mathit{call}}, i))]\notag\\
                                                 &}\notag\\
-                                                &l_{call}[\delta_{call}\mapsto (s_l,s_g,s_h', s_t, s_{ht}[h_{val}\mapsto L])]
+                                                &l_{call}[\delta_{call}\mapsto (s_l,s_g,s_h', s_t, s_{ht}[h_{val}\mapsto L])] \label{eq:result2}
 \end{align}
-where the $\mathit{exitNode} : \text{FunctionName} \rightarrow \text{ExitNode}$ function, given a function name, returns the corresponding unique exit node. These functions will return an lattice containing all local values, temps and local scope, from the call-context and the global values, global scope and heap, from the exit-context. The possible result of the function-call is gathered from the exit-node and saved in either temporary- or heap-temporary-variables, depending on the function being pass by value or by reference respectively. In the latter case the position of the \emph{exit-argument} is again used to decide which heap locations to save the value, if the function returns a value rather than references. Since the number of arguments  in any function definition, the number of return statements in any function body, and the number of initialized arrays in the start lattice in practice is finite, so is the number of heap-locations. 
+where the $\mathit{exitNode} : \text{FunctionName} \rightarrow \text{ExitNode}$ function given a function name returns the corresponding unique exit node. These functions will return a lattice-element containing all local values, temps and local scope from the call-context, and the global values, global scope, and heap from the exit-context. The possible result of the function-call is gathered from the exit-node and saved in either temporary- or heap-temporary-variables, depending on the function being pass-by-value or pass-by-reference respectively. In the latter case the position of the \emph{exit-argument} is again used to decide which heap location to save the value at, if the function returns a value rather than references. Since the number of arguments in any function definition, the number of return statements in any function body, and the number of initialized arrays in the start lattice-element in practice are finite, so is the number of heap-locations. 
 
 \subsection{Other transfer functions}
-Two interesting transfer functions remains. The function for $n = \mathit{constRead}(c, t_{tar})$, which converts a constant $c$ to a lattice using the $value : \mathcal{C} \rightarrow \text{Value}$ function, which works as one would expect, is defined as
+\label{sec:otherTransferFuncs}
+Two interesting transfer functions remains. The first one is the function for $n = \mathit{constRead}(c, t_{tar})$. This function converts a constant $c$ to a lattice using the $value : \mathcal{C} \rightarrow \text{Value}$ function (working as one would expect) and is defined as
 \begin{align}
 f_{n,\delta}((s_l, s_g, s_h, s_t,s_{ht})) = (s_l, s_g, s_h, s_t[t_{tar} \mapsto value(c)], s_{ht})
 \end{align}
-and finally for $n = global(v_0, v_1, \cdots, v_{n-1});$ which creates variables in the local scope, sharing the locations of the corresponding variable in the global scope. If the variables points to no locations, a new location must be added to the global and local scope. If the current scope is empty, them no modifications are made to the input lattice. The transfer function is defined as
+
+The last function is for $n = global(v_0, v_1, \cdots, v_{n-1});$ which creates variables in the local scope, sharing the locations of the corresponding variable in the global scope. If the variable points to no locations, a new location must be added to the global and local scope. If the current scope is empty no modifications are made to the input lattice-element. The transfer function is defined as
 \begin{align}
 f_{n, \delta} ((s_l,s_g,s_h,s_t, s_{ht})) =     &\match{\delta}\notag\\
                                                 &\quad\with{\Lambda}(s_l,s_g,s_h,s_t, s_{ht})\notag\\
