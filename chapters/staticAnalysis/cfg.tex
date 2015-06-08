@@ -13,7 +13,7 @@ Parsing a P0 program $p : \syn{program}$ to an abstract syntax tree, the control
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{c|l}
+\begin{tabularx}{c|X}
  Symbol & Description \\\hline\hline
  $t \in \text{Temps}$ & A temporary variable name used to pass evaluated values between CFG nodes \\
  $h \in \text{HeapTemps}$ & A temporary heap variable name used to pass a set of heap locations between CFG nodes \\
@@ -23,7 +23,7 @@ Parsing a P0 program $p : \syn{program}$ to an abstract syntax tree, the control
  $\subt{R}(h)$ & Sub graph for reference expression $R$ with evaluated heap-location set stored in $h$ \\
  $\subt{V}(h)$ & Sub graph for a variable expression $V$ with evaluated heap-location set stored in $h$ \\
  $\subt{T}(c)$ & Sub graph for either an expression, a reference expression or a variable expression with $c$ being the corresponding $t$ or $h$ as described above
-\end{tabular}
+\end{tabularx}
 \caption{Symbols used in the control flow graph}
 \label{tab:nodes}
 \end{table}
