@@ -13,7 +13,6 @@ While the analysis is neither proven sound, optimized for fast execution, nor ex
 
 
 
-
 %The purpose of the dynamic analysis was to evaluate our hypothesis stating that arrays in a given program can be categorized as either list, map, or object, and once categorized, will stay in the category throughout multiple executions of that program. The results of the analysis supports this hypothesis by showing that arrays generally keep the same type. Furthermore, the usage of array operations normally associated with lists, proved almost exclusive for arrays categorized as lists. This information should used to define unexpected behaviour reported by the static analysis, e.g. reporting \texttt{array\_pop} preformed on a map. 
 
 %The initial definitions categorized arrays as objects based on the type of the values. In the analysis however, a significant number of arrays turned out to be lists with different type values, defining them as objects. Operations on these objects were often list-operations, which indicates that categorizing based on value type might not be a meaningful strategy. It can be considered if the object type is providing enough significant information in itself, or should be consumed by the definitions of maps and lists, i.e. letting maps and lists allow values of different type.

@@ -1,27 +1,26 @@
 \section{Maps and lists}
-This study concerns a constructed case to illustrate how the analysis work with the two array-types, lists and maps. What the program does is define an array of month names and use a loop to create an array with these month names as keys and the corresponding month number as value as seen in program \ref{lst:monthsNoError}. The first array is considered a list by the analysis whereas the second array is considered a map from strings to numbers. The last two lines of the program uses the map to look up the number of a month name provided by the user (from the superglobal \texttt{\$\_GET}). Since the definition of lists in the analysis does not take indices into account the analysis lose precision for the map in this example. The analysis can only tell it is a map from strings to unsigned integers and nothing more precise.
 
+
+Program \ref{lst:monthsNoError} first define an list-array of month names, \texttt{\$monthNames}, and use a loop to create a new map-array, \texttt{\$monthMap}, with these month names as keys and the corresponding month number as value, e.g. given \texttt{\$monthNames = ["January", ... , "December"]} after running the program the map becomes \texttt{\$monthMap=["January"=>1, ... , "December" => 12]}. The constructed map-array is then used to print a string containing month number of a given input, e.g. the input \texttt{"August"} yields the string \texttt{"August is month number 8"} and input \texttt{"Duck"} yields \texttt{"Duck is month number "}. The input is provided via. the super-global \texttt{\$\_GET}, containing the data of the query string\footnote{\url{http://tools.ietf.org/html/rfc3986\#section-3.4}}, as field \texttt{"monthName"}. 
 
 
 \begin{program}
 \begin{lstlisting}
-$monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-$monthMap = [];
+$monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %*\label{line:mne-1}*)
+$monthMap = [];%*\label{line:mne-2}*)
 
 for($i = 1; $i <= 12; $i++) {
-	$monthMap[array_pop($monthNames)] = $i; %* \label{line:pop}*)
+	$monthMap[array_pop($monthNames)] = $i; %* \label{line:pop}*)%*\label{line:mne-3}*)
 }
 
-$input = $_GET["monthName"];
+$input = $_GET["monthName"];%*\label{line:mne-4}*)
 
-echo $input . " is month number " . $monthMap[$input];
+echo $input . " is month number " . $monthMap[$input];%*\label{line:mne-5}*)
 \end{lstlisting}
 \caption{Turning a month list into a ``month name to month number''-map}
 \label{lst:monthsNoError}
 \end{program}
 
-The first step of the analysis is generating the control flow graph. For the array in the first line of this program a CFG node is generated for creating an empty array. Then nodes are generated for each of the 12 initial strings as well as for adding them to the array, when the analysis encounter on of these nodes the empty array will become a list type array since they are represented as array append nodes due to no keys being specified. Lastly the variable name ``monthNames'' will be associated with the initialized list array.
+The array creation at line \ref{line:mne-1} is preformed by initializing an empty array and immediately thereafter appending the month names. With the only operation performed on the array being appends, the analysis will represent the array as a list of strings. At line \ref{line:mne-2} the \texttt{\$monthMap} variable is initialized to an empty array. The analysis will represent this as emptyArray, since no operations are yet performed on the array. Notice how this explicit initialization isn't necessary since any subsequent array operation will implicitly initialize the array. The month map array is first modified at line \ref{line:mne-3} with an array-write operation with keys from the month-names array. Since the function \texttt{array\_pop} is used to generate the key, which may return \texttt{null} if the given array is empty, \texttt{\$monthMap} will be represented as a map-array with NotUIntString mapping to UInt. 
 
-The next interesting step of the analysis is line \ref{line:pop} where an array write node is generated preceded by a sub tree for the expression \texttt{array\_pop(\$monthNames)}. When the analysis encounters the array write node it determines the possible index values for the expression sub tree and since string values are possible the array becomes a map array.
-
-\todo{write something about GET}
+The analysis yields no error or warning, following the arrays being treated properly. I.e. when first represented as either lists or maps only the \emph{right} operations are performed on them, e.g. writes with string keys on maps and \texttt{array\_pop} on list.  
