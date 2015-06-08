@@ -1,4 +1,13 @@
 \section{Precision}
-\todo{Handling read of $\top$-element arrays when returning location sets, current solution is naively returning the whole heap}
+The abstraction of a static analysis based on the monotone framework are done in two places. Firstly the lattice used to represent the state of the analysis and secondly the transfer functions or abstract operations used to transition between different lattice elements to represent changes of the program state. These abstractions are where precision is traded for other properties of the analysis like performance and ease of implementation. The next section will discuss possible improvements of the lattice abstraction whereas the rest of discusses improvements for the transfer functions.
 
-\todo{Propose unsound analysis wrt. references for better precision}
+\subsection{Lattice improvements}
+Each element of the lattice represents either a certain value or a predicate restricting possible values. The analysis developed in this thesis is path-insensitive except for statically computable boolean values in conditionals where the unreachable branch will be pruned. As such the analysis lattice represents only a single predicate, i.e. whether strings, numbers, and array indices are positive integers or not. Otherwise exact values are kept where possible. 
+
+Currently the Integer-lattice, which is part of the Index-lattice, has no predicates at all. By introducing the negative and not negative (including 0) predicates differentiation between maps and lists would be more precise, since writes with non-negative integer keys would produce lists and otherwise a map will be produced.
+
+\subsection{Arrays}
+The current implementation of the array read transfer function uses a naive handling of reading from $\top$-element arrays that simply results in all existing heap locations. A possible way to improve on this naive solution would be to result in all heap locations that are part of an array. To get an indication of whether this is a useful precision improvement existing code which results in $\top$-element arrays should be studied to find examples where the more precise implementation leads the analysis to discover suspicious array uses otherwise not detected.
+
+\subsection{References}
+Because of PHP keeping references when copying arrays the analysis can not soundly perform strong updates however references inside arrays may be one of the less used features of PHP. A hypothesis about the use of references in arrays can be tested by expanding the dynamic analysis in chapter \ref{ch:study}. If references in arrays turn out to be rarely used strong updates can be reintroduced. The unsoundness introduced by strong updates would then be negligible compared to the precision gained.

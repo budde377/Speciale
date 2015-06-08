@@ -1,24 +1,20 @@
 \section{PHP Language subset}
 \newcommand{\syn}[1]{\langle\mathit{#1}\rangle}
 \label{sec:langsubset}
-To simplify the static analysis a subset of the PHP language, P0, is used. The PHP language has no formal definition and thus the language used here can not be formally shown to be a subset of the complete PHP language. The full PHP language is defined by the reference Zend Interpreter.
+To simplify the static analysis, a subset of the PHP language (P0) is used. The PHP language has no formal definition and thus the language used here can not be formally shown to be a subset of the complete PHP language. The full PHP language is defined by the reference Zend Interpreter.
 
-To simplify the analysis and keep the focus on arrays; resource handles and objects have been completely removed from the language. Dynamic dispatch (variable function names), variable variables and dynamic loading of code (\texttt{require} and \texttt{include}) have also been omitted. It is assumed that any possible path in a function body results in a return statement and return statements are only allowed in a function body. There are no anonymous functions, a limited number of statements but the language does support all reference features, i.e. reference assigning entries in an array or variables. Reading from and writing to the \texttt{\$GLOBALS} array should get or change the value of the variables, respectively. Creating a new variable by adding an new entry to the array does however not initialize a new variable in the global scope.
+To simplify the analysis and keep the focus on arrays, resource handles and objects have been completely removed from the language. Dynamic dispatch (variable function names), variable variables and dynamic loading of code (\texttt{require} and \texttt{include}) have also been omitted. It is assumed that any possible path in a function body results in a return statement and return statements are only allowed in a function body. There are no anonymous functions and a limited number of statements but the language does support all reference features, e.g. reference assigning entries in an array. Initializing an array with references is not supported directly, however this can be done by initializing an empty array and writing or appending the initial values one by one. Reading from and writing to the \texttt{\$GLOBALS} array will get and set the value of the variables, respectively. Creating a new variable by adding a new entry to the array does however not initialize a new variable in the global scope.
 
-The syntax can be expressed with grammar \ref{gramm:p0}. Here $e : \syn{expr}$ denotes an expression, $e : \syn{rexpr}$ a reference expression, and $e : \syn{vexpr}$ a variable expression.   Furthermore it being a subset of PHP, a program is only valid in P0  if it is also a valid PHP program. E.g. while the syntax allows negation of arrays, this action yields a fatal error in PHP and may be considered as an invalid program, hence also an invalid P0 program. 
+The syntax can be expressed with grammar \ref{gramm:p0}. Here $e : \syn{expr}$ denotes an expression, $e : \syn{rexpr}$ a reference expression, and $e : \syn{vexpr}$ a variable expression.   Furthermore a program is only valid in P0 if it is also a valid PHP program. For example the syntax allows negation of arrays, however this action yields a fatal error in PHP and may be considered as an invalid program, hence also an invalid P0 program. 
 
-Notice that returning an $\syn{rexpr}$ with a non-reference function might result in a fatal error, e.g. when returning the result of an array-append operation, but the same operation is valid in a reference-function.  
+Notice that returning an $\syn{rexpr}$ with a non-reference function might result in a fatal error, e.g. when returning the result of an array-append operation, but the same operation is valid in a reference-function.
+
+PHP supports using the array access syntax with strings to read and write individual characters of the given string. P0 does not support accessing strings with array syntax. The full PHP language defines a lot of cross-type operations however P0 supports only the operations described in sections \ref{sec:coercion} and \ref{sec:abseval}.
 
 
 \todo{elaborate}
 
-\todo{We are not supporting initializing an array with references}
-
 \todo{Write about support of alias}
-
-\todo{No string array access}
-
-\todo{Only supporting operation signatures mentioned in abstract evaluation}
 
 \begin{grammarf}
 \centering

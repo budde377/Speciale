@@ -9,7 +9,27 @@
 \tikzstyle{dots} = [draw=none,fill=none]
 \newcommand{\subt}[1]{\llbracket #1\rrbracket}
 
-Given a P0 program, $p : \syn{program}$, parsed to a abstract syntax tree, the control flow graph can be constructed recursively. Most of the nodes takes arguments. Here $h$ denotes variables of type HeapTemps, $t$ variables of type Temps, and $c$ variables of either type. Subgraphs are denoted by a grey rectangles with letters $\subt{S}$, $\subt{E}(t)$, $\subt{R}(h)$, $\subt{V}(h)$, and $\subt{T}(c)$ which denotes subgraph of statement $S$, expression $E$ with the resulting value stored in variable $t$, reference expression $R$ with resulting heap-location-set stored in $h$, variable expression $V$ with resulting heap-location-set stored in $h$, or either expression with the result stored in $c$ respectively. For a given argument, $c$, to the subgraph, the variable corresponds to the target variable, $c_{tar}$, in the subgraph. E.g. let  $E = \texttt{1+(2+3)}$ then the graph of $\subt{E}(t)$ is recursively constructed as in graph \ref{graph:exexpr}. Notice how the argument, $t$, passed to the graph is the third argument of the last $\mathit{bop}_+(\_)$ node.
+Parsing a P0 program $p : \syn{program}$ to an abstract syntax tree, the control flow graph can be constructed recursively. Most of the nodes take one or more arguments which are described in table \ref{tab:nodes}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{c|l}
+ Symbol & Description \\\hline\hline
+ $t \in \text{Temps}$ & A temporary variable name used to pass evaluated values between CFG nodes \\
+ $h \in \text{HeapTemps}$ & A temporary heap variable name used to pass a set of heap locations between CFG nodes \\
+ $c \in \text{Temps}\bigcup\text{HeapTemps}$ & Either of the above two types of variable names \\
+ $\subt{S}$ & Sub graph for statement $S$ \\
+ $\subt{E}(t)$ & Sub graph for expression $E$ with evaluation result stored in $t$ \\
+ $\subt{R}(h)$ & Sub graph for reference expression $R$ with evaluated heap-location set stored in $h$ \\
+ $\subt{V}(h)$ & Sub graph for a variable expression $V$ with evaluated heap-location set stored in $h$ \\
+ $\subt{T}(c)$ & Sub graph for either an expression, a reference expression or a variable expression with $c$ being the corresponding $t$ or $h$ as described above
+\end{tabular}
+\caption{Symbols used in the control flow graph}
+\label{tab:nodes}
+\end{table}
+
+
+Here $h$ denotes variables of type HeapTemps, $t$ variables of type Temps, and $c$ variables of either type. Subgraphs are denoted by a grey rectangles with letters $\subt{S}$, $\subt{E}(t)$, $\subt{R}(h)$, $\subt{V}(h)$, and $\subt{T}(c)$ which denotes subgraph of statement $S$, expression $E$ with the resulting value stored in variable $t$, reference expression $R$ with resulting heap-location-set stored in $h$, variable expression $V$ with resulting heap-location-set stored in $h$, or either expression with the result stored in $c$ respectively. For a given argument, $c$, to the subgraph, the variable corresponds to the target variable, $c_{tar}$, in the subgraph. E.g. let  $E = \texttt{1+(2+3)}$ then the graph of $\subt{E}(t)$ is recursively constructed as in graph \ref{graph:exexpr}. Notice how the argument, $t$, passed to the graph is the third argument of the last $\mathit{bop}_+(\_)$ node.
 \begin{definition}
 \label{def:cfg}
 A control-flow-graph $G = (V,E, s, t)$ where $V$ is a set of nodes, $E$ is a set of node pairs representing an edge between two nodes, $s\in V$ is a start node and $t\in V$ is an exit node. When illustrated as a graph, the entry node is marked with an ingoing edge with no origin and the exit node is marked with an outgoing edge with no target. E.g. in example graph \ref{graph:exexpr}, $s = \mathit{constRead}(1, t_1)$ and $t = \mathit{bop}_+(t_1, t_2, t)$.
