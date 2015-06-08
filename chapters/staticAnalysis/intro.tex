@@ -3,11 +3,11 @@ Based on the findings in chapter \ref{ch:study}, a \emph{dataflow analysis} is d
 The definitions of maps and lists from chapter \ref{ch:study} are expanded to each absorb a part of the object type.
 
 \begin{definition}
-Let $a$ be an array with integer keys $0$ to $count(a)-1$ defined, $a$ is then considered an array-list.
+Let $a$ be an array with integer keys $0$ to $\mathit{count}(a)-1$ defined, $a$ is then considered an array-list.
 \end{definition}
 
 \begin{definition}
-Let $a$ be an array with some integer key in the range $0$ to $count(a)-1$ is \emph{not} defined, $a$ is then considered an array-map.
+Let $a$ be an array with some integer key in the range $0$ to $\mathit{count}(a)-1$ is \emph{not} defined, $a$ is then considered an array-map.
 \end{definition}
 
 While running the analysis on the corpus of the dynamic analysis would be ideal, limited time forces the analysis to be defined on a subset of PHP, introduced in section \ref{sec:langsubset}. The analysis is performed using the monotone framework. Using a control-flow-graph (introduced in section \ref{sec:cfg}) a model of program states (introduced in section \ref{sec:lattice}) and finally transfer functions for each CFG-node (introduced in section \ref{sec:transferf}) an instance of the monotone framework is derived in section \ref{sec:framework}. Since PHP relies heavily on coercion, a separate section (section \ref{sec:coercion}) covers coercion of abstract values. Section \ref{sec:abseval} covers abstract evaluation and in section \ref{sec:worklist} the implementation of the analysis is briefly introduced.

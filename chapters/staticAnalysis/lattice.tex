@@ -1,50 +1,53 @@
-
 \section{Lattice}
 \label{sec:lattice}
 %\todo{The keys of PHP arrays can be strings and/or integers. If given an integer string (e.g. "1") the key will be coerced to an integer key. Strings containing an integer as well as other characters well be kept as a string key as opposed to the string to integer coercing with math operators. Taking this fact into consideration it is interesting to support differentiating of Strings and IntegerStrings in our lattice.}
-In order to create a inter-procedural analysis, the analysis lattice is defined as
+The lattice is the data-structure passed around by the flow of the control-flow graph. In order to create a \emph{inter-procedural analysis}, the analysis lattice is defined as
 \begin{align}
 \text{AnalysisLattice} = \Delta \rightarrow \text{State}
 \end{align}
-This is a map from a context to an abstract state, where the context, $\Delta$ consists of a list of call-sites, represented as the call nodes in the control flow graph, with length bounded by $k>0$. The bound $k$ must be greater than zero, since the context is chosen to decide between local and global scope. 
+This is a map from a context to an abstract state, where the context $\Delta$ consists of a list of call-sites, represented as the call nodes in the control flow graph with length bounded by $k>0$. The bound $k$ must be greater than zero, since the context is chosen to decide between local and global scope. 
 
-If the context was bounded by $k=0$ this would entail that all variables would be updated in the global scope, which with the current analysis isn't sound. In the analysis the only strong update of the heap is preformed when writing to a variable pointing to no locations, which is sound because the variable has not been initialized, hence can not have been referenced. By only using the global scope, performing an strong update with a not-null value will indicate that the variable can't be \texttt{null}. This is true for the function body, but in the global scope the variable is uninitialized, i.e. \texttt{null}, hence the analysis would be unsound.
+If the context was bounded by $k=0$, this would entail that all variables would be updated in the global scope resulting in a unsound analysis. In the analysis the only strong update of the heap is performed when writing to a variable pointing to no locations which is sound, since the variable has not been initialized and hence cannot have been referenced. By only using the global scope, performing a strong update with a not-null value will indicate that the variable cannot be \texttt{null}. This is true for the function body, but in the global scope the variable is uninitialized, i.e. \texttt{null}, hence the analysis would be unsound.
 
 \begin{align}
 \Delta = \text{CallNode}_*^{\leq k}
 \end{align}
-The abstract state is a product lattice with five factors. The first two models the scope, the third the heap, and the last two models storage for intermediate results. 
+The abstract state is a product lattice with five factors. The first two model the scope, the third the heap, and the last two the storage for intermediate results. 
 \begin{align}
 \text{State} = \text{Locals} \times \text{Globals} \times \text{Heap} \times \text{Temps} \times \text{HeapTemps} 
 \end{align}
-As described, in section \ref{sec:backg_scoping}, the scoping rules of PHP are very simple and can be expressed with a global and a local scope. The global scope is necessary, because global variables can always be accessed from a function using the \texttt{global} statement. Furthermore the super-global variables resides in the global scope but can always be accessed directly. Only two scopes is enough, because any other variables has to be passed to a function as an argument. This is even the case for anonymous functions, where however the \texttt{use} keyword can be used to pass variables to a function when defining the function.
+As described in section \ref{sec:backg_scoping}, the scoping rules of PHP are very simple and can be expressed with a global and a local scope. The global scope is necessary, since global variables can always be accessed from a function using the \texttt{global} statement. Furthermore, the super-global variables reside in the global scope but can always be accessed directly. Two scopes are enough, because any other variables have to be passed to a function as an argument.
+
 \begin{align}
 \text{Locals} = \text{Globals} = \text{Scope} = \text{Var} \rightarrow \mathcal{P}(\text{HLoc})
 \end{align}
-The scopes are defined as maps from variable names, { Var}, to power-set of heap locations $\mathcal{P}(\text{ HLoc})$. While PHP supposedly performs deep copies of values on assignments, letting the scope be a map from variable names to values would not facilitate feature of assigning references to and from variables and array entries. This is done using the \texttt{\&} operator and makes the heap abstraction is necessary. The heap allows values to be used by multiple variables and arrays which enables properly propagation of changes. 
+The scopes are defined as maps from variable names in Var to power-sets of heap locations $\mathcal{P}(\text{HLoc})$. While PHP supposedly performs deep copies of values on assignments, letting the scope be a map from variable names to values would not facilitate the feature of assigning references to and from variables and array entries. This is done using the \texttt{\&} operator and makes the heap abstraction necessary. The heap allows values to be used by multiple variables and arrays, which enables proper propagation of changes. 
 \begin{align}
 \text{Heap} = \text{HLoc} \rightarrow \text{Value}
 \end{align}
-The { Temps} and { HeapTemps} are for storing intermediate results. Since these results cannot be referenced there is no need to store them in the heap. By keeping them in a seperate lattice, they can be strongly updated and does not have to, and should not, be passed when switching context, since they are in every respect local to the current context. A single temporary storage mapping from temporary variables to a sum-lattice of values and power-set lattice was considered, this however would involve special handling of $\top$ and $\bot$ elements, which is avoided by this method. 
+The Temps and HeapTemps map-lattices store intermediate results. Since these results cannot be referenced, there is no need to store them in the heap. By keeping them in a separate lattice, they can be strongly updated and do not have to (and should not) be passed when switching context, since they are in every respect local to the current context. A single temporary storage mapping from temporary variables to a sum-lattice of values and power-set lattice was considered. This however would involve special handling of $\top$ and $\bot$ elements, which is avoided by this method. 
 \begin{align}
 \text{Temps} = \text{TVar} \rightarrow \text{Value}
 \end{align}
 \begin{align}
 \text{HeapTemps} = \text{THVar} \rightarrow \mathcal{P}(\text{HLoc})
 \end{align}
-The necessity for the latter lattice follows from the fact that reference assignments may be nested, which requires intermediate results shared between nodes in the control-flow graph. The sets of temporary variables, { TVar} and { THVar}, are both finite, following from the control-flow-graph being finite.
+The necessity of the HeapTemps lattice follows from the fact that reference assignments may be nested, which requires intermediate results shared between nodes in the control-flow graph. The sets of temporary variable names, TVar and THVar, are both finite following from the control-flow-graph being finite.
 
-The heap locations are allocation site abstractions wrt. context, node, and a natural number. The natural number allows the creation of multiple location per node, which is necessary in e.g. $\mathit{call}$-nodes. Adding the natural number as a factor makes the set of allocation sites possibly infinite, in practise however the set is finite. 
+The heap locations are allocation site abstractions with respect to the context, node, and a natural number. The natural number allows the creation of multiple location per node, which is necessary in $\mathit{call}$-nodes to support multiple arguments. Adding the natural number as a factor makes the set of allocation sites possibly infinite, in practise however the set is finite since the number of function parameters is finite.
+
 \begin{align}
 \text{HLoc}  = \Delta \times \mathcal{N} \times \mathbb{N}
 \end{align}
-Where $\mathcal{N}$ is the set of nodes in the control flow graph. 
+where $\mathcal{N}$ is the set of nodes in the control flow graph. 
 
-An abstract value is defined a product lattice with five factors defined by the Hasse diagrams shown in figure \ref{fig:hasse_lat}. These lattices was chosen with the hope of better coercion between values, but others might be considered. E.g. by focusing more on coercion from strings to array indices.
+An abstract value is defined as the product lattice of the five factors defined by the Hasse diagrams shown in figure \ref{fig:hasse_lat}. These lattices were chosen with the hope of better coercion between values, but others might be considered, e.g. by focusing more on coercion from strings to array indices.
+
 \begin{align}
 \text{Value} = \text{Array} & \times \text{String} \times \text{Number} \times \text{Boolean}  \times \text{Null}
 \end{align}
-Following the results of the dynamic analysis in \ref{ch:study}, the array is considered either a set of locations or a map from indices to sets of types. I.e. lists or maps. The sum-lattice has been chosen as opposed to a product-lattice, because the dynamic analysis indicated that arrays seldom changes from lists to maps or vice versa. Top array elements is then a predictor for suspicious behavior. Furthermore the array lattice has an element for the empty array which can become either a list or a map.  
+
+Following the results of the dynamic analysis in \ref{ch:study}, the array is considered either a set of locations or a map from indices to sets of types, i.e. array-lists or array-maps. The sum-lattice has been chosen as opposed to a product-lattice, because the dynamic analysis indicated that arrays seldom changes from lists to maps or vice versa. Top array elements is then a predictor for suspicious behavior. Furthermore the array lattice has an element for the empty array which can become either a list or a map.  
 \begin{align}
 \text{ArrayList}= \mathcal{P}( L )
 \end{align}
