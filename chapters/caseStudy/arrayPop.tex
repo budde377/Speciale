@@ -14,6 +14,8 @@ order.
 
 \begin{program}
 \begin{lstlisting}
+<?php
+
 $people = ["John", "Jane", "Alice", "Bob"];
 $animals = ["Dog", "Cat", "Bird", "Fish"];
 $animalMap = [];
@@ -24,7 +26,7 @@ for($i = 0; $i < count($people); $i++) {
 }
 
 array_pop($animalMap);
-$animalString = implode("", $animalMap); %* \label{line:arrayPopExample-1} *)
+$animalString = implode("", $animalMap);
 echo "The people have the following animals: " . $animalString;
 \end{lstlisting}
 \caption{Joining array values example}

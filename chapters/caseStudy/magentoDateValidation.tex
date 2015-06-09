@@ -4,6 +4,8 @@ Program \ref{lst:dateValidation} was found on the e-commerce platform Magento, w
 
 \begin{program}
 \begin{lstlisting}
+<?php
+
 function isValidDate($day, $month, $year) {
     $errors = [];
     if(!checkdate($month, $day, $year))
@@ -18,7 +20,7 @@ function isMinimumDay($day, $month, $year, $required, $minDay) {
         $errors[] = "The date is required";
 
     $result = isValidDate($day, $month, $year);
-    $errors = array_merge($errors, $result); %* \label{line:dateValidation-1} *)
+    $errors = array_merge($errors, $result);
 
     if($minDay > $day)
         $errors[] = "The day should at least be " . $minDay;

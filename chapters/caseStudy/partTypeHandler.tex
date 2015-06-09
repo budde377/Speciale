@@ -4,20 +4,23 @@ Program \ref{lst:typeHandler} was found in the CMS framework Part, which is crea
 
 \begin{program}
 \begin{lstlisting}
+<?php
+
 $keyArray = [];
 $valueArray = [];
+
 function createInstance($string, $instance, $value)
 {
     global $keyArray,$valueArray;
 
-    if (!array_key_exists($keyArray[$string])) {  %*\label{line:typeHandler-1}*)
+    if (!array_key_exists($string, $keyArray)) {
         $keyArray[$string] = [];
         $valueArray[$string] = [];
     } else if(($k = array_search($instance, $keyArray, true)) !== false){
-        return $valueArray[$k]; 
+        return $valueArray[$k];
     }
-    $keyArray[] = $instance; %*\label{line:typeHandler-2}*)
-    return $valueArray[] = $value; %*\label{line:typeHandler-3}*)
+    $keyArray[] = $instance;
+    return $valueArray[] = $value;
 }
 createInstance("test", "test2", "testValue");
 \end{lstlisting}
@@ -33,13 +36,16 @@ Program \ref{lst:typeHandler2} illustrates how the program should have been impl
 
 \begin{program}
 \begin{lstlisting}
+<?php
+
 $keyArray = [];
 $valueArray = [];
+
 function createInstance($string, $instance, $value)
 {
     global $keyArray,$valueArray;
 
-    if (!array_key_exists($keyArray[$string])) { 
+    if (!array_key_exists($string, $keyArray)) {
         $keyArray[$string] = [];
         $valueArray[$string] = [];
     } else if(($k = array_search($instance, $keyArray[$string], true)) !== false){
