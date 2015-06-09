@@ -26,7 +26,7 @@ To be able to support all these operations in a sound way the official PHP Inter
 \subsection{Dynamic features}
 The language subset P0 does not support variable variables. One way of supporting variable variables is to change the definition of the local and global scope lattices. Instead of mapping from variable names they could be maps from strings to values allowing an abstract operation for look-up in the global and local variable scopes. Supporting variable variables have the possibility of impacting precision in cases containing many writes to variable variables with names that cannot be reasoned about statically. Any write to a $\top$-element string have to be joined when reading from all variables which lowers the precision of all variable reads.
 
-\todo{write about dynamic functions}
+\todo{write about dynamic functions, call\_user\_func might have side effects}
 
 \todo{anonymous functions, global and local scope is still enough to express those because of the use keyword}
 
@@ -36,7 +36,38 @@ The language subset P0 does not support variable variables. One way of supportin
 This thesis have completely ignored a large part of PHP, namely the object model. To be able to handle real PHP application objects must be supported since almost every PHP application is at least partly object oriented. Since objects are dynamic as the rest of PHP, properties can be added and removed at execution time. To keep soundness of the analysis object properties can be modelled as a map array. This approach suffer from the same weakness as variable variables, that writes to $\top$-element property names lessens the precision of all other properties. By expanding the dynamical analysis from chapter \ref{ch:study} to log object property creations and removals a hypothesis about these operations being rare can be tested. If such a hypothesis turns out to be true an unsound disregard of property creations and removals can be applied in the analysis. Which will in turn heighten the precision of the analysis.
 
 \subsection{Other unsupported features}
-The huge library of functions packaged with PHP by default is essential to any real application. To be able to handle real application all of these functions must be supported with at least a naive, imprecise transfer function. Functions without any side-effects, i.e. without reference-parameters, can be naively supported by resulting in the $\top$-element value. Functions with possible side-effects further more have to join the heap locations values of the reference parameters with the $\top$-element value. By adding these naive transfer-functions for library functions the analysis will keep soundness for any use of library functions at the cost of losing a lot of precision. To keep a higher precision each library function must be examined and abstracted into a sound transfer-function.
+The huge library of functions packaged with PHP by default is essential to any real application. To be able to handle real application all of these functions must be supported with at least a naive, imprecise transfer function. Functions without any side-effects, i.e. without reference-parameters, can be naively supported by resulting in the $\top$-element value. Functions with possible side-effects further more have to join the heap locations values of the reference parameters with the $\top$-element value. By adding these naive transfer-functions for library functions the analysis will keep soundness for any use of library functions at the cost of losing a lot of precision. The soundness argument here is based on an assumption that library functions do not have side-effects except for possible manipulation of reference-parameters. Since library functions are implemented using an API provided by the interpreter they may have side-effects, however we have not observed any functions with such side-effects and thus find it fair to assume they do not exist. To keep a higher precision each library function must be examined and abstracted into a sound transfer-function.
+
+Function-like language constructs are not supported in P0, however most real programs rely on at least some of these constructs. In program \ref{lst:languageConstructs} the \texttt{isset}, \texttt{unset}, \texttt{empty} and \texttt{exit} constructs are demonstrated. The most straight-forward construct is \texttt{empty}, since it takes ordinary expressions as input just like any function. A transfer function must be specified, like for library functions, to support \texttt{empty}. The constructs \texttt{isset} and \texttt{unset} accept variable-expressions only as parameters. Unsetting can be abstracted by joining with the \texttt{Null}-value, since that is the value of unset variables and unset array entries. Implementing \texttt{isset} naively is simple, however to get more precision the implementation of \texttt{unset} has to be taken into account, since unsetting a variable will result in \texttt{isset} for that variable returning boolean true. 
+
+\begin{program}
+\begin{subfigure}[b]{.45\linewidth}
+    \begin{lstlisting}
+    $a = 0;
+    $b = 42;
+    empty($a); // true
+    empty($b); // false
+    empty($c); // true
+    isset($a); // true
+    isset($b); // true
+    isset($c); // false
+    unset($b);
+    isset($b); // false
+\end{lstlisting}
+    \caption{Isset, unset, and empty}
+\end{subfigure}
+\begin{subfigure}[b]{.50\linewidth}
+    \begin{lstlisting}
+    $a = 1;
+    $b = 2;
+    exit();
+    $c = 3; // unreachable
+\end{lstlisting}
+    \caption{Exit}
+\end{subfigure}
+\caption{Function-like language constructs}
+\label{lst:languageConstructs}
+\end{program}
 
 The Value-lattice in this thesis does not support the PHP \texttt{resource} type. It is a special type used for handling references to external resources like files or database connections, which are used by most real applications. To support the resource type, an abstraction in the form of a lattice must be created and added as another factor in the Value-lattice. Further more operators and coercion must be expanded to the resource type as well.
 
