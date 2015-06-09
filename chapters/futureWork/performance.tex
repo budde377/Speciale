@@ -4,14 +4,9 @@ Performance concerns can be split into two parts, namely theoretical performance
 \todo{write something about resource usage for the case studies (CPU, memory)}
 
 \subsection{Analysis performance}
-\todo{does this split even make sense? What can be improved in the analysis specification performance-wise?}
+The analysis lattice is the primary data-structure used and thus a major factor in performance regarding to memory usage. To obtain context sensitivity the State-lattice is stored multiple times in the analysis lattice and because of this minimizing the size of the State-lattice potentially results in multiple times the performance gain.
 
-\subsection{Implementation performance}
-No performance optimizations have been made on the implementation of the analysis since performance have not been the primary concern.
-
-The analysis lattice is the primary data-structure used and thus a major factor in performance regarding to memory usage. To obtain context sensitivity the State-lattice is stored multiple times in the analysis lattice and because of this minimizing the size of the State-lattice results in multiple times the performance gain.
-
-The two lattice-parts Temps and HeapTemps are used to pass information between control-flow nodes and are specified as partial maps from temporary variable names and temporary heap variable names respectively. Keeping only specified entries in the map and returning a set ``empty'' value for unspecified entries keeps the memory usage reasonable. The current implementation never removes entries from the map which will keep growing in size with programs of larger size. Due to the nature of how these maps are used each entry can be seen as having a provider and consumer control-flow node. The provider node sets the entry which is then later used by the consumer node. To keep the maps small in size even with large programs the consumer nodes can remove the entries they consume. Graph \ref{graph:exexpr1} shows a simple control-flow graph to demonstrate the effect of letting the consumer node remove consumed entries. In listing \ref{lst:exampleLattice} the first line shows the entries which would be set in the Temps lattice-element associated with the last node without any optimizations. The second line shows the set entries with the optimization.
+The two lattice-parts Temps and HeapTemps are used to pass information between control-flow nodes and are specified as complete maps from temporary variable names and temporary heap variable names respectively. Consider $\bot$-values smaller to store than other values as this is the default value. The current analysis never resets entries from the map, which means it will keep growing in size with programs of larger size as more temporary storage entries are set to values different than $\bot$. Due to the nature of how these maps are used each entry can be seen as having a provider and potentially also a consumer control-flow node. The provider node sets the entry which is then later used by the consumer node. To keep the maps small in size even with large programs the consumer nodes can reset the entries they consume to $\bot$. Graph \ref{graph:exexpr1} shows a simple control-flow graph to demonstrate the effect of letting the consumer node reset consumed entries. In listing \ref{lst:exampleLattice} the first line shows the entries which would be set in the Temps lattice-element associated with the last node without any optimizations. The second line shows the set entries with the optimization.
 
 \begin{graph}
 \centering
@@ -43,6 +38,11 @@ The two lattice-parts Temps and HeapTemps are used to pass information between c
 temps $\rightarrow$ [t1, t2, t3, t4, t] // without optimization
 temps $\rightarrow$ [t] // with optimization
 \end{lstlisting}
-\caption{Set entries in the Temps part of the lattice-element associated with the last \texttt{bop$_+$}-node before and after optimizations}
+\caption{Entries with a different value than $\bot$ in the Temps part of the lattice-element associated with the last \texttt{bop$_+$}-node before and after optimizations}
 \label{lst:exampleLattice}
 \end{program}
+
+\subsection{Implementation performance}
+No performance optimizations have been made on the implementation of the analysis since performance have not been the primary concern.
+
+\todo{write about implementation performance; better cache etc.}
