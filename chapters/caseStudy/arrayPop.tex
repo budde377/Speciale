@@ -1,5 +1,16 @@
+\newpage
 \section{Joining array values}
-This case is inspired by \todo{what?} and shows how the analysis yields an error when using the array function \texttt{array\_pop} on a map type array. The program seen in listing \ref{lst:arrayPopExample} builds a map from a person to an animal while also adding in a separator. The separators are then used when the map values are turned into a string using the \texttt{implode} function. The map can afterwards be used to refer to which animal belong to which person. To remove the unwanted separator at the end of the map \texttt{array\_pop} is used to remove the last element of the array. The analysis then alerts the user to the fact that \texttt{array\_pop} is used with a map which is suspicious. The separator should instead be specified as the first argument for \texttt{implode} which avoids the use of \texttt{array\_pop} altogether.
+Found in the Zend framework, program \ref{lst:arrayPopExample} takes lists of strings, with 
+size $n$, \texttt{\$people} and \texttt{\$animals}, and constructs an array with values from 
+the first array as keys pointing to values from the second array and integer keys, $0$ to 
+$n-1$, pointing to the string \texttt{", "}. The array then serves as a map from 
+\texttt{\$people} to \texttt{\$animal} and as the \texttt{\$animal} array with comma 
+separators. E.g. finding the \textit{animal} corresponding to \texttt{"John"} can be found by 
+reading \texttt{\$animalMap["John"]}, i.e. the animal string \texttt{"Dog"}, and a comma-
+separated string of animals can be created using \texttt{implode}, as line 
+\ref{line:arrayPopExample-1}. Notice that the creation of a comma-separated list utilizes how 
+arrays are ordered, i.e. in the order added to the array rather than e.g. lexicographical 
+order. 
 
 \begin{program}
 \begin{lstlisting}
@@ -13,18 +24,29 @@ for($i = 0; $i < count($people); $i++) {
 }
 
 array_pop($animalMap);
-$animalString = implode("", $animalMap);
+$animalString = implode("", $animalMap); %* \label{line:arrayPopExample-1} *)
 echo "The people have the following animals: " . $animalString;
 \end{lstlisting}
-\caption{Joining array values to a string}
+\caption{Joining array values example}
 \label{lst:arrayPopExample}
 \end{program}
+
+
+While the \texttt{\$arrayMap} might seem suspicious, it can be considered a map and is 
+correctly classified as such by the analysis. An error first occur when an 
+\texttt{array\_pop} function is executed on the map, see figure \ref{fig:arrayPopScreenshot}, which just as 
+array append operations is considered, by the analysis, only to be performed on lists. The error could be 
+resolved by not adding the \texttt{", "} strings to the animal-map, and imploding with \texttt{", "} instad of the empty string on line \ref{line:arrayPopExample-1}. This would also prevent dependence on the order of the array.
 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{chapters/caseStudy/newScreens/joinArray}
-\caption{Using the pop function on a map array}
+\caption{Joining array values example}
 \label{fig:arrayPopScreenshot}
 \end{figure}
-\todo{Add sub-captions}
+
+
+%shows how the analysis yields an error when using the array function \texttt{array\_pop} on a map type array. The program seen in listing \ref{lst:arrayPopExample} builds a map from a person to an animal while also adding in a separator. The separators are then used when the map values are turned into a string using the \texttt{implode} function. The map can afterwards be used to refer to which animal belong to which person. To remove the unwanted separator at the end of the map \texttt{array\_pop} is used to remove the last element of the array. The analysis then alerts the user to the fact that \texttt{array\_pop} is used with a map which is suspicious. The separator should instead be specified as the first argument for \texttt{implode} which avoids the use of \texttt{array\_pop} altogether.
+
+
 

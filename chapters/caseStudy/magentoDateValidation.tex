@@ -1,3 +1,4 @@
+\newpage
 \section{Date validation}
 Program \ref{lst:dateValidation} was found on the e-commerce platform Magento, where the original functions were located in two different files. The \texttt{isValidDate} function takes three arguments expressing a date and returns a map being either empty or containing an error message at the \texttt{"invalidDate"} key.  The \texttt{isMinimumDay} similarly checks the validity of a date using the previous function, Here however, the output is a list which leads to a merge of a list and a map at line \ref{line:dateValidation-1}. 
 

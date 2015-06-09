@@ -1,5 +1,6 @@
+\newpage
 \section{Caching instances}
-This case demonstrates the opposite of the case in section \ref{sec:directoryContent}. In lines \ref{ln:mapStart} and \ref{ln:mapEnd} the arrays associated with \texttt{\$keyArray} and \texttt{\$valueArray} are used in a map context by writing to a string index. Then in lines \ref{ln:appendStart} and \ref{ln:appendEnd} the array append operation is used with both arrays. When detecting the latter the analysis presents the user with an error as seen in figure \ref{fig:typeHandlerScreenshot} turning the attention of the user to the fact that she is about to append to an array previously used in a map context. The program incidentally functions correctly even though half the program intends to use the array associated with \texttt{\$keyArray} as a map and the other half as a list. Maintaining this code is difficult since the intention of the code is not clear and putting attention to that enables the mistake to be fixed right away.
+Program \ref{lst:typeHandler} was found in the CMS framework Part, which is created by one of the authors. The program is supposed to work as a map of maps from \texttt{\$instance}'s to \texttt{\$value}'s with no type-restriction of the instances, and caching of values. E.g. calling \texttt{createInstance("key1", "instance1", "value1"}  should return \texttt{"value1"}, thereafter calling \texttt{createInstance("key1", "instance1", "value2")} should also return \texttt{"value1"}, since the value is cached.
 
 \begin{program}
 \begin{lstlisting}
@@ -9,20 +10,54 @@ function createInstance($string, $instance, $value)
 {
     global $keyArray,$valueArray;
 
-    if (!isset($keyArray[$string])) { 
-        $keyArray[$string] = [];%*\label{ln:mapStart}*)
-        $valueArray[$string] = [];%*\label{ln:mapEnd}*)
+    if (!array_key_exists($keyArray[$string])) {  %*\label{line:typeHandler-1}*)
+        $keyArray[$string] = [];
+        $valueArray[$string] = [];
     } else if(($k = array_search($instance, $keyArray, true)) !== false){
-        return $this->valueArray[$k];
+        return $valueArray[$k]; 
     }
-    $keyArray[] = $instance;%*\label{ln:appendStart}*)
-    return $valueArray[] = $value;%*\label{ln:appendEnd}*)
+    $keyArray[] = $instance; %*\label{line:typeHandler-2}*)
+    return $valueArray[] = $value; %*\label{line:typeHandler-3}*)
 }
 createInstance("test", "test2", "testValue");
 \end{lstlisting}
 \caption{Caching instances example}
 \label{lst:typeHandler}
 \end{program}
+
+
+
+Program \ref{lst:typeHandler2} illustrates how the program should have been implemented, by keeping two maps of lists containing instances or values respectively. Two maps are used, as opposed to a single multidimensional map, because it might not be possible to coerce the instances to array indices. The actual implementation is however wrong in that it does not use the multidimensionality of the \texttt{\$keyArray} or \texttt{\$valueArray}. Instead instances are appended and lists written to the array, i.e. the two maps are used as lists and maps simultaneously. 
+
+
+
+\begin{program}
+\begin{lstlisting}
+$keyArray = [];
+$valueArray = [];
+function createInstance($string, $instance, $value)
+{
+    global $keyArray,$valueArray;
+
+    if (!array_key_exists($keyArray[$string])) { 
+        $keyArray[$string] = [];
+        $valueArray[$string] = [];
+    } else if(($k = array_search($instance, $keyArray[$string], true)) !== false){
+        return $valueArray[$string][$k];
+    }
+    $keyArray[$string][] = $instance;
+    return $valueArray[$string][] = $value;
+}
+createInstance("test", "test2", "testValue");
+\end{lstlisting}
+\caption{Caching instances example}
+\label{lst:typeHandler2}
+\end{program}
+%In lines \ref{ln:mapStart} and \ref{ln:mapEnd} the arrays associated with \texttt{\$keyArray} and \texttt{\$valueArray} are used in a map context by writing to a string index. Then in lines \ref{ln:appendStart} and \ref{ln:appendEnd} the array append operation is used with both arrays. When detecting the latter the analysis presents the user with an error as seen in figure \ref{fig:typeHandlerScreenshot} turning the attention of the user to the fact that she is about to append to an array previously used in a map context. The program incidentally functions correctly even though half the program intends to use the array associated with \texttt{\$keyArray} as a map and the other half as a list. Maintaining this code is difficult since the intention of the code is not clear and putting attention to that enables the mistake to be fixed right away.
+
+When running the analysis on the program (\ref{lst:typeHandler}), two errors are raised as illustrated in figure \ref{fig:typeHandlerScreenshot}. Both errors are of the same type, but on the \texttt{\$keyArray} (line \ref{line:typeHandler-1}) or \texttt{\$valueArray} (line \ref{line:typeHandler-2}) respectively. They occur when an append operation is preformed on arrays that previously were considered maps, and represent the main problem of the program quite well. They would not occur in the corrected version (program \ref{lst:typeHandler2}), where the append operations would be performed on lists.
+
+Two library functions are used in the program; \texttt{array\_key\_exists}, modelled as a function returning boolean $\top$ and \texttt{array\_search}, as a function returning array indices from the given array and boolean false. These are used for checking if a key is set in an array and finding the key of a given value in an array respectively.
 
 \begin{figure}
 \centering
@@ -41,7 +76,6 @@ createInstance("test", "test2", "testValue");
 \label{fig:typeHandlerScreenshot-2}
 \end{subfigure}
 
-\caption{Running analysis on \texttt{createInstance}}
+\caption{Running analysis on \texttt{createInstance} \todo{newScreenshots}}
 \label{fig:typeHandlerScreenshot}
 \end{figure}
-

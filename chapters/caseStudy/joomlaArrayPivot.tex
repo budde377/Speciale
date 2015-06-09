@@ -1,5 +1,5 @@
 \section{Array pivot}
-The function, \texttt{pivot}, in program \ref{lst:pivot}, was found in the Joomla content management system, in a class containing functions for manipulating arrays. It uses the library function \texttt{count}, which returns the size of a given array, and the special \texttt{empty} expression, which has been replaced by the function \texttt{is\_empty} that takes a single argument and returns a boolean. 
+The function, \texttt{pivot}, in program \ref{lst:pivot}, was found in the Joomla content management system, in a class containing functions for manipulating arrays. It uses the library functions \texttt{count}, which returns the size of a given array, and \texttt{array\_key\_exists} which given an array and a key checks if the key is set in the array. 
 
 The \texttt{pivot} function accepts an array as its only argument and return an array, with the unique values of the input array as keys and their position in the original array as value. E.g. executing \texttt{pivot([1,2,3,4,5,4,3,2,1])} yields the map
 \lstdefinestyle{nonumbers}{numbers=none}
@@ -25,7 +25,7 @@ function pivot($source)
         $resultKey = $source[$i];
         $resultValue = $i;
 
-        if (is_empty($counter[$resultKey])) %* \label{line:pivot-1} *)
+        if (array_key_exists($resultKey, $counter)) %* \label{line:pivot-1} *)
         {
             $result[$resultKey] = $resultValue;
             $counter[$resultKey] = 1;
