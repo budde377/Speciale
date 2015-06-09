@@ -28,5 +28,12 @@ The language subset P0 does not support variable variables. One way of supportin
 
 \todo{write about dynamic functions}
 
+\todo{anonymous functions, global and local scope is still enough to express those because of the use keyword}
+
+\todo{write about includes}
+
 \subsection{Objects}
-This thesis have completely ignored a large part of PHP, namely the object model. To be able to handle real PHP application objects must be supported since almost every PHP application is at least partly object oriented. Since objects are dynamic as the rest of PHP, properties can be added and removed at execution time. To keep soundness of the analysis object properties can be modelled as a map array. This approach suffer from the same weakness as variable variables, that writes to $\top$-element property names lessens the precision of all other properties
+This thesis have completely ignored a large part of PHP, namely the object model. To be able to handle real PHP application objects must be supported since almost every PHP application is at least partly object oriented. Since objects are dynamic as the rest of PHP, properties can be added and removed at execution time. To keep soundness of the analysis object properties can be modelled as a map array. This approach suffer from the same weakness as variable variables, that writes to $\top$-element property names lessens the precision of all other properties. By expanding the dynamical analysis from chapter \ref{ch:study} to log object property creations and removals a hypothesis about these operations being rare can be tested. If such a hypothesis turns out to be true an unsound disregard of property creations and removals can be applied in the analysis. Which will in turn heighten the precision of the analysis.
+
+\subsection{Other unsupported features}
+\todo{write something about the rest of the unsupported features: resources, more library functions, what else?}

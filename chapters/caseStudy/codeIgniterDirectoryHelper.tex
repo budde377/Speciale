@@ -1,10 +1,16 @@
 \section{Directory Content}
 \label{sec:directoryContent}
-Inspired by the framework CodeIgniter this example demonstrates mixing of the map and list type arrays. The function takes a directory name and a depth as input and returns the structure of the given directory recursively until the given depth is reached or no more sub directories are found. The resulting structure is a mix of a list of file names and a map from sub directory name to the structure of that sub directory. Mixing a list array and a map array like seen in program \ref{lst:directoryMap} provides no obvious way of using the ouput of the function. If the function ever has to be refactored the users may use the resulting structure in many different ways making it difficult to refactor without breaking possible use cases.
+Found in the CodeIgniter framework, the example in program \ref{lst:directoryMap} demonstrates mixing the map and list type arrays. This programs four library functions for traversing the file-system; \texttt{opendir} which creates a file-pointer for a given directory, \texttt{readdir} which reads the name of the next file/directory in the given directory using the file-pointer, \texttt{is\_dir} which as the name suggests checks if a path is a directory, and \texttt{closedir} which \emph{closes} the file-pointer. Since P0 doesn't support file pointers, these are modelled as numbers in the analysis. 
+
+
+The \texttt{directory\_map} function takes a directory name and a depth as input and returns the structure of the given directory recursively bound by the provided length. The resulting structure is a mix of a list of file names and a map from sub directory name to the structure of that sub directory. Mixing a list array and a map array like seen in program \ref{lst:directoryMap} provides no obvious way of using the output of the function, and it it seem to assume that directories can't have integers as names. If a directory had a integer, $i$, as a name and more than $i$ files has been seen, then adding the new folder will will override a file already added to the list. E.g. let a directory contain a file named \texttt{file1} and an empty subdirectory named \texttt{0}. If \texttt{readdir} first returns the name of the file and then the folder, the result will be \texttt{[[]]} (a list containing an empty list), if the order is reversed, the result will be \texttt{["file1", []]}.
+
+This is a good example on how arrays in PHP serve as the go-to data-structure, when other alternatives might suit the problem better. In this case, representing the files and directories as objects would solve the problem.
+
 
 The analysis provides an error to bring attention to the possibly bad design choice as seen in figure \ref{fig:directoryScreenshot}. The mixing of array types are detected by the analysis because the append operation creates a list array and then afterwards a write is encountered with the index possibly being a string which then triggers the error.
 
-Another possible problem with this design is that directories can be named with just numbers which might then override a file already added to the list. This problem occurs because the library function \texttt{readdir} follows the order of which the file system stores the files and directories. Such an error is difficult to reproduce and therefore potentially difficult to find.
+\todo{No error ... }
 
 \begin{program}
 \begin{lstlisting}
@@ -16,11 +22,11 @@ function directory_map($dir, $depth)
         $new_depth	= $depth - 1;
         while (FALSE !== ($file = readdir($fp)))
         {
-            is_dir($dir.$file) && $file .= '/';
             if (($depth < 1 || $new_depth > 0) 
                 && is_dir($dir.$file))
             {
-                $filedata[$file] = directory_map($dir.$file, $new_depth);
+                $filedata[$file] = 
+                	directory_map($dir.$file, $new_depth);
             }
             else
             {
@@ -38,9 +44,9 @@ $result = directory_map("testDir", 2);
 \label{lst:directoryMap}
 \end{program}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[scale=0.6]{chapters/caseStudy/directoryError}
-\caption{Error about writing to a list, thus mixing the list and map type}
-\label{fig:directoryScreenshot}
-\end{figure}
+%\begin{figure}[htbp]
+%\centering
+%\includegraphics[scale=0.6]{chapters/caseStudy/directoryError}
+%\caption{Error about writing to a list, thus mixing the list and map type}
+%\label{fig:directoryScreenshot}
+%\end{figure}

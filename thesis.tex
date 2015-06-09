@@ -16,6 +16,7 @@
 \usepackage{lmodern}
 \usepackage[labeled]{multibib}
 \usepackage{color}
+\usepackage{courier}
 
 \usepackage{datetime}
 \usepackage{epstopdf} 
@@ -60,6 +61,7 @@
 \newcounter{subdiagram}
 \alph{subdiagram}
 
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
 \newcolumntype{Y}{>{\RaggedRight\arraybackslash}X} 
 \usepackage{algorithm,algpseudocode}
 
@@ -84,7 +86,7 @@
 }
 \lstset{ %
   backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
-  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  basicstyle=\footnotesize\ttfamily,        % the size of the fonts that are used for the code
   breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
   breaklines=true,                 % sets automatic line breaking
   captionpos=b,                    % sets the caption-position to bottom
@@ -193,7 +195,7 @@
 \chapter{Data Flow Analysis}
 \label{ch:analysis}
 %\input{chapters/staticAnalysis/definitions}
-\input{chapters/staticAnalysis/dataflow}
+\input{chapters/staticAnalysis/intro}
 \input{chapters/staticAnalysis/languageSubset}
 \input{chapters/staticAnalysis/cfg}
 \input{chapters/staticAnalysis/lattice}
@@ -233,12 +235,7 @@
 \input{chapters/futureWork/fullLanguage}
 \input{chapters/futureWork/precision}
 \input{chapters/futureWork/performance}
-
-
-\todo{Propose more work in fine-tuning the lattice (need support for larger language), e.g. better index?}
-
-\todo{...}
-
+\input{chapters/futureWork/summary}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage

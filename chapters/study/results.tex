@@ -51,7 +51,7 @@ Zend Framework 2&	30.99\%	&   35.07\% &	1.08\%	&   19.78\% &	6.25\%	&   0.00\%  
 % There might be a problem with our classification. E.g. the groups decided to be objects are prob. not objects, but really lists with different type. It might be an idea to go through the groups and analyse. The only "real" objects are maps (what is callables then? Special case?). If it is the case that the M lists are in fact S lists, then we may make the assumption that when a list is observed, it has the same type and really doesn't change over time. We need however to keep track of key -> type of maps, since they may prove to be objects rather than maps. A further study on how the depth/size changes for each group would be nice.  
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{chapters/study/g12.png}
+\includegraphics[width=\textwidth]{chapters/study/g22.png}
 \caption{Distribution of different types of arrays}
 \label{fig:array_types}
 \end{figure}
@@ -71,7 +71,7 @@ The distribution of operations support the claim that the List-marked objects fi
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{chapters/study/g22.png}
+\includegraphics[width=\textwidth]{chapters/study/g12.png}
 \caption{Distribution of array-changing operations over array types}
 \label{fig:type_operations}
 \end{figure}

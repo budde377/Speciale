@@ -1,8 +1,18 @@
 \section{Array Pivot}
-The following example is found in an array helper class in the Joomla content management system. The code is adapted to fit in P0 as well as shortened to only display necessary code. The function accepts an array as input and return an array with the unique values of the input array as keys and the keys of the input array as values. The odd thing about this function is how unique and duplicate values from the input array are represented differently in the output array namely as either a string/integer value or an array of string/integer values. See program \ref{lst:pivotExample} for an example. This mix of arrays and scalar values in the resulting array forces the user of the function to check the data type before using the values. Necessary data type checks strongly suggests a bad design and the analysis provides warnings about suspicious use of arrays as seen in figure \ref{fig:pivotScreenshot}. Both warnings are based on the fact that values of the array associated with ``result'' might be arrays or scalar values.
+The function, \texttt{pivot}, in program \ref{lst:pivot}, was found in the Joomla content management system, in a class containing functions for manipulating arrays. It uses the library function \texttt{count}, which returns the size of a given array, and the special \texttt{empty} expression, which has been replaced by the function \texttt{is\_empty} that takes a single argument and returns a boolean. 
 
-\todo{the warning is due to path insensitivity, and not directly caused by the actual problem, we have to describe that somehow and argue that capturing the problem indirectly is good enough}
-
+The \texttt{pivot} function accepts an array as its only argument and return an array, with the unique values of the input array as keys and their position in the original array as value. E.g. executing \texttt{pivot([1,2,3,4,5,4,3,2,1])} yields the map
+\lstdefinestyle{nonumbers}{numbers=none}
+\begin{lstlisting}[style=nonumbers]
+[
+	1 => [0,8], 	//1 is at key 0 and 8
+	2 => [1,7], 	//2 is at key 1 and 7
+	3 => [2,6], 	//3 is at key 2 and 6
+	4 => [3,5], 	//4 is at key 3 and 5
+	5 => 4  			//5 is at key 4
+]
+\end{lstlisting}
+Notice how the type of the values in the resulting array above alternates. If a value only occurs once in the input array, that single position is returned in the output array, else  if there are more than one, an array of possible positions is returned.
 \begin{program}
 \begin{lstlisting}
 function pivot($source)
@@ -12,23 +22,22 @@ function pivot($source)
 
     for ($i = 0; $i < count($source); $i++)
     {
-        $rKey = $source[$i];
-        $rValue = $i;
+        $resultKey = $source[$i];
+        $resultValue = $i;
 
-        if (empty($counter[$rKey]))
+        if (is_empty($counter[$resultKey])) %* \label{line:pivot-1} *)
         {
-            $result[$rKey] = $rValue;
-            $counter[$rKey] = 1;
+            $result[$resultKey] = $resultValue;
+            $counter[$resultKey] = 1;
         }
-        else if ($counter[$rKey] == 1)
+        else if ($counter[$resultKey] == 1)
         {
-            $result[$rKey] = [$result[$rKey],
-                              $rValue];
-            $counter[$rKey]++;
+            $result[$resultKey] = [$result[$resultKey], $resultValue];
+            $counter[$resultKey]++;
         }
         else
         {
-            $result[$rKey][] = $rValue;
+            $result[$resultKey][] = $resultValue;
         }
     }
     return $result;
@@ -36,27 +45,17 @@ function pivot($source)
 
 $simpleArr = [1,2,3,4,5,6,7,8,1,5,3,7,9,0,4,2,5,8,4,3,8,9];
 $result = pivot($simpleArr);
+var_dump($result);
 \end{lstlisting}
 \caption{Pivoting an array so values becomes keys and keys becomes values}
 \label{lst:pivot}
 \end{program}
 
-\begin{program}
-\begin{lstlisting}
-[1,2,3,4,5,4,3,2,1]
-\end{lstlisting}
+While PHP supports coercion between many of native types, there is no such thing as array coercion. The mix of arrays and scalar values in the resulting array would ultimately force a check the data type before using the values, which could have been avoided if the function consequently returned an array containing arrays of integers. Necessary data type checks strongly suggests bad design choices and the analysis provides warnings about suspicious use of arrays as seen in figure \ref{fig:pivotScreenshot}. Both warnings are based on the fact that values of the array associated with ``result'' might be arrays or number values, the first happens when an integer is appended to an array already containing an array or integer, the second when an array append operation is performed on something that might be a number. 
 
-\begin{lstlisting}
-[1 => [0,8],
- 2 => [1,7],
- 3 => [2,6],
- 4 => [3,5],
- 5 => 4]
-\end{lstlisting}
+Notice how both warnings occurs as side-effects of the real problem, namely the type of the content. In practice the sub-array always contains integers (not arrays and integers) and the append operation is always performed on a number. The real problem is however not captured by the analysis. This happens when the branches of the if-statement meets. Here the analysis preforms a join of the analysis lattice element, hence a join of the lattice element representing the abstract value of \texttt{\$result} array. For the first iteration of the for-loop, the first branch of the if statement on line \ref{line:pivot-1} would express the array as a list of integers, while the second branch as a list of lists containing integers. A warning on a join of these opposing representations could be implemented, but is currently not supported by the analysis.
 
-\caption{Example of input and output of the pivot function}
-\label{lst:pivotExample}
-\end{program}
+
 
 \begin{figure}[htbp]
 \centering
@@ -66,4 +65,4 @@ $result = pivot($simpleArr);
 \label{fig:pivotScreenshot}
 \end{figure}
 
-\todo{array write warning does not consider possible null values since that will cause false positives}
+%\todo{array write warning does not consider possible null values since that will cause false positives}
