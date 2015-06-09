@@ -6,18 +6,18 @@ When running a plug-in on a given program, an AST and type-information is availa
 
 The lattices are defined by interfaces and the elements are implemented as immutable data structures of these interfaces. In the name of efficiency the domain of map-lattice elements (\texttt{MapLatticeElement}) are defined as the indices of modified entries, not including the values defaulted to Value(Null($\top$)) in the initial array. Comparing two map elements is then done by comparing the values corresponding to the joint domain of the elements, which in turn allows comparisons to be done in finite time. This \emph{short-cut} also ensures that, when updating the entry of a $\top$-array only the variables initialized are effected, which is sound and yields a more precise model.
 
-The transfer functions are implemented notoriously as introduced in section \ref{sec:transferf} with added statements for reporting of suspicious behaviour to the IDE through \texttt{Annotation}s. Reporting does not effect the outcome of the analysis and is made possible by the references to the \texttt{PSIElements} in the nodes of the control-flow-graph. The analysis reports the following
+The transfer functions are implemented notoriously as introduced in section \ref{sec:transferf} with added statements for reporting of suspicious behaviour to the IDE through \texttt{Annotation}s. Reporting does not affect the outcome of the analysis and is made possible by the references to the \texttt{PSIElements} in the nodes of the control-flow graph. The feedback given to the user is in the form of either an error or a warning. An error indicates code that is definitely using an array in a suspicious way. A warning indicates code that might be suspicious, meaning that the analysis has lost some precision. Below is a list of the warnings and errors implemented. Chapter \ref{ch:evaluation} contains screenshots of how the warnings and errors are presented to the user in IntelliJ IDEA.
 \begin{itemize}
-\item Appending on definite map yields error
-\item Merging a list with a map and visa versa yields error
-\item Definite string write on list yields error
-\item Adding new type to array yields warning
-\item Writing to possible non-array yields warning
-\item Appending on possible map yields warning
-\item Possible string write on list yields warning
+\item Appending on definite map yields an error
+\item Merging a list with a map and vice versa yields an error
+\item Writing to a definite string key on a list yields an error
+\item Adding a new type to an array yields a warning
+\item Writing to possible non-array yields a warning
+\item Appending on possible map yields a warning
+\item Writing to a possible string key on a list yields a warning
 \end{itemize}
-\todo{Write better list}
-Solving the data-flow equations are performed by an implementation of the worklist algorithm (Algorithm \ref{algo:worklist}). Notice, that since $\iota \not\sqsubseteq \bot$, any reachable node is bound to be analysed at least once. 
+
+Solving the data-flow equations of the Monotone Framework are performed by an implementation of the worklist algorithm (Algorithm \ref{algo:worklist}). Notice that, since $\iota \not\sqsubseteq \bot$, any reachable node is bound to be analysed at least once. 
 
 \begin{algorithm}
 \caption{Worklist algorithm}
@@ -46,7 +46,7 @@ Solving the data-flow equations are performed by an implementation of the workli
 
 Until now, it has been assumed that any function called should be implemented in the same program. PHP however comes with a large number of internal functions, which are essential to any program. In order to support these, a \texttt{LibraryFunction} interface has been created. Implementing a class of this interface and registering it in the \texttt{PSIParser} allows modelling of a function by expressing the signature, whether arguments and return values are passed by reference or value, and specifying a transfer function for the result node. Let $\mathit{lib}$ be the name of a library function. Then the transfer function of the $\mathit{call}_\mathit{lib}(\_)$ node becomes the identity function, the flow graph is the graph containing a $\mathit{start}$ node followed by an $\mathit{exit}$ node, and the transfer function of the $\mathit{result}_{\mathit{call}_{\mathit{lib}(\_)}}$ is the specified transfer function. 
 
-For the library function $fn = $\texttt{array\_merge}\footnote{\url{http://php.net/manual/en/function.array-merge.php}} the arguments and return value are all passed by value. The transfer function for the result node, $n = \mathit{result}_{c}(c_{\mathit{tar}})$, where $c = \mathit{call}_{{fn}}(t_1,\cdots, t_n)$, is defined as 
+For the library function $fn = $ \texttt{array\_merge}\footnote{\url{http://php.net/manual/en/function.array-merge.php}} the arguments and return value are all passed by value. The transfer function for the result node, $n = \mathit{result}_{c}(c_{\mathit{tar}})$, where $c = \mathit{call}_{{fn}}(t_1,\cdots, t_n)$, is defined as 
 \begin{align*}
 f_{n,\delta_{\mathit{call}},\delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\mathit{exit}}) = 	&\letin{(s_l, s_g, s_h, s_t, s_{ht}) = l_{\mathit{call}}[\delta_{\mathit{call}}]}\notag\\
 																							&\letin{V =  \{v_i| v_i = s_t[t_i]\wedge i \in [1;n]\}}\notag\\
@@ -66,8 +66,8 @@ f_{n,\delta_{\mathit{call}},\delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\mathi
 																							&}\notag\\
 																							&l_{\mathit{call}}[\delta_{\mathit{call}}\mapsto (s_l, s_g, s_h', s_t', s_{ht}')]
 \end{align*} 
-This basically just joins the arrays of each input value, taking invalid arguments yielding \texttt{null} into account. The joined value is then stored in the heap or temporary storage, depending on the result argument.
+This transfer function simply joins the arrays of each input value, taking invalid arguments yielding \texttt{null} into account. The joined value is then stored in the heap or temporary storage, depending on the result argument.
 
 The implementation has been tested against 48 small functional tests. While these are not representative of actual PHP programs, neither in size nor feature usage, they do aim to cover as many feature cases as possible.
 
-\todo{Elaborate on more library functions.}
+Library functions have been implemented on a by-need basis for the functional tests and the case studies presented in chapter \ref{ch:evaluation}. Some of the implemented library functions, which do not contain reference-parameters or reference-return, have been naively implemented by returning the $\top$-element value, since the precision was not required for the test in question.
