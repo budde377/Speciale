@@ -192,12 +192,12 @@ where $\texttt{- -} : \text{Number}\rightarrow\text{Number}$ is defined by table
 \end{table}
 \end{comment}
 
-In table \ref{tab:binop} logical \texttt{AND} and \texttt{OR} operators have two different notations. This is due to PHP specifying different precedence for the two notations. The textual operators bind weaker than assignments whereas the symbol operators bind stronger than assignments. Since the AST for the analysis is provided this difference have no direct impact on the analysis implementation.
+In table \ref{tab:binop} logical \texttt{AND} and \texttt{OR} operators have two different notations. This is due to PHP specifying different precedence for the two notations. The textual operators bind weaker than assignments, whereas the symbol operators bind stronger than assignments. Since the AST for the analysis is provided, this difference have no direct impact on the analysis implementation.
 
-For numeric operators the variables $x$, $y$, $a$, and $b$ are used. $x$ and $y$ denote an integer larger than zero, $x, y \in \mathbb{Z} \wedge x, y > 0$ and $a$, $b$ is a double smaller than zero or not a integer, $a, b \in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})$. Or an uInt number and notUInt number respectively, e.g. with this notion the addition $x+a$ would be an addition of a uInt number ($x$) and a notUInt number ($a$).
+For numeric operators the variables $x$, $y$, $a$, and $b$ are used. The variables $x$ and $y$ denote an integer larger than zero ($x, y \in \mathbb{Z} \wedge x, y > 0$) and the variables $a$, $b$ denotes a double smaller than zero or not an integer, $a, b \in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})$. Rephrased; $x$ and $y$ are uInt numbers and $a$ and $b$ are notUInt numbers, e.g. with this notion the addition $x+a$ would be an addition of a uInt number ($x$) and a notUInt number ($a$).
 
 
-Table \ref{tab:abstract_subtraction1} defines abstract subtraction. Numbers in uInt are split into 0 and all other numbers while numbers in notUInt are split into negative and positive numbers. These splits are made to heighten the precision of the operator. 0 is the right-identity of subtraction which is used in the 0-column of table \ref{tab:abstract_subtraction1} to get uInt instead of $\top$. Subtracting negative numbers correspond to adding the absolute value of the number, e.g. $5 - (-3) = 5 + 3$. For uInt this means that adding negative integers results in uInt instead of $\top$.
+Table \ref{tab:abstract_subtraction1} defines abstract subtraction. Numbers in uInt are split into 0 and all other numbers, while numbers in notUInt are split into negative and positive numbers. These splits are made to heighten the precision of the operator. The right-identity of subtraction is 0 which is used in the 0-column of table \ref{tab:abstract_subtraction1} to get uInt instead of $\top$. Subtracting negative numbers correspond to adding the absolute value of the number, e.g. $5 - (-3) = 5 + 3$. For uInt this means that adding negative integers results in uInt instead of $\top$.
 
 \begin{table}[htbp]
 \centering
@@ -219,7 +219,7 @@ $\top$                          & $\bot$ & $\top$  & $\top$  & $\top$  & $\top$ 
 \end{table}
 
 
-For division and modulo operators an error can occur trying to divide by 0. PHP handles division by 0 by returning the boolean \texttt{false} value instead of a number. For this reason division and modulo operators are functions from numbers to a value as opposed to the rest of the numeric operators. The shorthand $f$ is used for the boolean \texttt{false} value to keep the table smaller. Only the uInt part of the number lattice can contain 0 which restricts the amount of possible \texttt{false} returns for division. However as seen in table \ref{tab:abstract_modulus1} the amount of possible \texttt{false} values are high for the modulus operator. This is because PHP handles modulus for decimal numbers by removing the decimal part which means $-0.5 \Rightarrow 0$ and $0.8 \Rightarrow 0$. The result of the modulus operator is always an integer and the sign is dictated by the sign of the left-hand operand which can be seen in the table by the $\top$-element column not consisting solely of $\top$-element results.
+For division and modulo operators, an error can occur trying to divide by 0. PHP handles division by 0 by returning the boolean \texttt{false} value instead of a number. For this reason, division and modulo operators are functions from numbers to a value as opposed to the rest of the numeric operators. The shorthand $f$ is used instead of the boolean \texttt{false} value to keep the table smaller. Only the uInt part of the number lattice can contain 0 which restricts the amount of possible \texttt{false} returns for division. However as seen in table \ref{tab:abstract_modulus1} the amount of possible \texttt{false} values is high for the modulus operator. This is because PHP handles modulus for decimal numbers by truncating the decimal part, which means $-0.5 \Rightarrow 0$ and $0.8 \Rightarrow 0$. The result of the modulus operator is always an integer and the sign is dictated by the sign of the left-hand operand, which can be seen in the table by the $\top$-element column not consisting solely of $\top$-element results.
 
 \begin{table}[htbp]
 \centering
@@ -240,11 +240,11 @@ $\top$   & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f
 \label{tab:abstract_modulus1}
 \end{table}
 
-Comparison operators are defined directly on values since different types can be compared with each other courtesy of type translation. PHP has an non-complete ordered definition of how values are compared depending on their type which can be seen in table \ref{tab:comparisons}. Any combination of operators not present in the table considered unspecified and yields a boolean $\top$ value. 
+Comparison operators are defined directly on values, since different types can be compared with each other courtesy of type translation. PHP has an non-complete ordered definition of how values are compared depending on their type, which can be seen in table \ref{tab:comparisons}. Any combination of operators not present in the table are considered unspecified and yields a boolean $\top$ value. 
 
-For performance reasons the analysis do not try to compare all different combinations of possible types when performing abstract comparison operators. If either value have multiple possible types the result is the boolean $\top$-element. Otherwise the comparison operators follow the order of table \ref{tab:comparisons} for coercion of values and comparison of specific types are specified in the tables in appendix \ref{app:abstract_operators}.
+For performance reasons, the analysis does not try to compare all different combinations of possible types when performing abstract comparison operators. If either value has multiple possible types the result is the boolean $\top$-element. Otherwise the comparison operators follow the order of table \ref{tab:comparisons} for coercion of values and comparison of specific types are specified in the tables in appendix \ref{app:abstract_operators}.
 
-Arrays are first of all compared by size. Equal sized arrays with different keys are incomparable and otherwise the arrays are compared by their values. Since the array lattice have no notion of size it is not possible to reason about the results of array comparisons. The only possible sound result is the boolean $\top$-element.
+Arrays are first of all compared by size. Equal sized arrays with different keys are incomparable, while arrays of equal size are compared by their values. Since the array lattice has no notion of size it is not possible to reason about the results of array comparisons. The only possible sound result is the boolean $\top$-element.
 
 \begin{table}[htbp]
 \centering
