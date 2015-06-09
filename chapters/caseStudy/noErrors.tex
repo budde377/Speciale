@@ -1,4 +1,4 @@
-\section{Maps and lists}
+\section{Month names and number}
 
 
 Program \ref{lst:monthsNoError} first define an list-array of month names, \texttt{\$monthNames}, and use a loop to create a new map-array, \texttt{\$monthMap}, with these month names as keys and the corresponding month number as value, e.g. given \texttt{\$monthNames = ["January", ... , "December"]} after running the program the map becomes \texttt{\$monthMap=["January"=>1, ... , "December" => 12]}. The constructed map-array is then used to print a string containing month number of a given input, e.g. the input \texttt{"August"} yields the string \texttt{"August is month number 8"} and input \texttt{"Duck"} yields \texttt{"Duck is month number "}. The input is provided via. the super-global \texttt{\$\_GET}, containing the data of the query string\footnote{\url{http://tools.ietf.org/html/rfc3986\#section-3.4}}, as field \texttt{"monthName"}. 
@@ -17,7 +17,7 @@ $input = $_GET["monthName"];%*\label{line:mne-4}*)
 
 echo $input . " is month number " . $monthMap[$input];%*\label{line:mne-5}*)
 \end{lstlisting}
-\caption{Turning a month list into a ``month name to month number''-map}
+\caption{Month name and number example}
 \label{lst:monthsNoError}
 \end{program}
 

@@ -1,4 +1,4 @@
-\section{Array Pivot}
+\section{Array pivot}
 The function, \texttt{pivot}, in program \ref{lst:pivot}, was found in the Joomla content management system, in a class containing functions for manipulating arrays. It uses the library function \texttt{count}, which returns the size of a given array, and the special \texttt{empty} expression, which has been replaced by the function \texttt{is\_empty} that takes a single argument and returns a boolean. 
 
 The \texttt{pivot} function accepts an array as its only argument and return an array, with the unique values of the input array as keys and their position in the original array as value. E.g. executing \texttt{pivot([1,2,3,4,5,4,3,2,1])} yields the map
@@ -47,29 +47,33 @@ $simpleArr = [1,2,3,4,5,6,7,8,1,5,3,7,9,0,4,2,5,8,4,3,8,9];
 $result = pivot($simpleArr);
 var_dump($result);
 \end{lstlisting}
-\caption{Pivoting an array so values becomes keys and keys becomes values}
+\caption{Pivot example}
 \label{lst:pivot}
 \end{program}
 
-While PHP supports coercion between many of native types, there is no such thing as array coercion. The mix of arrays and scalar values in the resulting array would ultimately force a check the data type before using the values, which could have been avoided if the function consequently returned an array containing arrays of integers. Necessary data type checks strongly suggests bad design choices and the analysis provides warnings about suspicious use of arrays as seen in figure \ref{fig:pivotScreenshot}. Both warnings are based on the fact that values of the array associated with ``result'' might be arrays or number values, the first happens when an integer is appended to an array already containing an array or integer, the second when an array append operation is performed on something that might be a number. 
-
-Notice how both warnings occurs as side-effects of the real problem, namely the type of the content. In practice the sub-array always contains integers (not arrays and integers) and the append operation is always performed on a number. The real problem is however not captured by the analysis. This happens when the branches of the if-statement meets. Here the analysis preforms a join of the analysis lattice element, hence a join of the lattice element representing the abstract value of \texttt{\$result} array. For the first iteration of the for-loop, the first branch of the if statement on line \ref{line:pivot-1} would express the array as a list of integers, while the second branch as a list of lists containing integers. A warning on a join of these opposing representations could be implemented, but is currently not supported by the analysis.
-
-
+While PHP supports coercion between many of native types, there is no such thing as array coercion. The mix of arrays and scalar values in the resulting array would ultimately force a check the data type before using the values, which could have been avoided if the function consequently returned an array containing arrays of integers. Necessary data type checks strongly suggests bad design choices and the analysis provides warnings about suspicious use of arrays as seen in figure \ref{fig:pivotScreenshot}. Both warnings are based on the fact that values of the array associated with ``result'' might be arrays or number values, the first happens when an integer is appended to an array already containing an array or integer (figure \ref{fig:pivotScreenshot1}), the second when an array append operation is performed on something that might be a number (figure \ref{fig:pivotScreenshot2}). 
 
 \begin{figure}
 \centering
 \begin{subfigure}{\textwidth}
 \centering
 \includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/pivot1}
+\subcaption{Array write with different values}
+\label{fig:pivotScreenshot1}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \centering
 \includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/pivot2}
+\subcaption{Array append on non-array}
+\label{fig:pivotScreenshot2}
 \end{subfigure}
-\caption{Warnings shown due to the mixed value types of the result array}
+\caption{Running the analysis on \texttt{pivot}}
 \label{fig:pivotScreenshot}
 \end{figure}
-\todo{Add sub-captions}
+
+Notice how both warnings occurs as side-effects of the real problem, namely the type of the content. In practice the sub-array always contains integers (not arrays and integers) and the append operation is always performed on a number. The real problem is however not captured by the analysis. This happens when the branches of the if-statement meets. Here the analysis preforms a join of the analysis lattice element, hence a join of the lattice element representing the abstract value of \texttt{\$result} array. For the first iteration of the for-loop, the first branch of the if statement on line \ref{line:pivot-1} would express the array as a list of integers, while the second branch as a list of lists containing integers. A warning on a join of these opposing representations could be implemented, but is currently not supported by the analysis.
+
+
+
 
 %\todo{array write warning does not consider possible null values since that will cause false positives}

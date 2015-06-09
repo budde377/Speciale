@@ -1,4 +1,4 @@
-\section{Keeping track of instances}
+\section{Caching instances}
 This case demonstrates the opposite of the case in section \ref{sec:directoryContent}. In lines \ref{ln:mapStart} and \ref{ln:mapEnd} the arrays associated with \texttt{\$keyArray} and \texttt{\$valueArray} are used in a map context by writing to a string index. Then in lines \ref{ln:appendStart} and \ref{ln:appendEnd} the array append operation is used with both arrays. When detecting the latter the analysis presents the user with an error as seen in figure \ref{fig:typeHandlerScreenshot} turning the attention of the user to the fact that she is about to append to an array previously used in a map context. The program incidentally functions correctly even though half the program intends to use the array associated with \texttt{\$keyArray} as a map and the other half as a list. Maintaining this code is difficult since the intention of the code is not clear and putting attention to that enables the mistake to be fixed right away.
 
 \begin{program}
@@ -20,22 +20,28 @@ function createInstance($string, $instance, $value)
 }
 createInstance("test", "test2", "testValue");
 \end{lstlisting}
-\caption{}
+\caption{Caching instances example}
 \label{lst:typeHandler}
 \end{program}
 
 \begin{figure}
 \centering
+
 \begin{subfigure}{\textwidth}
 \centering
 \includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/instance1}
+\subcaption{Appending on map: \texttt{\$keyArray}}
+\label{fig:typeHandlerScreenshot-1}
 \end{subfigure}
+
 \begin{subfigure}{\textwidth}
 \centering
 \includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/instance2}
+\subcaption{Appending on map: \texttt{\$valueArray}}
+\label{fig:typeHandlerScreenshot-2}
 \end{subfigure}
-\caption{Error message provided when using array append with a map array}
+
+\caption{Running analysis on \texttt{createInstance}}
 \label{fig:typeHandlerScreenshot}
 \end{figure}
-\todo{Add sub-captions}
 
