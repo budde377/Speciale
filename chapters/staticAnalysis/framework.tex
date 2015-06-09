@@ -75,9 +75,12 @@ h_\iota = [	&\text{HLoc}(\Lambda, s, i\in[0,2])\mapsto \text{Value}(\text{Array}
 			&\text{HLoc}(\Lambda, s, i\in[11,13])\mapsto \text{Value}(\text{Array}(\top),\text{String}(\top)),\notag\\
 			&\text{HLoc}(\Lambda, s, 14)\mapsto \text{Value}(\text{ArrayMap}([\text{Index}(\top)\mapsto\text{HLoc}(\Lambda, s, 15)])),\notag\\			
 			&\text{HLoc}(\Lambda, s, 15)\mapsto \text{Value}(\text{Number}(\top),\text{String}(\top)),\notag\\
+			&\text{HLoc}(\Lambda, s, 16)\mapsto \text{Value}(\top)\notag\\
 			&\_ \mapsto \text{Value}(\text{Null}(\top))]
 \end{align*}
-the last entry maps all other locations to the null value. 
+The last entry maps all other locations to the null value.
 
-\todo{Elaborate on decision of super-globals}
+The initial values of the superglobals are based on inspections of the structure of each individual variable. Take the \texttt{\$\_FILES} array as an example. The structure is a map from form-element names to maps of information about the file such as name, size, and type. In the initial lattice-element this structure is expressed by a map of maps containing strings and numbers.  Location $16$ is not used directly in the global scope. The location is created to ensure any initial values of the superglobals are covered when reading from a $\top$-element array. For example reading from the \texttt{\$\_SERVER} superglobal may result in any value defined by the server, which is expressed by the $\top$-element value in the heap. 
+
+By modifying the initial lattice-element it is possible to introduce assumptions about the superglobals into the analysis. By introducing such assumptions it is possible to analyse how different user input and environment will affect a program. The element chosen here is chosen to be sound for all possible values of the superglobals.
 
