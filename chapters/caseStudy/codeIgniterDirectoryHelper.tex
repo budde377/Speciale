@@ -10,8 +10,6 @@ This is a good example on how arrays in PHP serve as the go-to data-structure, w
 
 The analysis provides an error to bring attention to the possibly bad design choice as seen in figure \ref{fig:directoryScreenshot}. The mixing of array types are detected by the analysis because the append operation creates a list array and then afterwards a write is encountered with the index possibly being a string which then triggers the error.
 
-\todo{No error ... }
-
 \begin{program}
 \begin{lstlisting}
 function directory_map($dir, $depth)
@@ -43,6 +41,22 @@ $result = directory_map("testDir", 2);
 \caption{Mixing of map and list}
 \label{lst:directoryMap}
 \end{program}
+
+
+\begin{figure}
+\centering
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/dirmap1}
+\end{subfigure}
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/dirmap2}
+\end{subfigure}
+\caption{Error about writing to a list, thus mixing the list and map type}
+\label{fig:directoryScreenshot}
+\end{figure}
+\todo{Add sub-captions}
 
 %\begin{figure}[htbp]
 %\centering
