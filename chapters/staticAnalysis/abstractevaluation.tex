@@ -101,14 +101,14 @@ c_{\text{Null}, \text{Index}}(v) &= \begin{cases}
 c_{\alpha, \alpha} (v) &= v
 \end{align*}
 }
-The functions $\mathit{int}$, $\mathit{num}$, and $\mathit{string}$ creates an integer, a number, and a string respectively in the obvious way, e.g. $\mathit{int}(42.1) = 42$, $\mathit{string}(1337) = \texttt{"1337"}$, and $\mathit{number}(\texttt{"1337"}) = 1337$. Furthermore the predicates $\mathit{isNumber}$, $\mathit{isInteger}$ and $\mathit{isString}$ are satisfied if and only if the value can be interpreted as a number, integer, or string respectively. For example $\mathit{isNumber}(\texttt{"42.1"})$ is satisfied while $\mathit{isInteger}(\texttt{"42.1"})$ does not.
+The functions $\mathit{int}$, $\mathit{num}$, and $\mathit{string}$ creates an integer, a number, and a string respectively in the obvious way, e.g. $\mathit{int}(42.1) = 42$, $\mathit{string}(1337) = \texttt{"1337"}$, and $\mathit{number}(\texttt{"1337"}) = 1337$. Furthermore the predicates $\mathit{isNumber}$, $\mathit{isInteger}$ and $\mathit{isString}$ are satisfied if and only if the value can be interpreted as a number, integer, or string respectively. For example $\mathit{isNumber}(\texttt{"42.1"})$ is satisfied while $\mathit{isInteger}(\texttt{"42.1"})$ is not.
 
 Five interesting cases of coercion in PHP includes: (i) any array coerced to a string will result in the string \texttt{"Array"}, (ii) \texttt{null} is string-coerced to the empty string, (iii) both the empty string and the string literal \texttt{"0"} are boolean-coerced to boolean \texttt{false}, (iv) boolean \texttt{false} is string-coerced to the empty string, and (v) an empty array is boolean-coerced to boolean \texttt{false}.
 
 
 \section{Abstract evaluation}
 \label{sec:abseval}
-The PHP language syntax contains a set of binary and unary operators. These operators evaluate one or two operand values to a result value. Working with abstract values introduces the need for a abstract evaluation of these operators. Being dynamically typed PHP allows for many cross-type operations to be performed some of which simply coerces the operands to sensible types. However some exceptions exists, e.g. performing the increment operation on strings. P0 does not support these exceptions. The operations are supported on the types on which they are defined, and cross-type operations are supported by using the coercion functions defined in the previous section.
+The PHP language syntax contains a set of binary and unary operators. These operators evaluate one or two operand values to a result value. Working with abstract values introduces the need for an abstract evaluation of these operators. Being dynamically typed PHP allows for many cross-type operations to be performed some of which simply coerces the operands to sensible types. However some exceptions exists, e.g. performing the increment operation on strings. P0 does not support these exceptions. The operations are supported on the types on which they are defined, and cross-type operations are supported by using the coercion functions defined in the previous section.
 
 In order to maintain some precision when evaluating binary- and unary-operators, a table is created for each operation defining the result of evaluating a given input abstractly. These tables are available in appendix \ref{app:abstract_operators} with some interesting cases presented below.
 
@@ -192,7 +192,7 @@ where $\texttt{- -} : \text{Number}\rightarrow\text{Number}$ is defined by table
 \end{table}
 \end{comment}
 
-In table \ref{tab:binop} logical \texttt{AND} and \texttt{OR} operators have two different notations. This is due to PHP specifying different precedence for the two notations. The textual operators bind weaker than assignments, whereas the symbol operators bind stronger than assignments. Since the AST for the analysis is provided, this difference have no direct impact on the analysis implementation.
+In table \ref{tab:binop} logical \texttt{AND} and \texttt{OR} operators have two different notations. This is due to PHP specifying different precedence for the two notations. The textual operators bind weaker than assignments, whereas the symbol operators bind stronger than assignments. Since the AST for the analysis is provided, this difference has no direct impact on the analysis implementation.
 
 For numeric operators the variables $x$, $y$, $a$, and $b$ are used. The variables $x$ and $y$ denote an integer larger than zero ($x, y \in \mathbb{Z} \wedge x, y > 0$) and the variables $a$, $b$ denotes a double smaller than zero or not an integer, $a, b \in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})$. Rephrased; $x$ and $y$ are uInt numbers and $a$ and $b$ are notUInt numbers, e.g. with this notion the addition $x+a$ would be an addition of a uInt number ($x$) and a notUInt number ($a$).
 
