@@ -1,29 +1,30 @@
 \section{Implementation}
 \label{sec:studyImplementation}
-This section contains the implementation details of the dynamic analysis. The last part of the section discusses flaws and limitations arisen from the chosen implementation of the analysis. The analysis consists of two phases: \textit{test suite execution} with logging of feature usage and \textit{analysis} of the logged data. The test suites are executed on a modified version of the official PHP interpreter to enable logging of feature usage.
+This section contains the implementation details of the dynamic analysis. The last part of the section discusses flaws and limitations arisen from the chosen implementation of the analysis. The analysis consists of two phases: \textit{test suite execution} with logging of feature usage, and \textit{analysis} of the data logged. The test suites are executed on a modified version of the official PHP interpreter to enable logging of feature usage.
 
 \subsection{Logging of feature usage}
 All usages of array reads, array writes, assignments, array library functions (\texttt{array\_push()}, \texttt{array\_pop()}, \texttt{array\_search()}, \texttt{count()}, etc.), and every array initialization are logged while executing the test suites. These are logged in a CSV file where each line is a log entry containing information separated by the tab character. All entries begin with  \emph{line type}, which identifies the type of the entry. The possible line types are described in the list below.
 
 \begin{itemize}
-\item \emph{array function}: Every call to a library array function\footnote{\url{http://php.net/manual/en/ref.array.php}}, such as \texttt{count()} or \texttt{array\_push()} are logged with the function name as line type. The array functions do not include the \texttt{array()} used to initialize an array, since it is a language construct and not an actual function. Some subroutines are also logged when dealing with multiple arrays in the same function, e.g. \texttt{array\_mr\_part} used by the \texttt{array\_merge} function.
-\item \texttt{array\_read}: Every read from an array is logged with the array being read from and the key used as well as the type of the value being.
-\item \texttt{array\_write}: All array writes of the form \texttt{\$x[\$key] = \$y} are logged with the array being read from (\texttt{\$x}) the key (\texttt{\$key}). 
+\item \emph{array function}: Every call to a library array function\footnote{\url{http://php.net/manual/en/ref.array.php}}, such as \texttt{count()} or \texttt{array\_push()} is logged with the function name as line type. The array functions do not include the \texttt{array()} used to initialize an array, since it is a language construct and not an actual function. Some subroutines are also logged when dealing with multiple arrays in the same function, e.g. \texttt{array\_mr\_part} used by the \texttt{array\_merge} function.
+\item \texttt{array\_read}: Every read from an array is logged with the array being read from and the key used, as well as the type of the value being read.
+\item \texttt{array\_write}: All array writes of the form \texttt{\$x[\$key] = \$y} are logged with the array being read from (\texttt{\$x}) and the key (\texttt{\$key}). 
 \item \texttt{array\_append}: When elements are added to the array using the append method, \texttt{\$x[] = \$y}, this is logged with the array being read from, \texttt{\$x}.
 \item \texttt{assign\_*}: Every assignment is logged as either \texttt{assign\_var}, \texttt{assign\_tmp}, \texttt{assign\_const} or \texttt{assign\_ref} depending on whether the value being assigned is a constant, temporary variable, variable or reference respectively.\\
-The assignment \texttt{\$x = (string) \$y} is an example of an assignment from a temporary variable. Here the the \texttt{\$y} variable is casted and saved in a temporary variable which then is assigned to \texttt{\$x}. One of these lines always follow \texttt{array\_write} and \texttt{array\_append} and is used to determine the type of value written in those lines.
-\item \texttt{array\_init}: When an array is initialized without the static keyword, using either the \texttt{array('key' => 'value')} construct or the corresponding bracket notation, \texttt{['key' => 'value']}, it is logged with the array being created. If the array is initialized in any other way, e.g. as a field or by array write it is not logged with \texttt{array\_init}.
+The assignment \texttt{\$x = (string) \$y} is an example of an assignment from a temporary variable. Here the \texttt{\$y} variable is cast and saved in a temporary variable which is then assigned to \texttt{\$x}. One of these lines always follow \texttt{array\_write} and \texttt{array\_append} and is used to determine the type of value written in those lines.
+\item \texttt{array\_init}: When an array is initialized without the static keyword, using either the \texttt{array('key' => 'value')} construct or the corresponding bracket notation, \texttt{['key' => 'value']}, it is logged with the array being created. If the array is initialized in any other way, e.g.\ as a field or by array write, it is not logged with \texttt{array\_init}.
 \item \texttt{hash\_init}: Whenever a hash table, the underlying structure of arrays, is initialized, this is logged with the memory address of the table.
 \end{itemize}
 
-Arrays are logged as a tuple with four entries, $(t,d,s,a)$, where $t\in T\times C$ is the type of the array, $d$ is the depth of the array, $s$ is the size of the array, and $a$ is the memory address. Here $T = \{\text{List, Map, Sparse List}\}$ and $C = \{\text{Cyclic, Acyclic}\}$. The array type logged indicates the type of keys present in the array, see definitions \ref{def:list} and \ref{def:map}, as well as whether it contains any self-references. Any array with a self-reference is Cyclic and all other arrays are Acyclic.
+Arrays are logged as a tuple with four entries $(t,d,s,a)$, where $t\in T\times C$ is the type of the array, $d$ is the depth of the array, $s$ is the size of the array, and $a$ is the memory address. Here $T = \{\text{List, Map, Sparse List}\}$ and $C = \{\text{Cyclic, Acyclic}\}$. The array-type logged indicates the type of keys present in the array, see definitions \ref{def:list} and \ref{def:map}, as well as whether it contains any self-references. Any array with a self-reference is cyclic and all other arrays are acyclic.
 
-Objects are logged as their instance name, integers and floats are logged with their value, strings are logged only as \texttt{string}, booleans as $0$ if \texttt{false} otherwise 1, and the null value logged as \texttt{NULL}. Strings are generally not logged with a value, because doing so increases the file-size drastically, tends to corrupt the file when containing binary data, and has not proven useful for the analysis.
+Objects are logged with their class name, integers and floats are logged with their value, strings are logged only as \texttt{string}, booleans as $0$ if \texttt{false} otherwise 1, and the null value logged as \texttt{NULL}. Strings are generally not logged with a value, because doing so increases the file size drastically, tends to corrupt the file when containing binary data, and has not proven to be useful for the analysis.
 
 All entries besides the \texttt{hash\_init} entries contain a line number and a file path to where the action occurred. 
 
 \subsection{Identification of arrays}
-In order to analyse how arrays are used throughout an execuation of a test suite, some method for identifying which arrays are mentioned on a given line is needed. E.g. in the output depicted in figure \ref{lst:id_array_code_out} all lines concerns the same array with memory address \texttt{0x539}. Here, identifying these arrays as the same is a matter of checking the address. Due to the size of the test suites, relying only on the address is not a stable approach. Over time addresses will be reused and false identifications will happen. This issue can be solved by depending on the \texttt{hash\_init} line, which indicates that a new array is initialized at some address. If such a line occurs between two usages of an address they can not be considered representing the same array. 
+In order to analyse how arrays are used throughout an execution of a test suite, some method for identifying which arrays that are mentioned on a given line is needed. For instance, in the output depicted in figure \ref{lst:id_array_code_out} all lines concern the same array with memory address \texttt{0x539}. Here, identifying these arrays as the same is a matter of checking the address. Due to the size of the test suites, relying only on the address is not a sound approach. Over time addresses will be reused and false identifications will happen. This issue can be solved by depending on the \texttt{hash\_init} line, which indicates that a new array is initialized at some address. If such a line occurs between two usages of an address they can not be considered representing the same array. 
+
 \begin{figure}
 \centering
 \begin{subfigure}{\textwidth}
@@ -47,11 +48,11 @@ $a[] = 4;
 \caption{Example of the result from a run with the modified interpreter.}
 \end{figure}
 
-Since the log files are generated from running a test suite, relying on addresses for identification alone might result in a skewed analysis with an over-representation of arrays occurring in \emph{critical} code. Determining array equality based on initialization location in the file should provide a more equal representation of arrays, not letting some arrays dominate the statistics. Locational identification would however identify four different arrays in example \ref{lst:id_array_code_out}, which does not reflect the program \ref{lst:id_array_code} and thus the address is still needed to identify the same array across multiple uses on different code locations.
+Since the log files are generated from running a test suite, relying on addresses for identification alone might result in a skewed analysis with an over-representation of arrays occurring in \emph{critical} code. Determining array equality based on initialization location in the file should provide a more equal representation of arrays, not letting some arrays dominate the statistics. Locational identification would, however, identify four different arrays in example \ref{lst:id_array_code_out}, which does not reflect the program \ref{lst:id_array_code} and thus the address is still needed to identify the same array across multiple uses on different code locations.
 
 
 \begin{definition}
-Given two lines, $l_1$ and $l_2$, from a log file, $R$, as described above, each containing an array $x_1\in l_1$ and $x_2\in l_2$, where $x_1 = (t_1,d_1,s_1,a_1)$ and $x_2 = (t_2,d_2,s_2,a_2)$, the arrays are said to be positionally equal, $x_1\stackrel{pos}{=} x_2$, if and only if the two lines share the same line number, line type, and file or $a_1 = a_2$ and there is no 
+Given two lines, $l_1$ and $l_2$, from a log file $R$, formatted as described above, each containing an array, $x_1\in l_1$ and $x_2\in l_2$, where $x_1 = (t_1,d_1,s_1,a_1)$ and $x_2 = (t_2,d_2,s_2,a_2)$, the arrays are said to be positionally equal $x_1\stackrel{pos}{=} x_2$, if and only if the two lines share the same line number, line type, and file or $a_1 = a_2$ and there is no 
 \begin{align*}
 \texttt{hash\_init}\;a_1
 \end{align*}
@@ -61,16 +62,16 @@ line between $l_1$ and $l_2$.
 This definition utilizes file position and addresses in order to identify arrays. The line type has been added in order to heighten precision, since multiple different operations, on different arrays, may occur on the same line. 
 
 \begin{definition}
-Given two lines $l_1, l_2\in R$ and two arrays, $x_1\in l_1$ and $x_2 \in l_2$, then $id$ is a ID-function if and only if
+Given two lines $l_1, l_2\in R$ and two arrays, $x_1\in l_1$ and $x_2 \in l_2$, then $id$ is an ID-function if and only if
 \begin{align*}
     id(x_1) = id(x_2) \Leftrightarrow x_1 \stackrel{pos}{=} x_2
 \end{align*}
 \end{definition}
 
-When iterating through a log file from top to bottom IDs can be generated by keeping a mapping from locations to IDs and from addresses to IDs, and by \emph{forgetting} addresses when a \texttt{hash\_init} line is observed.
+When iterating through a log file from top to bottom, IDs can be generated by keeping a mapping from locations to IDs and from addresses to IDs, and by \emph{forgetting} addresses when a \texttt{hash\_init} line is observed.
 
 \subsection{Determining type}
-Determining the type of every positionally distinct array is done by first determining the key type, $t\in T$, then determining the type of the values, and from this deduce the type as either List, Map or Object as defined in the beginning of this chapter. Since an array can change type during a program, the type of the keys is more accurately a set of types. If an array is observed with different key types throughout the analysis, then the key type of the array is the set of these types. E.g, let an array be observed at one point with type List and later with type Sparse List, then the type of the array is $\{$List, Sparse List$\}$.
+Determining the type of every positionally distinct array is done by first determining the key type, $t\in T$, then determining the type of the values, and from this deduce the type as either list, map or object as defined in the beginning of this chapter. Since we want to test the hypothesis of whether an array-type changes, the type of the keys is a set of types. If an array is observed with different key types throughout the analysis, then the key type of the array is the set of these types. E.g, let an array be observed at one point with type list and later with type sparse list, then the type of the array is $\{$List, Sparse List$\}$.
 
 Detecting the key type for each array is done by traversing the file from top to bottom inspecting each line. If a line contains an array $a$ the type of the line is associated with the corresponding ID of the array.
 
