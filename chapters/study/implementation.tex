@@ -77,12 +77,12 @@ Detecting the key type for each array is done by traversing the file from top to
 
 Detecting the type of values is also done by traversing through the log file from top to bottom. Here the reads and writes from and to the arrays are used to determine the types of the values. This is done by associating all the types of the values read/written with the respective array. 
 
-For every array with key and value type information, it is now possible to determine whether it is a list, map, object or uncategorizable. Given an array, $a$, with type information, if $a$ has multiple key types, it is considered uncategorizable. Else if $a$ contains values of a single type, it is either a map or a list, depending on the key type. If the values have multiple types, then $a$ is an object.
+For every array with key and value type information, it is now possible to determine whether it is a list, map, object or uncategorizable. Given an array, $a$, with type information, if $a$ has multiple key types, it is considered uncategorizable. Otherwise if $a$ contains values of a single type, it is either a map or a list, depending on the key type. If the values have multiple types, then $a$ is an object.
 
-When the types of the arrays are determined, we can analyse the operations used with each type of array. This is done by once again iterating through the log file and associating line types with the type of the arrays.
+When the types of the arrays are determined, we can analyse the operations used with each type of array. This is done by once again iterating through the log file and associating line types with the types of the arrays.
 
 \subsection{Compiling and running PHP with logging}
-For the purpose of the dynamic analysis, Vagrant\footnote{\url{http://vagrantup.com/}} is used to create a clean and reproducible environment. A Vagrant initialization file\footnote{\url{http://github.com/Silwing/tapas-survey}} is used to setup a virtual machine running a 64-bit Ubuntu 14.04, install the necessary dependencies and compile the modified PHP Interpreter. The environment for running the corpus test suites is then ready and can be accessed via SSH on the virtual machine. The folder \texttt{/vagrant/corpus} contains a Makefile which can be used to fetch dependencies and corpus frameworks as well as running all the test suites.
+The source code needed to compile and run the modified PHP interpreter can be found at \url{http://github.com/Silwing/tapas}. For the purpose of the dynamic analysis, Vagrant\footnote{\url{http://vagrantup.com/}} is used to create a clean and reproducible environment. A Vagrant initialization file is used to setup a virtual machine running a 64-bit Ubuntu 14.04, install the necessary dependencies and compile the modified PHP Interpreter. The environment for running the corpus test suites is then ready and can be accessed via SSH on the virtual machine. The folder \texttt{/vagrant/corpus} contains a Makefile which can be used to fetch dependencies and corpus frameworks as well as running all the test suites.
 
 All modifications to the interpreter are guarded by an ini-directive\citeB[Chapter~14.12]{programmingphp} that is disabled by default when compiling and running the modified interpreter source. The logging can be enabled via \texttt{php.ini} or for single runs as seen in figure \ref{fig:iniDirective}
 
@@ -101,7 +101,7 @@ rb.enable_debug_file="/path/to/output/csv/file"
 \end{lstlisting}
 \caption{Enable logging in php.ini.}
 \end{subfigure}
-\caption{How-to enable logging}
+\caption{How to enable logging}
 \label{fig:iniDirective}
 \end{figure}
 
@@ -110,11 +110,11 @@ rb.enable_debug_file="/path/to/output/csv/file"
 Since the analysis is performed by a modified interpreter, there are some imposed limitations on the achievable precision. 
 
 \begin{itemize}
-\item  \texttt{array\_init} does not capture the type of the array at initialization. This implies that the type of arrays initialized without being assigned or manipulated afterwards are not captured by the analysis. In figure \ref{lst:dis_code} line \ref{line:print}, the call to \texttt{print\_r} does yield an \texttt{array\_init} line in the log \ref{lst:dis_code_out} but with no type, depth 1 and size 0. The size should be 3 and the type List.
+\item  \texttt{array\_init} does not capture the type of the array at initialization. This implies that the types of arrays initialized without being assigned or manipulated afterwards are not captured by the analysis. In figure \ref{lst:dis_code} line \ref{line:print}, the call to \texttt{print\_r} does yield an \texttt{array\_init} line in the log \ref{lst:dis_code_out} but with no type, depth 1 and size 0. The size should be 3 and the type should be list.
 
-\item Detecting the type of arrays relies on the type of the values read from or written to the arrays. This implies that there is no reasoning about arrays never read or written. Some of these arrays may fall into the uncategorized category but remain undetected by the analysis.
+\item Detecting the type of arrays relies on the type of the values read from or written to the arrays. This implies that there is no reasoning about arrays never being read or written. Some of these arrays may fall into the uncategorizable type but remain undetected by the analysis.
 
-\item Callables can be written as anonymous functions, strings, or arrays containing either an instance or a string representing a class name together with string represent a function name. Arrays of callables should be considered lists however this analysis will classify them as objects. Example \ref{lst:callables} shows different types of callables.
+\item Callables can be written as anonymous functions, strings, or arrays containing either an instance or a string representing a class name together with string representing a function name. Arrays of callables should be considered lists, however this analysis will classify them as objects. Program \ref{lst:callables} shows different types of callables.
 
 \begin{program}
 \centering
@@ -144,7 +144,7 @@ $callable4 = function() use ($a){
 \label{lst:callables}
 \end{program}
 
-\item Multiple operations of the same type on different arrays leads to sharing of IDs. Following the limited information available to distinguish operations, operations such as assign to an multidimensional array leads to sharing it between the array and its sub-arrays, (see figure \ref{lst:dis_code} line \ref{line:assign}). This follows from the value first being assigned to the sub-array which then is assigned to the super-array. Combining multiple arrays may lead to uncategorizable arrays even if each array is categorizable. A possible solution would be if the interpreter kept character location information in addition to line number and file name.   
+\item Multiple operations of with the same type using different arrays lead to sharing of IDs. Following the limited information available to distinguish between operations, operations such as assign to an multidimensional array leads to sharing the ID between the array and its sub-arrays, (see figure \ref{lst:dis_code} line \ref{line:assign}). This follows from the value first being assigned to the sub-array, which is then assigned to the super-array. Combining multiple arrays may lead to uncategorizable arrays even if each array is categorizable. A possible solution would be if the interpreter kept character location information in addition to line number and file name.   
 
 \end{itemize}
 
