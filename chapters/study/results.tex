@@ -1,10 +1,70 @@
 \section{Results}
 \label{sec:analysisResults}
-\todo{Add something about file sizes of log-files}
-Table \ref{tab:cyclic_arrays} shows that across all frameworks in the corpus less than 1\% (column 5) of the arrays are detected as being cyclic. Cyclic arrays can only be created by using the the PHP reference operator, \texttt{\&}, which must be used explicitly. Since PHP by default copies values on assignment cyclic arrays can not be created by simple assignments\todo{Not true. How is this relevant}. The largest amount of cyclic arrays detected in the corpus is in PhpMyAdmin with a total of 10 cyclic arrays out of 3,373 identified arrays. By assuming that arrays are acyclic, the static analysis would not have to take recursive types into consideration \todo{Not true, it might coincidentally. Rewrite}. Since so few cyclic arrays were found a manual inspection of the code locations of the findings was possible. The manual inspection showed that almost all of the reported cyclic arrays are uses of the superglobal \texttt{\$GLOBALS} which is an array consisting of all variables defined in the global scope. This array also has a reference to itself which makes it a cyclic array. Only two of the frameworks in the corpus had cases where it was not immediately clear whether it was a use of the \texttt{\$GLOBALS} array: Zend Framework 2 and Symfony, these are noted in column 4 as ``NG Cyclic'' arrays. These few cases are function input parameters reported as cyclic which might in fact be the \texttt{\$GLOBALS} array passed to the function. The \texttt{\$GLOBALS} array is a special case to handle \todo{How is it a special case?} even without taking its cyclic structure into account, so uses of this array can be disregarded when considering cyclic arrays \todo{How can it be disregarded?}. Based on the results of the manual inspection the hypothesis of arrays being acyclic is true for almost all frameworks in the corpus. \todo{Write about how no creation of cyclic arrays has been observed}.
+Running the modified interpreter on the corpus created large log files, ranging from 41 MB to 13 GB in size. Most of the entries in the log-files were created by the test framework or other dependencies, i.e.\ not by the framework is question. These entries were removed before analysing the logs reducing the file-sizes to between 3.4 MB and 11 GB.
 
-\begin{table}[htbp]
-\begin{center}
+Figure \ref{fig:array_types} and table \ref{tab:array_types} shows the distribution of array types for the frameworks.  Between 4\% and 12\% of the arrays are uncategorizable. These include false uncategorizables originating from flaws in the array identification as discussed in section \ref{sec:limitations}. One of these were regarding the imprecision w.r.t.\ multidimensional arrays. A quick inspection of some of the code-locations containing uncategorizable arrays did show that many of these were in-fact caused by performing operations on multidimensional arrays.
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{chapters/study/g22.png}
+\caption{Distribution of different types of arrays}
+\label{fig:array_types}
+\end{figure}
+
+\begin{table}
+\centering
+\resizebox{\textwidth}{!}{\begin{tabular}{l | c c c c c c c}
+    &   List    &   Map &   Sparse List &   Object  &   Object (L)   &   Object (SL)   &   Uncategorizable \\
+\hline \hline
+Code Igniter    &   39.66\% &   36.21\% &   2.59\%  &   12.93\% &   2.59\%  &   0.00\%  &   6.03\% \\
+Joomla          &   30.78\% &   39.13\% &	2.17\%	&   20.02\% &	3.66\%	&   0.11\%  &   4.12\% \\
+Magento 2	    &   23.54\% &   46.51\% &	3.38\%	&   17.93\% &	2.63\%	&   0.70\%  &   	5.30\% \\
+MediaWiki	    &   32.48\%	&   32.23\% &	2.69\%	&   15.60\% &	8.20\%	&   0.49\%  &   	8.32\% \\
+Part	        &   33.33\%	&   39.10\% &	0.00\%	&   12.82\% &	5.77\%	&   0.00\%  &   	8.97\% \\
+phpBB	        &   27.13\%	&   33.33\% &	3.17\%	&   25.11\% &	4.33\%	&   0.14\%  &   	6.78\% \\
+PhpMyAdmin	    &   33.24\%	&   33.43\% &	2.09\%	&   14.06\% &	5.89\%	&   0.38\%  &   	10.92\% \\
+Symfony	        &   34.32\%	&   28.01\% &	1.99\%	&   14.86\% &	8.63\%	&   0.21\%  &   	11.99\% \\
+WordPress	    &   35.50\%	&   33.03\% &	2.02\%	&   14.11\% &	6.61\%	&   0.45\%  &   	8.29\% \\
+Zend Framework 2&	30.99\%	&   35.07\% &	1.08\%	&   19.78\% &	6.25\%	&   0.00\%  &   	6.82\% 
+\end{tabular}}
+\caption{Distribution of different array types}
+\label{tab:array_types}
+\end{table}
+
+
+Figure \ref{fig:type_operations} shows the distribution of operations on the arrays over the different array types from figure \ref{fig:array_types}. Write and append correspond to the language features for writing to arrays:
+\begin{lstlisting}
+$a = [];
+$a[0] = 42; // array write
+$a[] = 1337; // array append
+\end{lstlisting}
+these are by far the most used. The library function \texttt{array\_push} is equivalent to the append operation if given only a single argument. The documentation recommends the append operation in such situations for performance reasons, which aligns with the use of append over push in the figure. 
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{chapters/study/g12.png}
+\caption{Distribution of array operations over array types}
+\label{fig:type_operations}
+\end{figure}
+
+Notice how the objects are divided into three categories, Object, Object (List), and Object (Sparse List).  The last two are arrays with values of different types, but the keys of lists and sparse lists respectively. The distribution of array operations shows that array list operations almost exclusively are performed on lists (List, Sparse List, Object List, Object Sparse List). From this follows that if an list array-operation is performed on an array, then it is almost certain that the array is of type list. When encountering an array write operation it is not necessary the case that the array is a list. Array write operations are used frequently on lists, arrays, and objects.
+
+
+%The operation on arrays of map and object type consists almost entirely of write operations, whereas arrays of type list have some write operation but mostly append operations. 
+
+
+
+%The Object group marked with List is by definition \ref{def:object} categorized as objects, but they might fit better into the List category, as lists of a top level type \todo{What is a top-level type?}. Whereas string writes are good predictors for map type arrays and appending and list array functions are good predictors for list type arrays, no predictors have been found for the object type arrays. Without any predictors for an object-like array type it is not possible to define uses and misuses of such a structure. Instead the object-like array type can be absorbed partly by the list type and partly by the map type. \todo{Introduce notion predictors, elaborate section}
+
+
+%The distribution of operations support the claim that the List-marked objects fit better into the list category than the object category, since multiple list operations are frequently used with these arrays. \todo{Is this all we can state about the objects?}
+
+
+Table \ref{tab:cyclic_arrays} shows that across the corpus less than 1\% (column 5) of the arrays are detected as being cyclic. The largest percentage of cyclic arrays detected in the corpus is in phpMyAdmin with a total of 10 cyclic arrays out of 3,373 identified arrays. With such relatively few cyclic arrays were found, a manual inspection of the code locations was possible. The manual inspection showed that almost all of the reported cyclic arrays are uses of the super-global \texttt{\$GLOBALS} which is an array consisting of all variables defined in the global scope. This array also has a reference to itself which makes it a cyclic array. Only two of the frameworks in the corpus had cases where it was not immediately clear whether it was a use of the \texttt{\$GLOBALS} array: Zend Framework 2 and Symfony, these are noted in column 4 as ``NG Cyclic'' arrays. These few cases are function input parameters reported as cyclic which might in fact be the \texttt{\$GLOBALS} array passed to the function. The fact that no creation of cyclic arrays were found supports this theory.
+
+\begin{table}
+\centering
+
 \begin{tabular}{l| r  r  r  r}
 Framework & \# Arrays & \# Cyclic & \# NG Cyclic & \%  \\ \hline \hline
 Code igniter & 331 & 0 & 0 & 0.0\% \\
@@ -18,60 +78,10 @@ Symfony & 3707 & 6 & 6 & 0.2\%\\ %Ten found when running program, but only six w
 Wordpress & 3054 & 1 & 0 & <0.1\%\\ 
 Zend Framework 2 & 4381 & 3 & 2 & 0.1\%
 \end{tabular}
-\end{center}
+
 \caption{Amount of cyclic arrays detected in the corpus}
 \label{tab:cyclic_arrays}
 \end{table}
 
-Figure \ref{fig:array_types} shows the distribution of array types for the frameworks.  Between 4\% and 12\% of the arrays are uncategorizable. These include false uncategorizables originating from flaws in the array identification as discussed in section \ref{sec:limitations}. If multiple categorizable arrays from different categories are identified as a single array the combined array ends up in the uncategorizable part of the distribution.
+Based on the results of the manual inspection the hypothesis of arrays being acyclic is mostly true for all frameworks in the corpus. It is however also the case that every PHP program has at least one cyclic array in its scope, namely the \texttt{\$GLOBALS} array, therefor the analysis should support handling and creation of such arrays.
 
-The Object group marked with List is by definition \ref{def:object} categorized as objects, but they might fit better into the List category, as lists of a top level type \todo{What is a top-level type?}. Whereas string writes are good predictors for map type arrays and appending and list array functions are good predictors for list type arrays, no predictors have been found for the object type arrays. Without any predictors for an object-like array type it is not possible to define uses and misuses of such a structure. Instead the object-like array type can be absorbed partly by the list type and partly by the map type. \todo{Introduce notion predictors, elaborate section}
-
-\begin{table}[htbp]
-\begin{adjustbox}{center}
-\begin{tabular}{l | c c c c c c c}
-    &   List    &   Map &   Sparse List &   Object  &   Object (L)   &   Object (SL)   &   Uncategorizable \\
-\hline \hline
-Code Igniter    &   39.66\% &   36.21\% &   2.59\%  &   12.93\% &   2.59\%  &   0.00\%  &   6.03\% \\
-Joomla          &   30.78\% &   39.13\% &	2.17\%	&   20.02\% &	3.66\%	&   0.11\%  &   4.12\% \\
-Magento 2	    &   23.54\% &   46.51\% &	3.38\%	&   17.93\% &	2.63\%	&   0.70\%  &   	5.30\% \\
-MediaWiki	    &   32.48\%	&   32.23\% &	2.69\%	&   15.60\% &	8.20\%	&   0.49\%  &   	8.32\% \\
-Part	        &   33.33\%	&   39.10\% &	0.00\%	&   12.82\% &	5.77\%	&   0.00\%  &   	8.97\% \\
-phpBB	        &   27.13\%	&   33.33\% &	3.17\%	&   25.11\% &	4.33\%	&   0.14\%  &   	6.78\% \\
-PhpMyAdmin	    &   33.24\%	&   33.43\% &	2.09\%	&   14.06\% &	5.89\%	&   0.38\%  &   	10.92\% \\
-Symfony	        &   34.32\%	&   28.01\% &	1.99\%	&   14.86\% &	8.63\%	&   0.21\%  &   	11.99\% \\
-WordPress	    &   35.50\%	&   33.03\% &	2.02\%	&   14.11\% &	6.61\%	&   0.45\%  &   	8.29\% \\
-Zend Framework 2&	30.99\%	&   35.07\% &	1.08\%	&   19.78\% &	6.25\%	&   0.00\%  &   	6.82\% 
-\end{tabular}
-\end{adjustbox}
-\caption{Distribution of different array types}
-\label{tab:array_types}
-\end{table}
-
-% There might be a problem with our classification. E.g. the groups decided to be objects are prob. not objects, but really lists with different type. It might be an idea to go through the groups and analyse. The only "real" objects are maps (what is callables then? Special case?). If it is the case that the M lists are in fact S lists, then we may make the assumption that when a list is observed, it has the same type and really doesn't change over time. We need however to keep track of key -> type of maps, since they may prove to be objects rather than maps. A further study on how the depth/size changes for each group would be nice.  
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{chapters/study/g22.png}
-\caption{Distribution of different types of arrays}
-\label{fig:array_types}
-\end{figure}
-
-Figure \ref{fig:type_operations} shows the distribution of operations on the arrays over the different array types from figure \ref{fig:array_types}. Write and append correspond to the language features for writing to arrays:
-
-\begin{lstlisting}
-$a = [];
-$a[0] = 42; // array write
-$a[] = 1337; // array append
-\end{lstlisting}
-These operations are by far the most used. The library function \texttt{array\_push} is equivalent to the append operation if given only a single argument. The documentation recommends the append operation in such situations for performance reasons, which aligns with the use of append over push in the figure. The operation on arrays of map and object type consists almost entirely of write operations, whereas arrays of type list have some write operation but mostly append operations. This indicates that append is a good predictor for arrays in the list category. \todo{Repetition?}
-
-The distribution of operations support the claim that the List-marked objects fit better into the list category than the object category, since multiple list operations are frequently used with these arrays. \todo{Is this all we can state about the objects?}
-
-\todo{Rewrite}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{chapters/study/g12.png}
-\caption{Distribution of array-changing operations over array types}
-\label{fig:type_operations}
-\end{figure}

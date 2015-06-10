@@ -29,7 +29,6 @@ and for every $e_1, e_2\in E_{Sum}$
 e_1 \sqsubseteq_{Sum} e_2 \Leftrightarrow (x \sqsubseteq_i y \wedge e_1 = (x,i) \wedge e_2 = (y,i)) \vee e_2 = \top \vee e_1 = \bot
 \end{align}
 \end{definition}
-\todo{Lemma: $L_{Sum}$ is a lattice. }
 
 \begin{definition}
 The product of two lattices,  $L_1 = (E_1, \sqsubseteq_1)$ and $L_2 = (E_2, \sqsubseteq_2)$, are defined as 
@@ -46,7 +45,6 @@ and for every $(x_1, x_2), (y_1, y_2)\in E_{Prod}$
 e_1 \sqsubseteq e_2 \Leftrightarrow x_1 \sqsubseteq_1 y_1 \wedge x_2 \sqsubseteq_2 y_2
 \end{align}
 \end{definition}
-\todo{Lemma: $L_{Prod}$ is a lattice. }
 
 
 \begin{definition}
@@ -62,10 +60,8 @@ and for two elements $e_1, e_2 \in E_{Map}$,
 \begin{align}
 e_1 \sqsubseteq_{Map} e_2 \Leftrightarrow \forall a\in A:\; e_1(a) \sqsubseteq e_2(a)
 \end{align}
-\todo{Introduce reading set of locations from heap}
 
 \end{definition}
-\todo{Lemma: $L_{Map}$ is a lattice. }
 
 
 \begin{definition}
@@ -83,4 +79,3 @@ e_1 \sqsubseteq_P e_2 \Leftrightarrow e_1 \subseteq e_2
 \end{align}
 
 \end{definition}
-\todo{Lemma: $P(A)$ is a lattice. }
