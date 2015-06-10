@@ -20,7 +20,7 @@ function isMinimumDay($day, $month, $year, $required, $minDay) {
         $errors[] = "The date is required";
 
     $result = isValidDate($day, $month, $year);
-    $errors = array_merge($errors, $result);
+    $errors = array_merge($errors, $result); %* \label{line:dateValidation-1} *)
 
     if($minDay > $day)
         $errors[] = "The day should at least be " . $minDay;
@@ -45,7 +45,7 @@ Running the analysis on the program yields a single error, illustrated as figure
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{chapters/caseStudy/newScreens/validateDay}
-\caption{Running the analysis on date validation example \todo{new figure} }
+\includegraphics[width=0.9\textwidth]{chapters/caseStudy/screens/date}
+\caption{Running the analysis on date validation example}
 \label{fig:dateScreenshot}
 \end{figure}

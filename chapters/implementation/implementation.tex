@@ -16,6 +16,7 @@ The transfer functions are implemented notoriously as introduced in section \ref
 \item Appending on possible map yields a warning
 \item Writing to a possible string key on a list yields a warning
 \end{itemize}
+\todo{Write better list and check string-write}
 
 Solving the data-flow equations of the Monotone Framework are performed by an implementation of the worklist algorithm (Algorithm \ref{algo:worklist}). Notice that, since $\iota \not\sqsubseteq \bot$, any reachable node is bound to be analysed at least once. 
 

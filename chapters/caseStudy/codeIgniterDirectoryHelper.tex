@@ -17,11 +17,11 @@ function directory_map($source_dir, $directory_depth)
         {
             if (($directory_depth < 1 || $new_depth > 0) && is_dir($source_dir.$file))
             {
-                $filedata[$file] = directory_map($source_dir.$file, $new_depth);
+                $filedata[$file] = directory_map($source_dir.$file, $new_depth); %* \label{line:directoryMap-1} *)
             }
             else
             {
-                $filedata[] = $file;
+                $filedata[] = $file; %* \label{line:directoryMap-2} *)
             }
         }
         closedir($fp);
@@ -51,19 +51,19 @@ The analysis raises three warnings on two code-locations. Just as the previous c
 \centering
 \begin{subfigure}{\textwidth}
 \centering
-\includegraphics[width=\textwidth]{chapters/caseStudy/newScreens/dirmap1}
+\includegraphics[width=0.9\textwidth]{chapters/caseStudy/screens/dir1}
 \subcaption{Writing with string on list and type mismatch}
 \label{fig:directoryScreenshot1}
 
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \centering
-\includegraphics[width=\textwidth]{chapters/caseStudy/newScreens/dirmap2}
+\includegraphics[width=0.9\textwidth]{chapters/caseStudy/screens/dir2}
 \subcaption{Appending a string and type mismatch}
 \label{fig:directoryScreenshot2}
 
 \end{subfigure}
-\caption{Running analysis on \texttt{directory\_map} \todo{Crop figures}}
+\caption{Running analysis on \texttt{directory\_map}}
 \label{fig:directoryScreenshot}
 \end{figure}
 

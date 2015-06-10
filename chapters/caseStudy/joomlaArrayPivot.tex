@@ -27,7 +27,7 @@ function pivot($source)
         $resultKey = $source[$i];
         $resultValue = $i;
 
-        if (array_key_exists($resultKey, $counter))
+        if (array_key_exists($resultKey, $counter)) %* \label{line:pivot-1} *)
         {
             $result[$resultKey] = $resultValue;
             $counter[$resultKey] = 1;
@@ -60,13 +60,13 @@ While PHP supports coercion between many of native types, there is no such thing
 \centering
 \begin{subfigure}{\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/pivot1}
+\includegraphics[width=0.9\textwidth]{chapters/caseStudy/screens/pivot1}
 \subcaption{Array write with different values}
 \label{fig:pivotScreenshot1}
 \end{subfigure}
 \begin{subfigure}{\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/pivot2}
+\includegraphics[width=0.9\textwidth]{chapters/caseStudy/screens/pivot2}
 \subcaption{Array append on non-array}
 \label{fig:pivotScreenshot2}
 \end{subfigure}

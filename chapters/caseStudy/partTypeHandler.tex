@@ -51,8 +51,8 @@ function createInstance($string, $instance, $value)
     } else if(($k = array_search($instance, $keyArray[$string], true)) !== false){
         return $valueArray[$string][$k];
     }
-    $keyArray[$string][] = $instance;
-    return $valueArray[$string][] = $value;
+    $keyArray[$string][] = $instance; %* \label{line:typeHandler-1} *)
+    return $valueArray[$string][] = $value;  %* \label{line:typeHandler-2} *)
 }
 createInstance("test", "test2", "testValue");
 \end{lstlisting}
@@ -70,18 +70,18 @@ Two library functions are used in the program; \texttt{array\_key\_exists}, mode
 
 \begin{subfigure}{\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/instance1}
+\includegraphics[width=0.9\textwidth]{chapters/caseStudy/screens/part1}
 \subcaption{Appending on map: \texttt{\$keyArray}}
 \label{fig:typeHandlerScreenshot-1}
 \end{subfigure}
 
 \begin{subfigure}{\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{chapters/caseStudy/newScreens/instance2}
+\includegraphics[width=0.9\textwidth]{chapters/caseStudy/screens/part2}
 \subcaption{Appending on map: \texttt{\$valueArray}}
 \label{fig:typeHandlerScreenshot-2}
 \end{subfigure}
 
-\caption{Running analysis on \texttt{createInstance} \todo{newScreenshots}}
+\caption{Running analysis on \texttt{createInstance}}
 \label{fig:typeHandlerScreenshot}
 \end{figure}

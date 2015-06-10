@@ -8,11 +8,11 @@ Program \ref{lst:monthsNoError} first define an list-array of month names, \text
 \begin{lstlisting}
 <?php
 
-$monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-$monthMap = [];
+$monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %* \label{line:mne-1} *)
+$monthMap = []; %* \label{line:mne-2} *)
 
 for($i = 1; $i <= 12; $i++) {
-	$monthMap[array_pop($monthNames)] = $i;
+	$monthMap[array_pop($monthNames)] = $i; %* \label{line:mne-3} *)
 }
 $input = $_GET["monthName"];
 
