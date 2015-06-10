@@ -16,7 +16,7 @@ Figure \ref{fig:array_types} and table \ref{tab:array_types} shows the distribut
 \resizebox{\textwidth}{!}{\begin{tabular}{l | c c c c c c c}
     &   List    &   Map &   Sparse List &   Object  &   Object (L)   &   Object (SL)   &   Uncategorizable \\
 \hline \hline
-Code Igniter    &   39.66\% &   36.21\% &   2.59\%  &   12.93\% &   2.59\%  &   0.00\%  &   6.03\% \\
+CodeIgniter    &   39.66\% &   36.21\% &   2.59\%  &   12.93\% &   2.59\%  &   0.00\%  &   6.03\% \\
 Joomla          &   30.78\% &   39.13\% &	2.17\%	&   20.02\% &	3.66\%	&   0.11\%  &   4.12\% \\
 Magento 2	    &   23.54\% &   46.51\% &	3.38\%	&   17.93\% &	2.63\%	&   0.70\%  &   	5.30\% \\
 MediaWiki	    &   32.48\%	&   32.23\% &	2.69\%	&   15.60\% &	8.20\%	&   0.49\%  &   	8.32\% \\
@@ -60,17 +60,17 @@ Notice how the objects are divided into three categories, Object, Object (List),
 %The distribution of operations support the claim that the List-marked objects fit better into the list category than the object category, since multiple list operations are frequently used with these arrays. \todo{Is this all we can state about the objects?}
 
 
-Table \ref{tab:cyclic_arrays} shows that across the corpus less than 1\% (column 5) of the arrays are detected as being cyclic. The largest percentage of cyclic arrays detected in the corpus is in phpMyAdmin with a total of 10 cyclic arrays out of 3,373 identified arrays. With such relatively few cyclic arrays were found, a manual inspection of the code locations was possible. The manual inspection showed that almost all of the reported cyclic arrays are uses of the super-global \texttt{\$GLOBALS} which is an array consisting of all variables defined in the global scope. This array also has a reference to itself which makes it a cyclic array. Only two of the frameworks in the corpus had cases where it was not immediately clear whether it was a use of the \texttt{\$GLOBALS} array: Zend Framework 2 and Symfony, these are noted in column 4 as ``NG Cyclic'' arrays. These few cases are function input parameters reported as cyclic which might in fact be the \texttt{\$GLOBALS} array passed to the function. The fact that no creation of cyclic arrays were found supports this theory.
+Table \ref{tab:cyclic_arrays} shows that across the corpus less than 1\% (column 5) of the arrays are detected as being cyclic. The largest percentage of cyclic arrays detected in the corpus is in phpMyAdmin with a total of 10 cyclic arrays out of 3,373 arrays identified. With such relatively few cyclic arrays found, a manual inspection of the code locations was possible. The manual inspection showed that almost all of the reported cyclic arrays are uses of the super-global \texttt{\$GLOBALS} which is an array consisting of all variables defined in the global scope. This array also has a reference to itself which makes it a cyclic array. Only two of the frameworks in the corpus had cases where it was not immediately clear whether it was a use of the \texttt{\$GLOBALS} array: Zend Framework 2 and Symfony 2; these are noted in column 4 as ``NG Cyclic'' arrays. These few cases are function input parameters reported as cyclic, which might in fact be the \texttt{\$GLOBALS} array passed to the function. The fact that no creation of cyclic arrays were found supports this theory.
 
 \begin{table}
 \centering
 
 \begin{tabular}{l| r  r  r  r}
 Framework & \# Arrays & \# Cyclic & \# NG Cyclic & \%  \\ \hline \hline
-Code igniter & 331 & 0 & 0 & 0.0\% \\
+CodeIgniter & 331 & 0 & 0 & 0.0\% \\
 Joomla & 1969 & 2 & 0 & 0.1\% \\ 
 Magento2 & 6942 & 0 & 0 & 0.0\%\\ 
-Mediawiki & 27368 & 1 & 0 & <0.1\%\\ 
+MediaWiki & 27368 & 1 & 0 & <0.1\%\\ 
 Part & 378 & 0 & 0 & 0.0\%\\ 
 phpBB & 2529 & 1 & 0 & <0.1\%\\
 PhpMyAdmin & 3373 & 10 & 0 & 0.3\%\\
@@ -83,5 +83,5 @@ Zend Framework 2 & 4381 & 3 & 2 & 0.1\%
 \label{tab:cyclic_arrays}
 \end{table}
 
-Based on the results of the manual inspection the hypothesis of arrays being acyclic is mostly true for all frameworks in the corpus. It is however also the case that every PHP program has at least one cyclic array in its scope, namely the \texttt{\$GLOBALS} array, therefor the analysis should support handling and creation of such arrays.
+Based on the results of the manual inspection, the hypothesis of arrays being acyclic is mostly true for all frameworks in the corpus. It is, however, also the case that every PHP program has at least one cyclic array in its scope, namely the \texttt{\$GLOBALS} array, therefore the analysis should support handling and creation of such arrays.
 
