@@ -74,9 +74,40 @@ While PHP supports coercion between many of native types, there is no such thing
 \label{fig:pivotScreenshot}
 \end{figure}
 
-Notice how both warnings occurs as side-effects of the real problem, namely the type of the content. In practice the sub-array always contains integers (not arrays and integers) and the append operation is always performed on a number. The real problem is however not captured by the analysis. This happens when the branches of the if-statement meets. Here the analysis preforms a join of the analysis lattice element, hence a join of the lattice element representing the abstract value of \texttt{\$result} array. For the first iteration of the for-loop, the first branch of the if statement on line \ref{line:pivot-1} would express the array as a list of integers, while the second branch as a list of lists containing integers. A warning on a join of these opposing representations could be implemented, but is currently not supported by the analysis.
+Notice how both warnings occurs as side-effects of the real problem, namely the type of the content. In practice the sub-array always contains integers (not arrays and integers) and the append operation is always performed on a number. The real problem is however not captured by the analysis. This happens when the branches of the if-statement meets. Here the analysis preforms a join of the analysis lattice element, hence a join of the lattice element representing the abstract value of \texttt{\$result} array. For the first iteration of the for-loop, the first branch of the \texttt{if}-statement on line \ref{line:pivot-1} would express the array as a list of integers, while the second branch as a list of lists containing integers. A warning on a join of these opposing representations could be implemented, but is currently not supported by the analysis.
 
+By rewriting the program to always returning a list of lists (see program \ref{lst:pivotFixed}) the specification must be changed, but the warnings will disappear. While the number of lines isn't a useful metric for quality, the program is nine lines shorter and definitely easier to understand due to a lower number of branches and variables, i.e.\ an \texttt{if}-statement and the use of the \texttt{\$counter} array has been removed.
 
+\begin{program}
+\begin{lstlisting}
+<?php
 
+function pivot($source)
+{
+    $result = array();
+
+    for ($i = 0; $i < count($source); $i++)
+    {
+        $resultKey = $source[$i];
+        $resultValue = $i;
+
+        if (!array_key_exists($resultKey, $resultKey))
+        {
+            $result[$resultKey] = [$resultValue];
+        } else {
+            $result[$resultKey][] = $resultValue;
+        }
+
+    }
+
+    return $result;
+}
+
+$simpleArr = [1,2,3,4,5,6,7,8,1,5,3,7,9,0,4,2,5,8,4,3,8,9];
+$result = pivot($simpleArr);
+\end{lstlisting}
+\caption{Fixed pivot example}
+\label{lst:pivotFixed}
+\end{program}
 
 %\todo{array write warning does not consider possible null values since that will cause false positives}

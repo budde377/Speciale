@@ -41,7 +41,7 @@ The program uses two library functions; \texttt{checkdate} and \texttt{array\_me
 
 %The difference from the previous example is that the mixing occurs in a library function \texttt{array\_merge}. Each library function has transfer function which implements an abstract version of that particular function. The \texttt{array\_merge} abstract function also detects possible merges of different types of arrays and warns the user like shown in figure \ref{fig:dateScreenshot}.
 
-Running the analysis on the program yields a single error, illustrated as figure \ref{fig:dateScreenshot}. As opposed to the previous cases, this error is reflecting the main problem, namely the merge of a list and a map. Whether the issue is caused by the lack of specification of the \texttt{isValidDate} function or is as designed, is not known, but it could be resolved by converting the map to a list e.g. using the \texttt{array\_values} library function, or replacing append with write operations.
+Running the analysis on the program yields a single error, illustrated as figure \ref{fig:dateScreenshot}. As opposed to the previous cases, this error is reflecting the main problem, namely the merge of a list and a map. Whether the issue is caused by the lack of specification of the \texttt{isValidDate} function or is as designed, is not known.
 
 \begin{figure}
 \centering
@@ -49,3 +49,39 @@ Running the analysis on the program yields a single error, illustrated as figure
 \caption{Running the analysis on date validation example}
 \label{fig:dateScreenshot}
 \end{figure}
+
+
+Assuming that the error occurs due to incorrect assumptions regarding the return value of \texttt{isValidDate}, the problem can be resolved by converting the map to a list. This is done in program \ref{lst:dateValidationFixed} using the \texttt{array\_values} library function. Running the analysis on this raises no errors or warnings.
+
+
+\begin{program}
+\begin{lstlisting}
+<?php
+
+function isValidDate($day, $month, $year) {
+    $errors = [];
+    if(!checkdate($month, $day, $year))
+        $errors["invalidDate"] = "The given date is not valid";
+
+    return $errors;
+}
+
+function isMinimumDay($day, $month, $year, $required, $minDay) {
+    $errors = [];
+    if($required && $day == 0 && $month == 0 && $year == 0)
+        $errors[] = "The date is required";
+
+    $result = isValidDate($day, $month, $year);
+    $errors = array_merge($errors, array_values($result));
+
+    if($minDay > $day)
+        $errors[] = "The day should at least be " . $minDay;
+
+    return $errors;
+}
+$valid = isMinimumDay(27, 5, 2015, true, 6);
+$invalid = isMinimumDay(1, 3, 1991, true, 5);
+\end{lstlisting}
+\caption{Date validation example}
+\label{lst:dateValidationFixed}
+\end{program}

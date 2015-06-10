@@ -37,8 +37,28 @@ echo "The people have the following animals: " . $animalString;
 While the \texttt{\$arrayMap} might seem suspicious, it can be considered a map and is 
 correctly classified as such by the analysis. An error first occur when an 
 \texttt{array\_pop} function is executed on the map, see figure \ref{fig:arrayPopScreenshot}, which just as 
-array append operations is considered, by the analysis, only to be performed on lists. The error could be 
-resolved by not adding the \texttt{", "} strings to the animal-map, and imploding with \texttt{", "} instad of the empty string on line \ref{line:arrayPopExample-1}. This would also prevent dependence on the order of the array.
+array append operations is considered, by the analysis, only to be performed on lists. 
+
+The error could be resolved by not adding the \texttt{", "} strings to the animal-map, and imploding with \texttt{", "} instead of the empty string on line \ref{line:arrayPopExample-1}. This would also prevent dependence on the iteration-order of the array. The corrected program is illustrated as program \ref{lst:arrayPopExampleFixed}.
+
+\begin{program}
+\begin{lstlisting}
+<?php
+
+$people = ["John", "Jane", "Alice", "Bob"];
+$animals = ["Dog", "Cat", "Bird", "Fish"];
+$animalMap = [];
+
+for($i = 0; $i < count($people); $i++) {
+    $animalMap[$people[$i]] = $animals[$i];
+}
+
+$animalString = implode(", ", $animalMap);
+echo "The people have the following animals: " . $animalString;
+\end{lstlisting}
+\caption{Joining array values example}
+\label{lst:arrayPopExampleFixed}
+\end{program}
 
 \begin{figure}
 \centering
