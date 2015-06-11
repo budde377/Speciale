@@ -18,7 +18,7 @@ The concept of references in PHP complicates reasoning about PHP programs. In \c
 References in PHP arrays are also treated by \citeA{associativeArrays14} implementing a data-flow analysis using the concept of aliases to handle references. 
 
 \section{Dynamic analysis}
-This thesis utilizes a dynamic analysis to determine the behavior of PHP programs, which in turn is used to define the data abstraction for a static analysis. In \cite{richards10} a similar dynamic analysis is used to determine the behavior of JavaScript programs. The approach taken is different from our approach in that they record ``meaningful'' interactions with corpus websites, whereas our dynamic analysis relies on test suites provided by the corpus applications.
+This thesis utilizes a dynamic analysis to determine the behavior of PHP programs, which in turn is used to define the data abstraction for a static analysis. In \citeA{richards10} a similar dynamic analysis is used to determine the behavior of JavaScript programs. The approach taken is different from our approach in that they record ``meaningful'' interactions with corpus websites, whereas our dynamic analysis relies on test suites provided by the corpus applications.
 
 
 
@@ -30,15 +30,6 @@ The analysis in \citeA{artzi10} employs a strategy of dynamic test generation an
 Another approach to finding malformed HTML output is taken by \citeA{minamide05}. Using an analysis that generates a context-free grammar describing the possible output of a program, it is possible to check this output against a regular language describing valid HTML strings with a bounded tag-nesting.
 
 Detection of cross-site scripting vulnerabilities is a popular topic for analyses of PHP. In \citeA{minamide05} it is proposed to detect occurrences of the \texttt{<script>}-tag and report these as cross-site scripting vulnerabilities. In \citeA{wassermann08} the detection of these vulnerabilities is taken a step further, trying to compensate for browsers allowing malformed HTML which may lead vulnerabilities undetected by other approaches.
-
-
-\section{Alias Analysis for Object-Oriented Programs}
-\todo{write summary}
-\citeA{sridharan13}
-
-\section{Two Approaches to Interprocedural Data Flow Analysis}
-\todo{write summary}
-\citeA{interprocedural}
 
 \section{Practical Blended Taint Analysis for JavaScript}
 Method: Use JSBAF to make a blended taint analysis
