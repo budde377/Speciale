@@ -13,11 +13,11 @@ If the context was bounded by $k=0$, this would entail that all variables would 
 \begin{align}
 \Delta = \text{CallNode}_*^{\leq k}
 \end{align}
-The abstract state is a product lattice with five factors. The first two model the scope, the third the heap, and the last two the storage for intermediate results. 
+The abstract state is a product lattice with five factors. The first two model the scope, the third models the heap, and the last two model the storage for intermediate results. 
 \begin{align}
 \text{State} = \text{Locals} \times \text{Globals} \times \text{Heap} \times \text{Temps} \times \text{HeapTemps} 
 \end{align}
-As described in section \ref{sec:backg_scoping}, the scoping rules of PHP are very simple and can be expressed with a global and a local scope. The global scope is necessary, since global variables can always be accessed from a function using the \texttt{global} statement. Furthermore, the super-global variables reside in the global scope but can always be accessed directly. Two scopes are enough, because any other variables have to be passed to a function as an argument.
+As described in section \ref{sec:backg_scoping}, the scoping rules of PHP are very simple and can be expressed with a global and a local scope. The global scope is required, since global variables can always be accessed from a function using the \texttt{global} statement. Furthermore, the superglobals reside in the global scope but they can always be accessed directly. Two scopes are enough, because any other variables have to be passed to a function as an argument.
 
 \begin{align}
 \text{Locals} = \text{Globals} = \text{Scope} = \text{Var} \rightarrow \mathcal{P}(\text{HLoc})
