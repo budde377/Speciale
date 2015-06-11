@@ -345,7 +345,13 @@ The global scope and heap is preserved in the new state, while the temporary map
 \end{align}
 where the function $\mathit{addCallNode} : \Delta \times \text{CallNode} \rightarrow \Delta$ decides the target context from the current, the function $\mathit{args} : \text{FunctionNames} \rightarrow (\text{Var} \times \mathbb{N})^*$ given a function name returns a list of arguments expressed as pairs of variable names and positions, and the function $\mathit{startNode} : \text{FunctionNames} \rightarrow \text{StartNode}$ given a function name returns the unique $\mathit{start}$ node of that function. The heap locations created are associated with the start node rather than the call node for higher efficiency.
 
-After execution of a function it is the task of the transfer function of the result node, to restore the old execution context. For $n = \mathit{result}_{\mathit{call}_{fn}}(\_)$, the transfer functions are defined as functions from two lattice-elements to a single lattice-element: $f_{n,\delta_{\mathit{call}},\delta_{\mathit{exit}}}: \text{AnalysisLattice} \times \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}$, where the first lattice-element is the element passed to the transfer function of the call node ${\mathit{call}_{fn}}$ and $\delta_{\mathit{call}}$ is the original context. The second lattice-element is the usual element derived from incoming flow. Depending on the argument of the $\mathit{result}$ node, the transfer function is defined as either of \ref{eq:result1} and \ref{eq:result2}
+After execution of a function it is the task of the transfer function of the result node, to restore the old execution context. For $n = \mathit{result}_{\mathit{call}_{fn}}(\_)$, the transfer functions are defined as functions from two lattice-elements to a single lattice-element:
+
+\begin{equation}
+f_{n,\delta_{\mathit{call}},\delta_{\mathit{exit}}}: \text{AnalysisLattice} \times \text{AnalysisLattice} \rightarrow \text{AnalysisLattice}\notag
+\end{equation}
+
+where the first lattice-element is the element passed to the transfer function of the call node ${\mathit{call}_{fn}}$ and $\delta_{\mathit{call}}$ is the original context. The second lattice-element is the usual element derived from incoming flow. Depending on the argument of the $\mathit{result}$ node, the transfer function is defined as either of \ref{eq:result1} and \ref{eq:result2}
 \begin{align}
 f_{n,\delta_{\mathit{call}}, \delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\mathit{exit}})=   &\letin{\mathit{exit}(c_1, \cdots, c_n) = \mathit{exitNode}(fn)}\notag\\
                                                 &\letin{(s_l, \_, \_, s_t, s_{ht}) = l_{\mathit{call}}(\delta_{\mathit{call}})}\notag\\
