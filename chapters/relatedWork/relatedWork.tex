@@ -1,14 +1,14 @@
 \section{Dynamic features}
 In this thesis a lot of the dynamic features of PHP have not been covered even though \citeA{featureUsage13} and \citeA{dynamicfeatures15} confirms that dynamic features are used in most PHP programs.
 
-Programs composed of multiple files using \texttt{require} and \texttt{include} are considered by \citeA{includesResolution} which provides a technique for statically resolving includes in PHP. Using first a file-centered contextless alogrithm to find possible file matches and afterwards refining the results with a context sensitive program-centered alogrithm.
+Programs composed of multiple files using \texttt{require} and \texttt{include} are considered by \citeA{includesResolution} which provides a technique for statically resolving includes in PHP. Using first a file-centered context-less algorithm to find possible file matches and afterwards refining the results with a context sensitive program-centered algorithm.
 
 WeVerca the framework developed by \citeA{weverca14} abstract away the dynamic dispatch and variable variables uses by providing the control-flow as well as the heap shape and dynamic data access directly to the user of the framework. WeVerca uses the Phalanger parser which currently supports PHP features up to PHP 5.4 with support for newer features in development. With the aim of PHP 5.6 support for the analysis in this thesis WeVerca was discarded as an option early on.
 
-In \citeA{associativeArrays14} variable variables are supported by treating the global scope of PHP as an array with keys corresponding to the names of variables. Accessing variable variables is then a simple matter of how array access is handlded in general.
+In \citeA{associativeArrays14} variable variables are supported by treating the global scope of PHP as an array with keys corresponding to the names of variables. Accessing variable variables is then a simple matter of how array access is handled in general.
 
 \section{Static Analysis}
-JavaScript is similar to PHP in many ways. The static analysis provided by this thesis is inspired by TAJS \citeA{tajs09}, a type analysis for JavaScript. \todo{talk about differences between TAJS and TAPAS}
+JavaScript is similar to PHP in many ways. The static analysis provided by this thesis is inspired by TAJS \citeA{tajs09}, a type analysis for JavaScript. As opposed to PHP JavaScript does not deep-copy arrays. TAJS makes use of pointers in its Value-lattice for arrays and objects whereas the analysis in this thesis include arrays directly in the Value-lattice.
 
 Pixy \citeA{pixy06} is a static analysis tool aimed at detecting security vulnerabilities. The tool is limited to PHP 4 which is a long out-dated version of PHP neither developed nor supported anymore. The analysis developed in this thesis aims to support PHP 5.6 which is the newest version as of the time of writing.
 
@@ -17,25 +17,20 @@ The concept of references in PHP complicates reasoning about PHP programs. In \c
 
 References in PHP arrays are also treated by \citeA{associativeArrays14} implementing a data-flow analysis using the concept of aliases to handle references. 
 
-\section{Static Approximation of Dynamically Generated Web Pages}
-\todo{write summary}
-\citeA{minamide05}
+\section{Dynamic analysis}
+This thesis utilizes a dynamic analysis to determine the behavior of PHP programs, which in turn is used to define the data abstraction for a static analysis. In \cite{richards10} a similar dynamic analysis is used to determine the behavior of JavaScript programs. The approach taken is different from our approach in that they record ``meaningful'' interactions with corpus websites, whereas our dynamic analysis relies on test suites provided by the corpus applications.
 
-\section{Static Detection of Cross-Site Scripting Vulnerabilities}
-\todo{write summary}
-\citeA{wassermann08}
 
-\section{Static Detection of Security Vulnerabilities in Scripting Languages}
-\todo{write summary}
-\citeA{xie06}
 
-\section{Finding Bugs in Web Applications Using Dynamic Test Generation and Explicit-State Model Checking}
-\todo{write summary}
-\citeB{artzi10}
+\section{The purpose of program analysis}
+Different program analyses of course have different specific purposes. It is, however, possible to place the common purposes of program analysis into a few broader categories. Many analyses like \citeA{artzi10}, \citeA{minamide05}, are concerned with finding security flaws or other types of bugs. It is also possible to use program analysis to prove conformity to a specification. The findings of our analysis is not per se bugs, since the program in question may work to specification despite our analysis generating errors or warnings. Our analysis concerns somewhat more vaguely defined properties like clarity of intention and maintainability. In the end these properties also leads to code in which bugs are easier to find. The following works relate to this thesis in the sense that our analysis complements those analyses well.
 
-\section{Sound and Precise Analysis of Web Applications for Injection Vulnerabilities}
-\todo{write summary}
-\citeA{wassermann07}
+The analysis in \citeA{artzi10} employs a strategy of dynamic test generation and explicit-state model checking to be able to find bugs resulting in execution errors or malformed HTML output. By dynamically creating path constraints the analysis covers possible execution paths and is then able to report possible malformed output.
+
+Another approach to finding malformed HTML output is taken by \citeA{minamide05}. Using an analysis that generates a context-free grammar describing the possible output of a program, it is possible to check this output against a regular language describing valid HTML strings with a bounded tag-nesting.
+
+Detection of cross-site scripting vulnerabilities is a popular topic for analyses of PHP. In \citeA{minamide05} it is proposed to detect occurrences of the \texttt{<script>}-tag and report these as cross-site scripting vulnerabilities. In \citeA{wassermann08} the detection of these vulnerabilities is taken a step further, trying to compensate for browsers allowing malformed HTML which may lead vulnerabilities undetected by other approaches.
+
 
 \section{Alias Analysis for Object-Oriented Programs}
 \todo{write summary}
