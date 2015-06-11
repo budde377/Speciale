@@ -18,9 +18,9 @@ The concept of references in PHP complicates reasoning about PHP programs. In \c
 References in PHP arrays are also treated by \citeA{associativeArrays14} implementing a data-flow analysis using the concept of aliases to handle references. 
 
 \section{Dynamic analysis}
-This thesis utilizes a dynamic analysis to determine the behavior of PHP programs, which in turn is used to define the data abstraction for a static analysis. In \citeA{richards10} a similar dynamic analysis is used to determine the behavior of JavaScript programs. The approach taken is different from our approach in that they record ``meaningful'' interactions with corpus websites, whereas our dynamic analysis relies on test suites provided by the corpus applications.
+This thesis utilizes a dynamic analysis to determine the behavior of PHP programs, which in turn is used to define the data abstraction for a static analysis. In \citeA{richards10} a similar dynamic analysis is used to determine the behavior of JavaScript programs. The approach taken is different from our approach in that they record ``meaningful'' interactions with corpus websites, whereas our dynamic analysis relies on test suites provided by the corpus applications. 
 
-
+Blended analysis is a different approach to utilizing dynamical analysis. In \citeA{blendedtaint} a dynamical analysis is used to prune unused and impossible paths effectively speeding up the performance of a subsequent static taint analysis. Further more the pruned paths have the possibility of removing false positives from the static analysis result. However as stated by \citeA{blendedanalysis} utilizing dynamical analysis this way requires some kind of restriction on possible inputs for the programs, as each input has to be run by the dynamic analysis. Our approach utilizes the dynamic analysis to make well-founded choices about trading precision or soundness for performance in a static analysis.
 
 \section{The purpose of program analysis}
 Different program analyses of course have different specific purposes. It is, however, possible to place the common purposes of program analysis into a few broader categories. Many analyses like \citeA{artzi10}, \citeA{minamide05}, are concerned with finding security flaws or other types of bugs. It is also possible to use program analysis to prove conformity to a specification. The findings of our analysis is not per se bugs, since the program in question may work to specification despite our analysis generating errors or warnings. Our analysis concerns somewhat more vaguely defined properties like clarity of intention and maintainability. In the end these properties also leads to code in which bugs are easier to find. The following works relate to this thesis in the sense that our analysis complements those analyses well.
@@ -30,13 +30,3 @@ The analysis in \citeA{artzi10} employs a strategy of dynamic test generation an
 Another approach to finding malformed HTML output is taken by \citeA{minamide05}. Using an analysis that generates a context-free grammar describing the possible output of a program, it is possible to check this output against a regular language describing valid HTML strings with a bounded tag-nesting.
 
 Detection of cross-site scripting vulnerabilities is a popular topic for analyses of PHP. In \citeA{minamide05} it is proposed to detect occurrences of the \texttt{<script>}-tag and report these as cross-site scripting vulnerabilities. In \citeA{wassermann08} the detection of these vulnerabilities is taken a step further, trying to compensate for browsers allowing malformed HTML which may lead vulnerabilities undetected by other approaches.
-
-\section{Practical Blended Taint Analysis for JavaScript}
-Method: Use JSBAF to make a blended taint analysis
-
-Important points: static analyses are slow (> 10 minutes), blended analysis is much faster since impossible or unused paths can be pruned. More problems can be identified. Fewer false alarms
-\citeA{blendedtaint}
-
-\section{Blended Analysis for Performance Understanding of Framework-based Applications}
-Important points: blended analysis is good when you have a limited amount of possible inputs.
-\citeA{blendedanalysis}

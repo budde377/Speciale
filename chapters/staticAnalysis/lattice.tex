@@ -2,13 +2,13 @@
 \label{sec:lattice}
 \todo{Reference appendix}
 
-The lattice is the data-structure passed around by the flow of the control-flow graph. In order to create a \emph{inter-procedural analysis}, the analysis lattice is defined as
+The lattice is the data-structure passed around by the flow of the control-flow graph. In order to create an \emph{inter-procedural analysis}, the analysis lattice is defined as
 \begin{align}
 \text{AnalysisLattice} = \Delta \rightarrow \text{State}
 \end{align}
-This is a map from a context to an abstract state, where the context $\Delta$ consists of a list of call-sites, represented as the call nodes in the control flow graph with length bounded by $k>0$. The bound $k$ must be greater than zero, since the context is chosen to decide between local and global scope. 
+This is a mapping from a context to an abstract state, where the context $\Delta$ consists of a list of call-sites, represented as the call nodes in the control-flow graph with length bounded by $k>0$. The bound $k$ must be greater than zero, since the context is used to decide between local and global scope. 
 
-If the context was bounded by $k=0$, this would entail that all variables would be updated in the global scope resulting in a unsound analysis. In the analysis the only strong update of the heap is performed when writing to a variable pointing to no locations which is sound, since the variable has not been initialized and hence cannot have been referenced. By only using the global scope, performing a strong update with a not-null value will indicate that the variable cannot be \texttt{null}. This is true for the function body, but in the global scope the variable is uninitialized, i.e. \texttt{null}, hence the analysis would be unsound.
+If the context was bounded by $k=0$, this would entail that all variables would be updated in the global scope resulting in a unsound analysis. In the analysis the only strong update of the heap is performed when writing to a variable pointing to no locations, which is sound, since the variable has not been initialized and hence cannot have been referenced. By using only the global scope, performing a strong update with a not-null value will indicate that the variable cannot be \texttt{null}. This is true for the function body, but in the global scope the variable is uninitialized, i.e.\ \texttt{null}, hence the analysis would be unsound.
 
 \begin{align}
 \Delta = \text{CallNode}_*^{\leq k}

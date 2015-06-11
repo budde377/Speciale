@@ -144,7 +144,7 @@ $callable4 = function() use ($a){
 \label{lst:callables}
 \end{program}
 
-\item Multiple operations of with the same type using different arrays lead to sharing of IDs. Following the limited information available to distinguish between operations, operations such as assign to an multidimensional array leads to sharing the ID between the array and its sub-arrays, (see figure \ref{lst:dis_code} line \ref{line:assign}). This follows from the value first being assigned to the sub-array, which is then assigned to the super-array. Combining multiple arrays may lead to uncategorizable arrays even if each array is categorizable. A possible solution would be if the interpreter kept character location information in addition to line number and file name.   
+\item Multiple operations of the same type using different arrays lead to sharing of IDs. Following the limited information available to distinguish between operations, operations such as assign to a multidimensional array leads to sharing the ID between the array and its sub-arrays, (see figure \ref{lst:dis_code} line \ref{line:assign}). This follows from the value first being assigned to the sub-array, which is then assigned to the super-array. Combining multiple arrays may lead to uncategorizable arrays even if each array is categorizable. A possible solution would be if the interpreter kept character location information in addition to line number and file name.   
 
 \end{itemize}
 

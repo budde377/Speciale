@@ -1,8 +1,8 @@
 \section{Results}
 \label{sec:analysisResults}
-Running the modified interpreter on the corpus created large log files, ranging from 41 MB to 13 GB in size. Most of the entries in the log-files were created by the test framework or other dependencies, i.e.\ not by the framework is question. These entries were removed before analysing the logs reducing the file-sizes to between 3.4 MB and 11 GB.
+Running the modified interpreter on the corpus created large log files, ranging from 41 MB to 13 GB in size. Most of the entries in the log files were created by the test framework or other dependencies, i.e.\ not by the framework in question. These entries were removed before analysing the logs, reducing the file-sizes to between 3.4 MB and 11 GB.
 
-Figure \ref{fig:array_types} and table \ref{tab:array_types} shows the distribution of array types for the frameworks.  Between 4\% and 12\% of the arrays are uncategorizable. These include false uncategorizables originating from flaws in the array identification as discussed in section \ref{sec:limitations}. One of these were regarding the imprecision w.r.t.\ multidimensional arrays. A quick inspection of some of the code-locations containing uncategorizable arrays did show that many of these were in-fact caused by performing operations on multidimensional arrays.
+Figure \ref{fig:array_types} and table \ref{tab:array_types} show the distribution of array types for the frameworks.  Between 4\% and 12\% of the arrays are uncategorizable. These include false uncategorizables originating from flaws in the array identification as discussed in section \ref{sec:limitations}. One of these was regarding the imprecision w.r.t.\ multidimensional arrays. A quick inspection of some of the code-locations containing uncategorizable arrays did show that many of these were in fact caused by performing operations on multidimensional arrays.
 
 \begin{figure}
 \centering
@@ -23,7 +23,7 @@ MediaWiki	    &   32.48\%	&   32.23\% &	2.69\%	&   15.60\% &	8.20\%	&   0.49\%  
 Part	        &   33.33\%	&   39.10\% &	0.00\%	&   12.82\% &	5.77\%	&   0.00\%  &   	8.97\% \\
 phpBB	        &   27.13\%	&   33.33\% &	3.17\%	&   25.11\% &	4.33\%	&   0.14\%  &   	6.78\% \\
 PhpMyAdmin	    &   33.24\%	&   33.43\% &	2.09\%	&   14.06\% &	5.89\%	&   0.38\%  &   	10.92\% \\
-Symfony	        &   34.32\%	&   28.01\% &	1.99\%	&   14.86\% &	8.63\%	&   0.21\%  &   	11.99\% \\
+Symfony 2	    &   34.32\%	&   28.01\% &	1.99\%	&   14.86\% &	8.63\%	&   0.21\%  &   	11.99\% \\
 WordPress	    &   35.50\%	&   33.03\% &	2.02\%	&   14.11\% &	6.61\%	&   0.45\%  &   	8.29\% \\
 Zend Framework 2&	30.99\%	&   35.07\% &	1.08\%	&   19.78\% &	6.25\%	&   0.00\%  &   	6.82\% 
 \end{tabular}}
@@ -47,7 +47,7 @@ these are by far the most used. The library function \texttt{array\_push} is equ
 \label{fig:type_operations}
 \end{figure}
 
-Notice how the objects are divided into three categories, Object, Object (List), and Object (Sparse List).  The last two are arrays with values of different types, but the keys of lists and sparse lists respectively. The distribution of array operations shows that array list operations almost exclusively are performed on lists (List, Sparse List, Object List, Object Sparse List). From this follows that if an list array-operation is performed on an array, then it is almost certain that the array is of type list. When encountering an array write operation it is not necessary the case that the array is a list. Array write operations are used frequently on lists, arrays, and objects.
+Notice how the objects are divided into three categories, Object, Object (List), and Object (Sparse List).  The last two are arrays with values of different types, but with keys of lists and sparse lists respectively. The distribution of array operations shows that array list operations are almost exclusively performed on lists (List, Sparse List, Object List, Object Sparse List). From this follows that if a list array-operation is performed on an array, then it is almost certain that the array is of type list. When encountering an array write operation it is not necessarily the case that the array is a list. Array write operations are used frequently on lists, arrays, and objects.
 
 
 %The operation on arrays of map and object type consists almost entirely of write operations, whereas arrays of type list have some write operation but mostly append operations. 
