@@ -9,7 +9,7 @@ The syntax can be expressed with grammar \ref{gramm:p0}. Here $e : \syn{expr}$ d
 
 Notice that returning an $\syn{rexpr}$ with a non-reference function might result in a fatal error, e.g. when returning the result of an array-append operation, but the same operation is valid in a reference-function.
 
-PHP supports using the array access syntax with strings to read and write individual characters of the given string. P0 does not support accessing strings with array syntax. The full PHP language defines a lot of cross-type operations however P0 supports only the operations described in sections \ref{sec:coercion} and \ref{sec:abseval}.
+PHP supports using the array access syntax with strings to read and write individual characters of the given string. P0 does not support accessing strings with array syntax. The full PHP language defines a lot of cross-type operations, e.g. comparing a boolean with a string using \texttt{<=}, however P0 supports only the operations described in sections \ref{sec:coercion} and \ref{sec:abseval}.
 
 A few function-like language constructs exists. Syntactically they look like function calls but the expressions allowed as parameters may be limited or the constructs may have special side-effects. The \texttt{unset} and \texttt{isset} language constructs are two such functions which work only with variables and array-access expressions as parameters. Together with \texttt{empty}, \texttt{exit} and \texttt{eval} these special language constructs are not supported in P0.
 
