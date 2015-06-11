@@ -1,5 +1,5 @@
 \newpage\section{Conclusion}
-
+\label{sec:caseConcl}
 The implementation of the analysis successfully indicated errors when a program contained suspicious arrays and operations. Subsequently these errors were all resolved by rewriting the programs, without creating new errors. 
 
 It would however seem beneficial to add a warnings when two paths meet, e.g. after an \texttt{if}-statement, as was indicated by the second and third case. The inaccuracy of the $\top$ array also became apparent, where updating an top array would update most of the heap. It should be considered to modify the Array lattice, by adding an element of heap locations between the ArrayMap and ArrayList elements and the $\top$ element, see figure \ref{fig:newArray}. This would intuitively represent arrays that are not known to be lists or maps, but is assured to contain some locations, thus allowing for more precision than the $\top$ array. 

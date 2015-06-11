@@ -1,14 +1,15 @@
+\newpage
 \section{Performance}
 \label{sec:future3}
-Performance concerns can be split into two parts, namely theoretical performance and practical performance. First-mentioned is the performance of the specified analysis whereas the latter is optimizations in the implementation while still conforming to the specification of the analysis.
 
-\todo{write something about resource usage for the case studies (CPU, memory)}
+Since it was not a goal of the thesis, not much though has been put into optimization of the analysis performance. The analysis in practice has high memory consumption and while it might terminate within a few seconds, even that is too long for it to be used as a tool in a development environment where the changes are frequent.  
+
+When optimizing for performance, two approaches can be considered. Optimizing theoretical performance and optimizing practical performance. First-mentioned is the performance of the specified analysis whereas the latter is optimizations in the implementation while still conforming to the specification of the analysis.
 
 \subsection{Analysis performance}
 The analysis lattice is the primary data-structure used and thus a major factor in performance regarding to memory usage. To obtain context sensitivity the State-lattice is stored multiple times in the analysis lattice and because of this minimizing the size of the State-lattice potentially results in multiple times the performance gain.
 
-The two lattice-parts Temps and HeapTemps are used to pass information between control-flow nodes and are specified as complete maps from temporary variable names and temporary heap variable names respectively. Consider $\bot$-values smaller to store than other values as this is the default value. The current analysis never resets entries from the map, which means it will keep growing in size with programs of larger size as more temporary storage entries are set to values different than $\bot$. Due to the nature of how these maps are used each entry can be seen as having a provider and potentially also a consumer control-flow node. The provider node sets the entry which is then later used by the consumer node. To keep the maps small in size even with large programs the consumer nodes can reset the entries they consume to $\bot$. Graph \ref{graph:exexpr1} shows a simple control-flow graph to demonstrate the effect of letting the consumer node reset consumed entries. In listing \ref{lst:exampleLattice} the first line shows the entries which would be set in the Temps lattice-element associated with the last node without any optimizations. The second line shows the set entries with the optimization.
-
+The two lattice-parts Temps and HeapTemps are used to pass information between control-flow nodes and are specified as complete maps from temporary variable names and temporary heap variable names respectively. Consider $\bot$-values smaller to store than other values as this is the default value. The current analysis never resets entries from the map, which means it will keep growing in size with programs of larger size as more temporary storage entries are set to values different than $\bot$. Due to the nature of how these maps are used each entry can be seen as having a provider and potentially also a consumer control-flow node. The provider node sets the entry which is then later used by the consumer node. To keep the maps small in size even with large programs the consumer nodes can reset the entries they consume to $\bot$. Graph \ref{graph:exexpr1} shows a simple control-flow graph to demonstrate the effect of letting the consumer node reset consumed entries.
 \begin{graph}
 \centering
 \begin{adjustbox}{max size={1\textwidth}{.25\textheight}, margin = 10pt}\begin{tikzpicture}[node distance = 2cm, auto]
@@ -34,16 +35,13 @@ The two lattice-parts Temps and HeapTemps are used to pass information between c
 \label{graph:exexpr1}
 \end{graph}
 
-\begin{program}
+In the listing below the first line shows the entries which would be set in the Temps lattice-element associated with the last node without any optimizations. The second line shows the set entries with the optimization.
 \begin{lstlisting}[mathescape]
 temps $\rightarrow$ [t1, t2, t3, t4, t] // without optimization
 temps $\rightarrow$ [t] // with optimization
 \end{lstlisting}
-\caption{Entries with a different value than $\bot$ in the Temps part of the lattice-element associated with the last \texttt{bop$_+$}-node before and after optimizations}
-\label{lst:exampleLattice}
-\end{program}
 
 \subsection{Implementation performance}
-No performance optimizations has been made on the implementation of the analysis since performance have not been the primary concern.
+The implemented analysis does caches results and performs joins lazily, which should in theory limit the necessary computation. There is however much more to be done, and it is expected that existing techniques could be used for identifying possible optimizations. For example, it could be considered how running the analysis on the whole program, on any change, could be avoided by reusing abstract states from unchanged code. 
 
-\todo{write about implementation performance; better cache etc.}
+\todo{write more}

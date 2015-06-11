@@ -35,15 +35,24 @@ In order for the analysis to support the whole language, resolving functions dyn
 As mentioned in section \ref{sec:bgProgStuc}, dynamically loading code with the \texttt{include} or \texttt{require} statements shouldn't practically impose a problem, since modern PHP programs tend to use the auto-loading features of dependency managers. Another method for dynamically loading code is the \texttt{eval} function, which evaluates the PHP code in a given string. Adding support for this feature should be done inspired by existing work for the JavaScript \texttt{eval} function.
 
 \subsection{Objects and resources}	
-This thesis has completely ignored a large part of PHP, namely the object model. To be able to handle real PHP application objects must be supported since almost every PHP application is at least partly object oriented. Since objects are dynamic as the rest of PHP, properties can be added and removed at execution time. To keep soundness of the analysis object properties can be modelled as a map array. This approach suffers from the same weakness as variable variables, that writes to $\top$-element property names lessens the precision of all other properties. By expanding the dynamical analysis from chapter \ref{ch:study} to log object property creations and removals a hypothesis about these operations being rare can be tested. If such a hypothesis turns out to be true an unsound disregard of property creations and removals can be applied in the analysis. Which will in turn heighten the precision of the analysis.
+This thesis has completely ignored a large part of PHP, namely the object model. To be able to handle real PHP application objects must be supported since almost every PHP application is at least partly object oriented. When adding support of objects, existing techniques for making a type analysis object-sensitive should be investigated. 
 
-The Value-lattice in this thesis does not support the PHP resource type. It is a special type used for handling references to external resources like files or database connections, which are used by most real applications. To support the resource type, an abstraction in the form of a lattice must be created and added as another factor in the Value-lattice. Further more operators and coercion must be expanded to the resource type as well.
+Special care should be taken when implementing properties, since properties can be added and removed at run time. To keep soundness of the analysis object properties can be modelled as a map array. This approach suffers from the same weakness as variable variables, that writes to $\top$-element property names lessens the precision of all other properties. Another approach would involve researching usage of these dynamic features, by  logging and analysing object property creation and removal. If the occurrence of these operations proved rare, an unsound disregard of property creations and removals can be applied in the analysis. Which will in turn heighten the precision of the analysis.
+
+The resource type is not supported by this thesis. It is a special type used for handling references to external resources like files or database connections, which are used by most real applications. To support the resource type, an abstraction in the form of a lattice must be created and added as another factor in the Value-lattice. Further more operators and coercion must be expanded to the resource type as well.
 
 \subsection{Library functions}
-The huge library of functions packaged with PHP by default is essential to any real application. To be able to handle real application all of these functions must be supported with at least a naive, imprecise transfer function. Functions without any side-effects, i.e. without reference-parameters, can be naively supported by resulting in the $\top$-element value. Functions with possible side-effects further more have to join the heap locations values of the reference parameters with the $\top$-element value. By adding these naive transfer-functions for library functions the analysis will keep soundness for any use of library functions at the cost of losing a lot of precision. The soundness argument here is based on an assumption that library functions do not have side-effects except for possible manipulation of reference-parameters. Since library functions are implemented using an API provided by the interpreter they may have side-effects, however we have not observed any functions with such side-effects and thus find it fair to assume they do not exist. To keep a higher precision each library function must be examined and abstracted into a sound transfer-function.
+The huge library of functions packaged with PHP by default is essential to any real application. To be able to handle real application all of these functions must be supported with at least a naive, imprecise transfer function. Functions without any side-effects, i.e. without reference-parameters, can be naively supported by resulting in the $\top$-element value. Functions with possible side-effects further more have to join the heap locations values of the reference parameters with the $\top$-element value. By adding these naive transfer-functions for library functions the analysis will keep soundness for any use of library functions at the cost of losing a lot of precision. 
+
+The soundness argument here is based on an assumption that library functions do not have side-effects except for possible manipulation of reference-parameters. Since library functions are implemented using an API provided by the interpreter they may have side-effects, we have however not observed any functions with such side-effects, except the \texttt{eval} function which requires special attention in it self. 
+
+A more precise model of the library function would require manual inspection of the source code, which is  time-consuming, to say the least.
 
 \subsection{Special language constructs}
-Function-like language constructs are not supported in P0, however most real programs rely on at least some of these constructs. In program \ref{lst:languageConstructs} the \texttt{isset}, \texttt{unset}, \texttt{empty} and \texttt{exit} constructs are demonstrated. The most straight-forward construct is \texttt{empty}, since it takes ordinary expressions as input just like any function. A transfer function must be specified, like for library functions, to support \texttt{empty}. The constructs \texttt{isset} and \texttt{unset} accept variable-expressions only as parameters. Unsetting can be abstracted by joining with the \texttt{Null}-value, since that is the value of unset variables and unset array entries. Implementing \texttt{isset} naively is simple, however to get more precision the implementation of \texttt{unset} has to be taken into account, since unsetting a variable will result in \texttt{isset} for that variable returning boolean true. 
+
+Function-like language constructs are not supported in P0, however most real programs rely on at least some of these constructs. 
+
+In program \ref{lst:languageConstructs} the \texttt{isset}, \texttt{unset}, \texttt{empty} and \texttt{exit} constructs are demonstrated. The most straight-forward construct is \texttt{empty}, since it takes ordinary expressions as input just like any function. A transfer function must be specified, like for library functions, to support \texttt{empty}. The constructs \texttt{isset} and \texttt{unset} accept variables or array-reads only as parameters. 
 
 \begin{program}
 \begin{subfigure}[b]{.45\linewidth}
@@ -74,8 +83,17 @@ Function-like language constructs are not supported in P0, however most real pro
 \label{lst:languageConstructs}
 \end{program}
 
+
+Unsetting can be abstracted by joining with the \texttt{null}-value, since that is the value of unset variables and unset array entries. Implementing \texttt{isset} naively is simple, however to get more precision the implementation of \texttt{unset} has to be taken into account, since unsetting a variable will result in \texttt{isset} for that variable returning boolean true. 
+
+
 \subsection{Other unsupported features}
+The previous mentioned features are all some of most frequently used features, but as mentioned in chapter \ref{ch:background}, PHP is an ever changing language with new language features added at every version. These features includes casting to scalars, e.g. casting to boolean \texttt{(bool) \$a} or null \texttt{(unset) \$a}, array access on strings, accessing arrays with curly brackets, etc. In order to support the whole language, a notorious analysis of the source-code and documentation is required. 
 
-\todo{cast, array acces on strings etc.} 
+An alternative could be to only support a subset of the language as done in this thesis, but on a much larger scale. The subset could be decided based on a analysis of existing PHP frameworks, which hopefully excludes some of the more obscure features.
 
-\todo{are we missing any other features?}
+
+
+
+
+ 
