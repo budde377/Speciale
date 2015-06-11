@@ -17,30 +17,20 @@ The concept of references in PHP complicates reasoning about PHP programs. In \c
 
 References in PHP arrays are also treated by \citeA{associativeArrays14} implementing a data-flow analysis using the concept of aliases to handle references. 
 
+\section{Dynamic analysis}
+This thesis utilizes a dynamic analysis to determine the behavior of PHP programs, which in turn is used to define the data abstraction for a static analysis. In \cite{richards10} a similar dynamic analysis is used to determine the behavior of JavaScript programs. The approach taken is different from our approach in that they record ``meaningful'' interactions with corpus websites, whereas our dynamic analysis relies on test suites provided by the corpus applications.
+
+
+
 \section{The purpose of program analysis}
-Different program analyses of course have different specific purposes. It is, however, possible to place the common purposes of program analysis into a few broader categories. Many analyses like \citeA{artzi10}, \todo{more...}, are concerned with finding security flaws or other types of bugs. It is also possible to use program analysis to prove conformity to a specification. The findings of our analysis is not per se bugs, since the program in question may work to specification despite our analysis generating errors or warnings. Our analysis concerns somewhat more vaguely defined properties like clarity of intention and maintainability. In the end these properties also leads to fewer bugs and debugging becoming easier.
+Different program analyses of course have different specific purposes. It is, however, possible to place the common purposes of program analysis into a few broader categories. Many analyses like \citeA{artzi10}, \citeA{minamide05}, are concerned with finding security flaws or other types of bugs. It is also possible to use program analysis to prove conformity to a specification. The findings of our analysis is not per se bugs, since the program in question may work to specification despite our analysis generating errors or warnings. Our analysis concerns somewhat more vaguely defined properties like clarity of intention and maintainability. In the end these properties also leads to code in which bugs are easier to find. The following works relate to this thesis in the sense that our analysis complements those analyses well.
 
-The analysis in \citeA{artzi10} employs a strategy of dynamic test generation and explicit-state model checking to be able to find bugs resulting in execution errors or malformed HTML output. By dynamically creating path constraints the analysis covers possible execution paths and is then able to report possible malformed output. 
+The analysis in \citeA{artzi10} employs a strategy of dynamic test generation and explicit-state model checking to be able to find bugs resulting in execution errors or malformed HTML output. By dynamically creating path constraints the analysis covers possible execution paths and is then able to report possible malformed output.
 
-\section{Static Approximation of Dynamically Generated Web Pages}
-\todo{write summary}
-\citeA{minamide05}
+Another approach to finding malformed HTML output is taken by \citeA{minamide05}. Using an analysis that generates a context-free grammar describing the possible output of a program, it is possible to check this output against a regular language describing valid HTML strings with a bounded tag-nesting.
 
-\section{Static Detection of Cross-Site Scripting Vulnerabilities}
-\todo{write summary}
-\citeA{wassermann08}
+Detection of cross-site scripting vulnerabilities is a popular topic for analyses of PHP. In \citeA{minamide05} it is proposed to detect occurrences of the \texttt{<script>}-tag and report these as cross-site scripting vulnerabilities. In \citeA{wassermann08} the detection of these vulnerabilities is taken a step further, trying to compensate for browsers allowing malformed HTML which may lead vulnerabilities undetected by other approaches.
 
-\section{Static Detection of Security Vulnerabilities in Scripting Languages}
-\todo{write summary}
-\citeA{xie06}
-
-\section{Finding Bugs in Web Applications Using Dynamic Test Generation and Explicit-State Model Checking}
-
-\citeB{artzi10}
-
-\section{Sound and Precise Analysis of Web Applications for Injection Vulnerabilities}
-\todo{write summary}
-\citeA{wassermann07}
 
 \section{Alias Analysis for Object-Oriented Programs}
 \todo{write summary}
