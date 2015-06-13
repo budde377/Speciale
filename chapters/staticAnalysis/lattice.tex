@@ -1,12 +1,10 @@
 \section{Lattice}
 \label{sec:lattice}
-\todo{Reference appendix}
-
 The lattice is the data-structure passed around by the flow of the control-flow graph. In order to create an \emph{inter-procedural analysis}, the analysis lattice is defined as
 \begin{align}
 \text{AnalysisLattice} = \Delta \rightarrow \text{State}
 \end{align}
-This is a mapping from a context to an abstract state, where the context $\Delta$ consists of a list of call-sites, represented as the call nodes in the control-flow graph with length bounded by $k>0$. The bound $k$ must be greater than zero, since the context is used to decide between local and global scope. 
+This is a map-lattice from a context to an abstract state, where the context $\Delta$ consists of a list of call-sites, represented as the call nodes in the control-flow graph with length bounded by $k>0$. The bound $k$ must be greater than zero, since the context is used to decide between local and global scope. Definitions on the different type of lattices can be found in appendix \ref{app:lattice}.  
 
 If the context was bounded by $k=0$, this would entail that all variables would be updated in the global scope resulting in a unsound analysis. In the analysis the only strong update of the heap is performed when writing to a variable pointing to no locations, which is sound, since the variable has not been initialized and hence cannot have been referenced. By using only the global scope, performing a strong update with a not-null value will indicate that the variable cannot be \texttt{null}. This is true for the function body, but in the global scope the variable is uninitialized, i.e.\ \texttt{null}, hence the analysis would be unsound.
 
@@ -33,9 +31,9 @@ The Temps and HeapTemps map-lattices store intermediate results. Since these res
 \begin{align}
 \text{HeapTemps} = \text{THVar} \rightarrow \mathcal{P}(\text{HLoc})
 \end{align}
-The necessity of the HeapTemps lattice follows from the fact that reference assignments may be nested, which requires intermediate results shared between nodes in the control-flow graph. The sets of temporary variable names, TVar and THVar, are both finite following from the control-flow-graph being finite.
+The necessity of the HeapTemps lattice follows from the fact that reference assignments may be nested, which requires intermediate results shared between nodes in the control-flow graph. The sets of temporary variable names, TVar and THVar, are both finite following from the control-flow graph being finite.
 
-The heap locations are allocation site abstractions with respect to the context, node, and a natural number. The natural number allows the creation of multiple locations per node, which is necessary in $\mathit{call}$-nodes to support multiple arguments. Adding the natural number as a factor makes the set of allocation sites possibly infinite, in practice however, the set is finite since the number of function parameters is finite.
+The heap locations are allocation site abstractions with respect to the context, node, and a natural number. The natural number allows the creation of multiple locations per node, which is necessary in $\mathit{call}$-nodes to support multiple arguments. Adding the natural number as a factor makes the set of allocation sites possibly infinite. However, in practice the set is finite since the number of function parameters is finite.
 
 \begin{align}
 \text{HLoc}  = \Delta \times \mathcal{N} \times \mathbb{N}
@@ -48,14 +46,14 @@ An abstract value is defined as the product lattice of the five factors defined 
 \text{Value} = \text{Array} & \times \text{String} \times \text{Number} \times \text{Boolean}  \times \text{Null}
 \end{align}
 
-Following the results of the dynamic analysis in chapter \ref{ch:study}, the array is considered either a set of locations or a map from indices to sets of types, i.e. array-lists or array-maps. The sum-lattice has been chosen as opposed to a product-lattice, since the dynamic analysis indicated that arrays seldom change from lists to maps or vice versa. Top array elements are then predictors for suspicious behavior. Furthermore the array lattice has an element for the empty array which can become either a list or a map.  
+Following the results of the dynamic analysis in chapter \ref{ch:study}, the array is considered either a set of locations or a map from indices to sets of types, i.e. array-lists or array-maps. The sum-lattice has been chosen, as opposed to a product-lattice, since the dynamic analysis indicated that arrays seldom change from lists to maps or vice versa. Top array elements are then predictors for suspicious behavior. Furthermore the array lattice has an element for the empty array which can become either a list or a map.  
 \begin{align}
 \text{ArrayList}= \mathcal{P}( L )
 \end{align}
 \begin{align}
 \text{ArrayMap}=\text{Index} \rightarrow \mathcal{P}( L )
 \end{align}
-The indices of the array-map-lattice is an infinite lattice, yielding a possibly infinite array-lattice. To ensure termination of the analysis the lattice must be finite, so it must be argued that the lattice is finite in practice. Assuming that an infinite-sized array exists, an infinite number of writes to a map is required. This in turn requires an infinite-sized program, a recursive function, or a loop. Since an infinite-sized program is not possible, one of the two latter cases must hold. Assuming the cause is a recursive function, the array must then be finite because the number of contexts are bounded and the number of heap locations are bounded. Now, assuming that the array is caused by a loop, then the indices must be generated from previous iterations, meaning that they are generated from information stored on the heap. With a finite number of heap locations and no strong heap update, the indices must be abstracted, thus not yielding an array of infinite size.
+The indices of the array-map-lattice is an infinite lattice, yielding a possibly infinite array-lattice. To ensure termination of the analysis, the lattice must be finite, so it must be argued that the lattice is finite in practice. Assuming that an infinite-sized array exists, an infinite number of writes to a map is required. This in turn requires an infinite-sized program, a recursive function, or a loop. Since an infinite-sized program is not possible, one of the two latter cases must hold. Assuming the cause is a recursive function, the array must then be finite because the number of contexts are bounded and the number of heap locations are bounded. Now, assuming that the array is caused by a loop, then the indices must be generated from previous iterations, meaning that they are generated from information stored on the heap. With a finite number of heap locations and no strong heap update, the indices must be abstracted, thus not yielding an array of infinite size.
 
 \begin{align}
 \text{Index} = \text{String} + \text{Integer}

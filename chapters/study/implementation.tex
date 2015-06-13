@@ -107,7 +107,7 @@ rb.enable_debug_file="/path/to/output/csv/file"
 
 \subsection{Limitations}
 \label{sec:limitations}
-Since the analysis is performed by a modified interpreter, there are some imposed limitations on the achievable precision. 
+Since the analysis is performed by a modified interpreter, some limitations are imposed on the achievable precision. 
 
 \begin{itemize}
 \item  \texttt{array\_init} does not capture the type of the array at initialization. This implies that the types of arrays initialized without being assigned or manipulated afterwards are not captured by the analysis. In figure \ref{lst:dis_code} line \ref{line:print}, the call to \texttt{print\_r} does yield an \texttt{array\_init} line in the log \ref{lst:dis_code_out} but with no type, depth 1 and size 0. The size should be 3 and the type should be list.

@@ -19,7 +19,7 @@ and
 \end{align}
 Intuitively, $A_\bullet$ expresses the abstract state immediately after performing the given label and $A_\circ$ the state just before. Solving these equations performs the data-flow analysis. 
 
-Given a control flow graph $G = (V,E,s,t)$, an instance of the analysis can be derived, where $L = \text{AnalysisLattice}$ and $\mathcal{F}$ is the function space of the transfer functions. The mapping $f$ is defined throughout section \ref{sec:transferf} mapping nodes to transfer functions. $F : \mathcal{L} \times \mathcal{L}$ is defined as 
+Given a control-flow graph $G = (V,E,s,t)$, an instance of the analysis can be derived, where $L = \text{AnalysisLattice}$ and $\mathcal{F}$ is the function space of the transfer functions. The mapping $f$ is defined throughout section \ref{sec:transferf} mapping nodes to transfer functions. $F : \mathcal{L} \times \mathcal{L}$ is defined as 
 \begin{align}
 F = &\{((n, \delta), (n', \delta')) | (n,n') \in E \wedge\delta \in \Delta \notag\\
 &\quad \wedge \mathit{validSuccessor}(n, n')\notag\\
