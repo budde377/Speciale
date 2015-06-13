@@ -3,7 +3,7 @@
 In this chapter a subset of PHP (P0) has been defined. This language focuses on arrays by supporting native array operations, such as array append, write, and initialization as well as references. %Due the close relation between variables and arrays, i.e. scopes can by and large be considered as arrays, references has as an important feature 
 References are used to create more advanced arrays, e.g. cyclic arrays, and has proven to be a source of precision loss, since they disable deep-copy of arrays, and in turn strong updates on the heap. 
 
-An interprocedural data-flow analysis has been designed in the monotone framework, yielding a method for creating control-flow-graphs, a lattice expressing abstract state, and a set of transfer-functions. By relying on the monotone framework, the analysis has been performed using a straight-forward implementation of the worklist-algorithm as a plug-in in the development environment IntelliJ IDEA. 
+An interprocedural data-flow analysis has been designed in the monotone framework, yielding a method for creating control-flow graphs, a lattice expressing abstract state, and a set of transfer-functions. By relying on the monotone framework, the analysis has been performed using a straight-forward implementation of the worklist-algorithm as a plug-in in the development environment IntelliJ IDEA. 
 
 For the monotone framework to work all transfer-functions must be monotone. Monotonicity has not been proven formally. For abstract evaluation appendix \ref{app:abstract_operators} contains a full set of tables defining the abstract operators which have each been inspected for monotonicity.
 

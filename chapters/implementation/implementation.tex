@@ -1,31 +1,38 @@
 \section{Implementation}
 \label{sec:worklist}
-In order to solve the data-flow equations of the monotone framework, the above lattice, control-flow-graph, and transfer functions have been implemented in approximately $8100$ lines of Java code as a plug-in for the Intellij IDEA (Ultimate edition) development environment by JetBrains\citeB{jetbrains}. This IDE supports multiple languages, such as Java, Python, C, C++, C\#, Ruby, and PHP with tools such as re-factoring and type-checking, and a vast library of plug-ins, developed by JetBrains or the JetBrains community. The full source code of the implementation can be found at \url{http://github.com/Silwing/tapas}.
+In order to solve the data-flow equations of the monotone framework, the above lattice, control-flow graph, and transfer functions have been implemented in approximately $8100$ lines of Java code as a plug-in for the IntelliJ IDEA (Ultimate edition) development environment by JetBrains\citeB{jetbrains}. This IDE supports multiple languages, such as Java, Python, C, C++, C\#, Ruby, and PHP with tools such as re-factoring and type-checking, and a vast library of plug-ins, developed by JetBrains or the JetBrains community. The full source code of the implementation can be found at \url{http://github.com/Silwing/tapas}.
 
 When running a plug-in on a given program, an AST and type-information is available from the environment, expressed as \texttt{PSIElements} (Program-Structure-Interface elements).  The control-flow graph is created in a single pass of these elements, where each node keeps a reference to the element from which it was created. This allows for easy error reporting when performing the analysis. 
 
-The lattices are defined by interfaces and the elements are implemented as immutable data structures of these interfaces. In the name of efficiency the domain of map-lattice elements (\texttt{MapLatticeElement}) are defined as the indices of modified entries, not including the values defaulted to Value(Null($\top$)) in the initial array. Comparing two map elements is then done by comparing the values corresponding to the joint domain of the elements, which in turn allows comparisons to be done in finite time. This \emph{short-cut} also ensures that, when updating the entry of a $\top$-array only the variables initialized are effected, which is sound and yields a more precise model.
+The lattices are defined by interfaces and the elements are implemented as immutable data structures of these interfaces. In the name of efficiency the domain of map-lattice elements (\texttt{MapLatticeElement}) are defined as the indices of modified entries, not including the values defaulted to Value(Null($\top$)) in the initial array. Comparing two map elements is then done by comparing the values corresponding to the joint domain of the elements, which in turn allows comparisons to be done in finite time. This shortcut also ensures that, when updating the entry of a $\top$-array only the variables initialized are effected, which is sound and yields a more precise model.
 
 The transfer functions are implemented notoriously as introduced in section \ref{sec:transferf} with added statements for reporting of suspicious behaviour to the IDE through \texttt{Annotation}s. Reporting does not affect the outcome of the analysis and is made possible by the references to the \texttt{PSIElements} in the nodes of the control-flow graph. The feedback given to the user is in the form of either an error or a warning. An error indicates code that is definitely using an array in a suspicious way. A warning indicates code that might be suspicious, meaning that the analysis has lost some precision. Below is a list of the warnings and errors implemented. Chapter \ref{ch:evaluation} contains screenshots of how the warnings and errors are presented to the user in IntelliJ IDEA.
-\begin{itemize}
-\item Appending on definite map yields an error
-\item Merging a list with a map and vice versa yields an error
-\item Writing to a definite string key on a list yields an error
-\item Adding a new type to an array yields a warning
-\item Writing to possible non-array yields a warning
-\item Appending on possible map yields a warning
-\item Writing to a possible string key on a list yields a warning
-\end{itemize}
-\todo{Write better list and check string-write}
-
-Solving the data-flow equations of the Monotone Framework are performed by an implementation of the worklist algorithm (Algorithm \ref{algo:worklist}). Notice that, since $\iota \not\sqsubseteq \bot$, any reachable node is bound to be analysed at least once. 
+{\def\arraystretch{1.5}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{XcX}
+Condition                                                                 & Type    & Message\\\hline
+Appending on locations all pointing to maps.                              & E   & Appending on map                             \\
+Appending on locations where one or more are pointing to maps.            & W & Possible appending on map                    \\
+Merging a list with a map in \texttt{array\_merge}.                       & E   & Merging a list with a map                    \\
+Merging a map with a list in \texttt{array\_merge}.                       & E   & Merging a map with a list                    \\
+Writing to a list with a key that definitely is a string.                 & E   & Array write is with string index on list     \\
+Writing to a list with a key that is not an integer.                      & W & Array write may be with string index on list \\
+Array assigning to a location that might be a boolean, string, or number. & W & Target of write might be non-array           \\
+Array assigning a new scalar/array-type value to an array.                & W & Assigning value to array of different type   \\
+Popping an element of a map.                                                  & E   & array\_pop on map  
+\end{tabularx}
+\caption{Supported errors (E) and warnings (W)}
+\label{my-label}
+\end{table}}
+Solving the data-flow equations of the monotone framework is performed by an implementation of the worklist algorithm (Algorithm \ref{algo:worklist}). Notice that, since $\iota \not\sqsubseteq \bot$, any reachable node is bound to be analysed at least once. 
 
 \begin{algorithm}
 \caption{Worklist algorithm}
 \label{algo:worklist}
 \begin{algorithmic}[1]
 \scriptsize
-\Require Control flow graph, $G=(V,E,s,t)$
+\Require Control-flow graph, $G=(V,E,s,t)$
 \State{$I = [\forall \delta\in\Delta, n\in\mathcal{N}. ( n, \delta)\mapsto \bot]$}
 \State{$I[(s, \Lambda)\mapsto \iota]$}
 \State{$W = [f \in F | f = ((s, \Lambda),\_)]$}
@@ -43,9 +50,10 @@ Solving the data-flow equations of the Monotone Framework are performed by an im
 \end{algorithmic}
 \end{algorithm}
 
+\newpage
 \subsection{Library functions}
 \label{subsec:libraryFunctions}
-Until now, it has been assumed that any function called should be implemented in the same program. PHP however comes with a large number of internal functions, which are essential to any program. In order to support these, a \texttt{LibraryFunction} interface has been created. Implementing a class of this interface and registering it in the \texttt{PSIParser} allows modelling of a function by expressing the signature, whether arguments and return values are passed by reference or value, and specifying a transfer function for the result node. Let $\mathit{lib}$ be the name of a library function. Then the transfer function of the $\mathit{call}_\mathit{lib}(\_)$ node becomes the identity function, the flow graph is the graph containing a $\mathit{start}$ node followed by an $\mathit{exit}$ node, and the transfer function of the $\mathit{result}_{\mathit{call}_{\mathit{lib}(\_)}}$ is the specified transfer function. 
+Until now, it has been assumed that any function called should be implemented in the same program. PHP however comes with a large number of internal functions, which are essential to any program. In order to support these, a \texttt{LibraryFunction} interface has been created. Implementing a class of this interface and registering it in the \texttt{PSIParser} allows modelling of a function by expressing in the signature, whether arguments and return values are passed by reference or value, and specifying a transfer function for the result node. Let $\mathit{lib}$ be the name of a library function. Then the transfer function of the $\mathit{call}_\mathit{lib}(\_)$ node becomes the identity function, the flow graph is the graph containing a $\mathit{start}$ node followed by an $\mathit{exit}$ node, and the transfer function of the $\mathit{result}_{\mathit{call}_{\mathit{lib}(\_)}}$ is the specified transfer function. 
 
 For the library function $fn = $ \texttt{array\_merge}\citeB{arraymerge} the arguments and return value are all passed by value. The transfer function for the result node, $n = \mathit{result}_{c}(c_{\mathit{tar}})$, where $c = \mathit{call}_{{fn}}(t_1,\cdots, t_n)$, is defined as 
 \begin{align*}
@@ -69,6 +77,6 @@ f_{n,\delta_{\mathit{call}},\delta_{\mathit{exit}}}(l_{\mathit{call}}, l_{\mathi
 \end{align*} 
 This transfer function simply joins the arrays of each input value, taking invalid arguments yielding \texttt{null} into account. The joined value is then stored in the heap or temporary storage, depending on the result argument.
 
-The implementation has been tested against 48 small functional tests. While these are not representative of actual PHP programs, neither in size nor feature usage, they do aim to cover as many feature cases as possible.
+The implementation has been tested against 48 small scripts. While these are not representative of actual PHP programs, neither in size nor feature usage, they do aim to cover as many feature cases as possible.
 
 Library functions have been implemented on a by-need basis for the functional tests and the case studies presented in chapter \ref{ch:evaluation}. Some of the implemented library functions, which do not contain reference-parameters or reference-return, have been naively implemented by returning the $\top$-element value, since the precision was not required for the test in question.

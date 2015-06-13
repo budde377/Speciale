@@ -38,7 +38,7 @@ $a = [];
 $a[0] = 42; // array write
 $a[] = 1337; // array append
 \end{lstlisting}
-these are by far the most used. The library function \texttt{array\_push} is equivalent to the append operation if given only a single argument. The documentation recommends the append operation in such situations for performance reasons, which aligns with the use of append over push in the figure. 
+These are by far the most used. The library function \texttt{array\_push} is equivalent to the append operation if given only a single argument. The documentation recommends the append operation in such situations for performance reasons, which aligns with the use of append over push in the figure. 
 
 \begin{figure}
 \centering
@@ -47,7 +47,7 @@ these are by far the most used. The library function \texttt{array\_push} is equ
 \label{fig:type_operations}
 \end{figure}
 
-Notice how the objects are divided into three categories, Object, Object (List), and Object (Sparse List).  The last two are arrays with values of different types, but with keys of lists and sparse lists respectively. The distribution of array operations shows that array list operations are almost exclusively performed on lists (List, Sparse List, Object List, Object Sparse List). From this follows that if a list array-operation is performed on an array, then it is almost certain that the array is of type list. When encountering an array write operation it is not necessarily the case that the array is a list. Array write operations are used frequently on lists, arrays, and objects.
+Notice how the objects are divided into three categories, Object, Object (List), and Object (Sparse List). The last two are arrays with values of different types, but with keys of lists and sparse lists respectively. The distribution of array operations shows that array list operations are almost exclusively performed on lists (List, Sparse List, Object List, Object Sparse List). From this follows that if a list array-operation is performed on an array, then it is almost certain that the array is of type list. When encountering an array write operation it is not necessarily the case that the array is a list. Array write operations are used frequently on lists, arrays, and objects.
 
 
 %The operation on arrays of map and object type consists almost entirely of write operations, whereas arrays of type list have some write operation but mostly append operations. 
