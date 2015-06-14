@@ -14,9 +14,11 @@
 \usepackage{epsfig}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+%\usepackage{natbib}
 \usepackage[labeled]{multibib}
 \usepackage{color}
 \usepackage{courier}
+\usepackage[pagebackref]{hyperref}
 
 \usepackage{datetime}
 \usepackage{epstopdf} 
@@ -25,7 +27,6 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows}
 \usepackage{tikz-cd}
-\usepackage{hyperref}
 \usepackage{bussproofs}
 \usepackage{amsthm}
 \usepackage{caption,subcaption}
@@ -36,6 +37,7 @@
 \usepackage{ragged2e}  % for '\RaggedRight' macro (allows hyphenation)
 \usepackage{alphalph}
 \DeclareCaptionSubType*[arabic]{figure}
+\usepackage[inline]{enumitem}
 
 \usepackage{float}
 
@@ -68,13 +70,16 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
 \newtheorem{lemma}{Lemma}
+
 \hypersetup{
     colorlinks,
     citecolor=black,
     filecolor=black,
     linkcolor=black,
-    urlcolor=black
+    urlcolor=black,
+    backref=section
 }
+
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mygray}{rgb}{0.5,0.5,0.5}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
@@ -118,7 +123,7 @@
 
 \newcommand{\Tau}{\mathrm{T}}
 
-\newcommand{\todo}[1]{{\color[rgb]{.5,0,0}\textbf{$\blacktriangleright$#1$\blacktriangleleft$}}}
+%\newcommand{\todo}[1]{{\color[rgb]{.5,0,0}\textbf{$\blacktriangleright$#1$\blacktriangleleft$}}}
 
 \newcites{A,B}{Primary Bibliography,Secondary Bibliography}
 

@@ -17,7 +17,7 @@ $first = array_shift($numbers); // $numbers = [2,3,4]
 \label{lst:list_array}
 \end{program}
 
-Besides the \texttt{array\_shift} function and the array append operation, \texttt{\$v[]}, the PHP library contains many other library functions for manipulating lists, e.g. \texttt{array\_push}, \texttt{array\_pop}, \texttt{sort}, etc.
+Besides the \texttt{array\_shift} function and the array append operation, \texttt{\$v[]}, the PHP library contains many other library functions for manipulating lists, e.g.\ \texttt{array\_push}, \texttt{array\_pop}, \texttt{sort}.
 
 Arrays can also explicitly define keys, which can be either a string or an integer. 
 
@@ -48,7 +48,7 @@ $values = array_values($text_to_int);
 
 If given an array-map, the values or keys can be fetched using the functions \texttt{array\_values} or \texttt{array\_keys} respectively. These functions return an array of the list type. 
 
-Finally arrays can be treated as objects, i.e. the entries can be viewed as properties of arbitrary type. These arrays could be replaced by the \texttt{stdClass} which mainly is used for its dynamic properties, just like arrays. Some of the built-in arrays of PHP can be considered objects, including the \texttt{\$\_SERVER} array\citeB{phpserver}. This array contains server and execution environment information, which are of different types, e.g. \texttt{\$\_SERVER['argv']} is an array of arguments passed to the interpreter, and \texttt{\$\_SERVER['REQUEST\_TIME']} is an integer UNIX timestamp of the start of the request. 
+Finally arrays can be treated as objects, i.e.\ the entries can be viewed as properties of arbitrary type. These arrays could be replaced by the \texttt{stdClass} which mainly is used for its dynamic properties, just like arrays. Some of the built-in arrays of PHP can be considered objects, including the \texttt{\$\_SERVER} array\citeB{phpserver}. This array contains server and execution environment information, which are of different types, e.g.\ \texttt{\$\_SERVER['argv']} is an array of arguments passed to the interpreter, and \texttt{\$\_SERVER['REQUEST\_TIME']} is an integer UNIX timestamp of the start of the request. 
 
 \begin{definition}
 \label{def:object}

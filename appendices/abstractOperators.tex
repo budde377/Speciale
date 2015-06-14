@@ -4,7 +4,7 @@ The following definitions are used for all tables in this appendix.
 x, y &\in \mathbb{Z} \wedge x, y > 0 \\
 a, b &\in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})
 \end{align*}
-Furthermore the shortshand $f$ is used for the boolean \texttt{false} value.
+Furthermore the shorthand $f$ is used for the boolean \texttt{false} value.
 
 \begin{table}[htbp]
 \centering
@@ -124,7 +124,7 @@ f      & $\bot$ & f      & t      & $\top$ \\
 $\top$ & $\bot$ & $\top$ & $\top$ & $\top$
 \end{tabular}
 } &
-\subcaptionbox{Not Equality
+\subcaptionbox{Not equality
 \label{tab:abstract_not_equal_bool}}{
 \begin{tabular}{l|cccc}
 $!=$   & $\bot$ & t      & f      & $\top$ \\\hline
@@ -134,7 +134,8 @@ f      & $\bot$ & t      & f      & $\top$ \\
 $\top$ & $\bot$ & $\top$ & $\top$ & $\top$
 \end{tabular}
 } \\
-\subcaptionbox{Less Than\label{tab:abstract_less_than_bool}}{
+& \\
+\subcaptionbox{Less than\label{tab:abstract_less_than_bool}}{
 \begin{tabular}{l|cccc}
 $<$    & $\bot$ & t      & f      & $\top$ \\\hline
 $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
@@ -143,7 +144,7 @@ f      & $\bot$ & t      & f      & $\top$ \\
 $\top$ & $\bot$ & $\top$ & f      & $\top$
 \end{tabular}
 } &
-\subcaptionbox{Less Than/Equal\label{tab:abstract_less_than_equal_bool}}{
+\subcaptionbox{Less than/equal\label{tab:abstract_less_than_equal_bool}}{
 \begin{tabular}{l|cccc}
 $<=$   & $\bot$ & t      & f      & $\top$ \\\hline
 $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
@@ -152,7 +153,8 @@ f      & $\bot$ & t      & t      & t \\
 $\top$ & $\bot$ & t      & $\top$ & $\top$
 \end{tabular}
 } \\
-\subcaptionbox{Greater Than\label{tab:abstract_greater_than_bool}}{
+& \\
+\subcaptionbox{Greater than\label{tab:abstract_greater_than_bool}}{
 \begin{tabular}{l|cccc}
 $>$    & $\bot$ & t      & f      & $\top$ \\\hline
 $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
@@ -161,9 +163,9 @@ f      & $\bot$ & f      & f      & f \\
 $\top$ & $\bot$ & f      & $\top$ & $\top$
 \end{tabular}
 } &
-\subcaptionbox{Greater Than/Equal\label{tab:abstract_greater_than_equal_bool}}{
+\subcaptionbox{Greater than/equal\label{tab:abstract_greater_than_equal_bool}}{
 \begin{tabular}{l|cccc}
-$<=$   & $\bot$ & t      & f      & $\top$ \\\hline
+$>=$   & $\bot$ & t      & f      & $\top$ \\\hline
 $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
 t      & $\bot$ & t      & t      & t \\
 f      & $\bot$ & f      & t      & $\top$ \\
@@ -171,7 +173,7 @@ $\top$ & $\bot$ & $\top$ & t & $\top$
 \end{tabular}
 }
 \end{tabular}
-\caption{Abstract comparison operators on booleans}
+\caption{Abstract comparison operators for booleans}
 \end{table}
 
 \begin{table}[htbp]
@@ -185,7 +187,7 @@ r             & $\bot$ & f      & f          & r==s   & $\top$        & $\top$ \
 notUIntString & $\bot$ & f      & f          & $\top$ & $\top$        & $\top$ \\
 $\top$        & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$
 \end{tabular}
-\caption{Abstract Equal for Strings}
+\caption{Abstract equal for strings}
 \label{tab:abstract_equal_string}
 \end{table}
 
@@ -200,7 +202,7 @@ r             & $\bot$ & t      & t          & r!=s   & $\top$        & $\top$ \
 notUIntString & $\bot$ & t      & t          & $\top$ & $\top$        & $\top$ \\
 $\top$        & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$
 \end{tabular}
-\caption{Abstract Not Equal for Strings}
+\caption{Abstract not equal for strings}
 \label{tab:abstract_not_equal_string}
 \end{table}
 
@@ -215,7 +217,7 @@ r             & $\bot$ & $r\oplus y$    & $\top$     & $r\oplus s$    & $\top$  
 notUIntString & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$ \\
 $\top$        & $\bot$ & $\top$ & $\top$     & $\top$ & $\top$        & $\top$
 \end{tabular}
-\caption{Abstract less than (or equal) and greater than (or equal) for on strings.}
+\caption{Abstract less than (or equal) and greater than (or equal) for strings.}
 \label{tab:abstract_less_than_string}
 \end{table}
 

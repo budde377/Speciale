@@ -1,11 +1,9 @@
-\todo{Fix orphans etc}
-
-Evaluating the analysis presented in chapter \ref{ch:analysis} is performed by analysing six small P0 programs. The first program is a constructed example illustrating how the analysis handle the two introduced array types. The last five programs have been found by manually inspecting the results from the dynamic analysis in chapter \ref{ch:study}, looking for uncategorizable arrays and misuse of list-operations, e.g. \texttt{array\_pop} on a map. 
+In this chapter, the analysis from chapter \ref{ch:analysis} is evaluated on six small programs. The first program, evaluated in \ref{sec:monthnamenumber}, is a constructed example illustrating how the analysis handles the two array types introduced. The remaining five programs, evaluated in section \ref{sec:arraypivot} to \ref{sec:joiningarrayvalues}, have been found by manually inspecting the results from the dynamic analysis in chapter \ref{ch:study}, looking for uncategorizable arrays and misuse of list-operations, e.g.\ \texttt{array\_pop} on a map. 
 
 
-When found, the programs were minimized (i.e. unnecessary logic were removed), rewritten to P0, and necessary library functions implemented. Running the analysis was performed with a context bound by length two, $k=2$. This bound only imposes a practical restriction on recursive directory content case (sec. \ref{sec:directoryContent}), since the maximum possible depth of function calls for all other examples is two. 
+When found, the programs were minimized (i.e.\ unnecessary logic was removed), rewritten to P0, and necessary library functions implemented. Running the analysis was performed with a context bound by length two ($k=2$). This bound only imposes a practical restriction on the recursive directory content program (section \ref{sec:directoryContent}), since the maximum possible depth of function calls for all other examples is two. 
 
-Execution statistics, such as running time and memory consumption, has been omitted, since an implementation of a fast and resource efficient analysis isn't a goal of this thesis. Instead this chapter will investigate whether the analysis provides useful error-messages, at the right place of the right kind, and if the problem can be resolved without raising new errors.
+Execution statistics (such as running time and memory consumption) have been omitted, since an implementation of a fast and resource efficient analysis is not a goal of this thesis. Instead, this chapter will investigate whether the analysis provides useful error-messages, which are of the right kind and if the problem can be resolved without raising new errors.
 
 
 

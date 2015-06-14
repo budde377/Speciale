@@ -1,7 +1,8 @@
 \section{Array pivot}
-The function, \texttt{pivot}, in program \ref{lst:pivot}, was found in the Joomla content management system, in a class containing functions for manipulating arrays. It uses the library functions \texttt{count}, which returns the size of a given array, and \texttt{array\_key\_exists} which given an array and a key checks if the key is set in the array. 
+\label{sec:arraypivot}
+The function \texttt{pivot} in program \ref{lst:pivot}, was found in the Joomla content management system in a class containing functions for manipulating arrays. It uses the library functions \texttt{count}, which returns the size of a given array, and \texttt{array\_key\_exists} which given an array and a key checks if the key is set in the array. 
 
-The \texttt{pivot} function accepts an array as its only argument and return an array, with the unique values of the input array as keys and their position in the original array as value. E.g. executing \texttt{pivot([1,2,3,4,5,4,3,2,1])} yields the map
+The \texttt{pivot} function accepts an array as its only argument and returns an array with the unique values of the input array as keys and their position in the original array as value. For example executing \texttt{pivot([1,2,3,4,5,4,3,2,1])} yields the map
 \lstdefinestyle{nonumbers}{numbers=none}
 \begin{lstlisting}[style=nonumbers]
 [
@@ -12,7 +13,7 @@ The \texttt{pivot} function accepts an array as its only argument and return an 
 	5 => 4  			//5 is at key 4
 ]
 \end{lstlisting}
-Notice how the type of the values in the resulting array above alternates. If a value only occurs once in the input array, that single position is returned in the output array, else  if there are more than one, an array of possible positions is returned.
+Notice how the type of the values in the resulting array above alternates. If a value only occurs once in the input array, that single position is returned in the output array, otherwise if there are more than one, an array of possible positions is returned.
 \begin{program}
 \begin{lstlisting}
 <?php
@@ -53,8 +54,7 @@ $result = pivot($simpleArr);
 \caption{Pivot example}
 \label{lst:pivot}
 \end{program}
-
-While PHP supports coercion between many of native types, there is no such thing as array coercion. The mix of arrays and scalar values in the resulting array would ultimately force a check the data type before using the values, which could have been avoided if the function consequently returned an array containing arrays of integers. Necessary data type checks strongly suggest bad design choices and the analysis provides warnings about suspicious use of arrays as seen in figure \ref{fig:pivotScreenshot}. Both warnings are based on the fact that values of the array associated with ``result'' might be arrays or number values, the first happens when an integer is appended to an array already containing an array or integer (figure \ref{fig:pivotScreenshot1}), the second when an array append operation is performed on something that might be a number (figure \ref{fig:pivotScreenshot2}). 
+While PHP supports coercion between many of the simple types, there is no such thing as array coercion. The mix of arrays and scalar values in the resulting array would ultimately require a check of the data type before using the values, which could have been avoided if the function consistently returned an array containing arrays of integers. The need for data type checks strongly suggest bad design choices and the analysis provides warnings about suspicious use of arrays as seen in figure \ref{fig:pivotScreenshot}. Both warnings are based on the fact that values of the array associated with ``result'' might be arrays or number values. The first happens when an integer is appended to an array already containing an array or integer (figure \ref{fig:pivotScreenshot1}) and the second when an array append operation is performed on something that might be a number (figure \ref{fig:pivotScreenshot2}). 
 
 \begin{figure}
 \centering
@@ -74,9 +74,9 @@ While PHP supports coercion between many of native types, there is no such thing
 \label{fig:pivotScreenshot}
 \end{figure}
 
-Notice how both warnings occurs as side-effects of the real problem, namely the type of the content. In practice the sub-array always contains integers (not arrays and integers) and the append operation is always performed on a number. The real problem is however not captured by the analysis. This happens when the branches of the if-statement meets. Here the analysis preforms a join of the analysis lattice element, hence a join of the lattice element representing the abstract value of \texttt{\$result} array. For the first iteration of the for-loop, the first branch of the \texttt{if}-statement on line \ref{line:pivot-1} would express the array as a list of integers, while the second branch as a list of lists containing integers. A warning on a join of these opposing representations could be implemented, but is currently not supported by the analysis.
+Both warnings occur as side-effects of the real problem, namely the type of the content. In practice, the sub-array always contains integers (not arrays and integers) and the append operation is always performed on a number. The real problem, however, is not captured by the analysis. This happens when the branches of the if-statement meet. Here, the analysis performs a join of the analysis lattice element, hence a join of the lattice element representing the abstract value of \texttt{\$result} array. For the first iteration of the for-loop, the first branch of the \texttt{if}-statement on line \ref{line:pivot-1} would express the array as a list of integers, while the second branch would express it as a list of lists containing integers. A warning on a join of these opposing representations could be implemented, but is currently not supported by the analysis.
 
-By rewriting the program to always returning a list of lists (see program \ref{lst:pivotFixed}) the specification must be changed, but the warnings will disappear. While the number of lines isn't a useful metric for quality, the program is nine lines shorter and definitely easier to understand due to a lower number of branches and variables, i.e.\ an \texttt{if}-statement and the use of the \texttt{\$counter} array has been removed.
+By rewriting the program to always return a list of lists (see program \ref{lst:pivotFixed}) the specification must be changed, however the warnings will disappear. The program is nine lines shorter and definitely easier to understand due to a lower number of branches and variables, i.e.\ an \texttt{if}-statement and the use of the \texttt{\$counter} array has been removed.
 
 \begin{program}
 \begin{lstlisting}

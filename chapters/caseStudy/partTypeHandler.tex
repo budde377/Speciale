@@ -1,6 +1,6 @@
 \newpage
 \section{Caching instances}
-Program \ref{lst:typeHandler} was found in the CMS framework Part, which is created by one of the authors. The program is supposed to work as a map of maps from \texttt{\$instance}'s to \texttt{\$value}'s with no type-restriction of the instances, and caching of values. E.g. calling \texttt{createInstance("key1", "instance1", "value1"}  should return \texttt{"value1"}, then calling \texttt{createInstance("key1", "instance1", "value2")} should also return \texttt{"value1"}, since the value is cached.
+Program \ref{lst:typeHandler} was found in the CMS framework Part, which is created by one of the authors. The program is supposed to work as a map of maps from \texttt{\$instance}s to \texttt{\$value}s with caching of values and no type-restriction of the instances. For example calling \texttt{createInstance("key1", "instance1", "value1"}  should return \texttt{"value1"}. Then calling \texttt{createInstance("key1", "instance1", "value2")} should also return \texttt{"value1"}, since the value is cached.
 
 \begin{program}
 \begin{lstlisting}
@@ -30,7 +30,7 @@ createInstance("test", "test2", "testValue");
 
 
 
-Program \ref{lst:typeHandler2} illustrates how the program should have been implemented, by keeping two maps of lists containing instances or values respectively. Two maps are used, as opposed to a single multidimensional map, because it might not be possible to coerce the instances to array indices. The actual implementation is however wrong in that it does not use the multidimensionality of the \texttt{\$keyArray} or \texttt{\$valueArray}. Instead instances are appended and lists written to the array, i.e. the two maps are used as lists and maps simultaneously. 
+Program \ref{lst:typeHandler2} illustrates how the program should have been implemented by keeping two maps of lists containing instances or values, respectively. Two maps are used, as opposed to a single multidimensional map, since it might not be possible to coerce the instances to array indices. The actual implementation is wrong however, in that it does not use the multidimensionality of the \texttt{\$keyArray} or \texttt{\$valueArray}. Instead, instances are appended and lists written to the array, i.e.\ the two maps are used as lists and maps simultaneously. 
 
 
 
@@ -56,14 +56,14 @@ function createInstance($string, $instance, $value)
 }
 createInstance("test", "test2", "testValue");
 \end{lstlisting}
-\caption{Caching instances example}
+\caption{Caching instances corrected example}
 \label{lst:typeHandler2}
 \end{program}
 
 
-When running the analysis on the program (\ref{lst:typeHandler}), two errors are raised as illustrated in figure \ref{fig:typeHandlerScreenshot}. Both errors are of the same type, but on the \texttt{\$keyArray} (line \ref{line:typeHandler-1}) or \texttt{\$valueArray} (line \ref{line:typeHandler-2}) respectively. They occur when an append operation is preformed on arrays that previously were considered maps, and represent the main problem of the program quite well. They would not occur in the corrected version (program \ref{lst:typeHandler2}), where the append operations would be performed on lists. No problems are found in the corrected version (program \ref{lst:typeHandler2}).
+When running the analysis on program (\ref{lst:typeHandler}), two errors are raised as illustrated in figure \ref{fig:typeHandlerScreenshot}. Both errors are of the same type, but on the \texttt{\$keyArray} (line \ref{line:typeHandler-1}) and \texttt{\$valueArray} (line \ref{line:typeHandler-2}) respectively. They occur when an append operation is performed on arrays that previously were considered maps, and represent the main problem of the program quite well. They would not occur in the corrected version (program \ref{lst:typeHandler2}), where the append operations would be performed on lists. No problems are found in the corrected version.
 
-Two library functions are used in the program; \texttt{array\_key\_exists}, modelled as a function returning boolean $\top$ and \texttt{array\_search}, as a function returning array indices from the given array and boolean false. These are used for checking if a key is set in an array and finding the key of a given value in an array respectively.
+Two library functions are used in the program; \texttt{array\_key\_exists}, modelled as a function returning boolean $\top$, and \texttt{array\_search}, modelled as a function returning array indices from the given array and boolean false. These are used for checking if a key is set in an array and finding the key of a given value in an array, respectively.
 
 \begin{figure}
 \centering

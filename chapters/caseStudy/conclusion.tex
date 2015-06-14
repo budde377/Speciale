@@ -1,8 +1,8 @@
 \newpage\section{Conclusion}
 \label{sec:caseConcl}
-The implementation of the analysis successfully indicated errors when a program contained suspicious arrays and operations. Subsequently these errors were all resolved by rewriting the programs, without creating new errors. 
+The implementation of the analysis successfully indicated errors when a program contained suspicious arrays and operations. Subsequently, these errors were all resolved by rewriting the programs, without creating new errors. 
 
-It would however seem beneficial to add a warnings when two paths meet, e.g. after an \texttt{if}-statement, as was indicated by the second and third case. The inaccuracy of the $\top$ array also became apparent, where updating an top array would update most of the heap. It should be considered to modify the Array lattice, by adding an element of heap locations between the ArrayMap and ArrayList elements and the $\top$ element, see figure \ref{fig:newArray}. This would intuitively represent arrays that are not known to be lists or maps, but is assured to contain some locations, thus allowing for more precision than the $\top$ array. 
+It would, however, seem beneficial to add a warning when two paths meet, e.g.\ after an \texttt{if}-statement, as was indicated by the second and third case. The inaccuracy of the $\top$ array also became apparent, where updating a top array would update most of the heap. It should be considered to modify the Array-lattice, by adding an element of heap locations between the ArrayMap and ArrayList elements and the $\top$ element (see figure \ref{fig:newArray}). This would intuitively represent arrays that are not known to be lists or maps, but are assured to contain some locations, thus allowing for more precision than the $\top$ array. 
 
 \begin{figure}
 \centering
@@ -21,5 +21,5 @@ ArrayList\ar[dr] & & ArrayMap\ar[dl]\\
 \label{fig:newArray}
 \end{figure}
 
-Since this thesis doesn't focus on efficiency wrt. memory consumption or run-time, no such information is associated with this case study. It should however be noted that execution was reasonable fast, performed in seconds rather than minutes, this in spite of the current analysis being performed after running the static analysis of the IDE. The observed memory consumption was rather high which possibly follows from the implemented caching strategy of the lattice elements.  
+Since this thesis does not focus on efficiency with respect to memory consumption or run-time, no such information is associated with this case study. It should be noted however, that execution was reasonably fast (performed in seconds rather than minutes) in spite of the current analysis being performed after running the static analysis of the IDE. The observed memory consumption was rather high, which possibly follows from the implemented caching strategy of the lattice elements.  
 %It is expected that more false-postive, i.e. incorrect warnings, will be raised when running the analysis on larger programs. 

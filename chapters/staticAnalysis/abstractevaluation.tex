@@ -3,7 +3,7 @@
 
 In order to fully utilize the benefits of a dynamically typed language, PHP supports coercion from most types to scalars (strings, numbers and booleans). Coercion is primarily used when performing binary and unary operations, and when accessing arrays. Coercion to an array index must be treated as a separate case, since it behaves differently from string or number coercion. For example accessing an array with key \texttt{\$key} (\texttt{\$a[\$key]}) if \texttt{\$key = 42} or \texttt{\$key = "42"} then the entry at integer $42$ is accessed, which is similar to string-to-number coercion. The same entry is accessed with \texttt{\$key = 42.1} or \texttt{\$key = 4.34E1}, since keys must be either integers or strings. Accessing with \texttt{\$key = "42.1"} accesses the entry with string key \texttt{"42.1"}. 
 
-Since there is no formal language specification, these coercion rules have largely been discovered by manual inspection, using different operators, e.g. number coercion has been explored by adding values of various types together, with the binary \texttt{+}-operator and string coercion with the string-concatenation \texttt{.}-operator.
+Since there is no formal language specification, these coercion rules have largely been discovered by manual inspection, using different operators, e.g.\ number coercion has been explored by adding values of various types together, with the binary \texttt{+}-operator and string coercion with the string-concatenation \texttt{.}-operator.
 
 Coercion on abstract values can be performed using the $c_{\alpha, \beta} : \alpha \rightarrow \beta$ function, where $\alpha \in \{ \text{Value}, \text{Array}, \text{Number}, \text{String}, \text{Null}, \text{Boolean}\}$ and $\beta \in \{\text{Number}, \text{Value}, \text{String}, \text{Index}, \text{Boolean}\}$. 
 
@@ -101,14 +101,14 @@ c_{\text{Null}, \text{Index}}(v) &= \begin{cases}
 c_{\alpha, \alpha} (v) &= v
 \end{align*}
 }
-The functions $\mathit{int}$, $\mathit{num}$, and $\mathit{string}$ create an integer, a number, and a string respectively in the obvious way, e.g.\ $\mathit{int}(42.1) = 42$, $\mathit{string}(1337) = \texttt{"1337"}$, and $\mathit{number}(\texttt{"1337"}) = 1337$. Furthermore the predicates $\mathit{isNumber}$, $\mathit{isInteger}$ and $\mathit{isString}$ are satisfied if and only if the value can be interpreted as a number, integer, or string respectively. For example $\mathit{isNumber}(\texttt{"42.1"})$ is satisfied while $\mathit{isInteger}(\texttt{"42.1"})$ is not.
+The functions $\mathit{int}$, $\mathit{num}$, and $\mathit{string}$ create an integer, a number, and a string, respectively, in the obvious way, e.g.\ $\mathit{int}(42.1) = 42$, $\mathit{string}(1337) = \texttt{"1337"}$, and $\mathit{number}(\texttt{"1337"}) = 1337$. Furthermore the predicates $\mathit{isNumber}$, $\mathit{isInteger}$ and $\mathit{isString}$ are satisfied if and only if the value can be interpreted as a number, integer, or string respectively. For example $\mathit{isNumber}(\texttt{"42.1"})$ is satisfied while $\mathit{isInteger}(\texttt{"42.1"})$ is not.
 
 Five interesting cases of coercion in PHP include: (i) any array coerced to a string will result in the string \texttt{"Array"}, (ii) \texttt{null} is string-coerced to the empty string, (iii) both the empty string and the string literal \texttt{"0"} are boolean-coerced to boolean \texttt{false}, (iv) boolean \texttt{false} is string-coerced to the empty string, and (v) an empty array is boolean-coerced to boolean \texttt{false}.
 
 
 \section{Abstract evaluation}
 \label{sec:abseval}
-The PHP language syntax contains a set of binary and unary operators. These operators evaluate one or two operand values to a result value. Working with abstract values introduces the need for an abstract evaluation of these operators. Being dynamically typed PHP allows for many cross-type operations to be performed, some of which simply coerce the operands to sensible types. However some exceptions exists, e.g. performing the increment operation on strings. P0 does not support these exceptions. The operations are supported on the types on which they are defined, and cross-type operations are supported by using the coercion functions defined in the previous section.
+The PHP language syntax contains a set of binary and unary operators. These operators evaluate one or two operand values to a result value. Working with abstract values introduces the need for an abstract evaluation of these operators. Being dynamically typed, PHP allows for many cross-type operations to be performed, some of which simply coerce the operands to sensible types. However some exceptions exist, e.g.\ performing the increment operation on strings. P0 does not support these exceptions. The operations are supported on the types on which they are defined, and cross-type operations are supported by using the coercion functions defined in the previous section.
 
 In order to maintain some precision when evaluating binary and unary operators, a table is created for each operation defining the result of evaluating a given input abstractly. These tables are available in appendix \ref{app:abstract_operators} with some interesting cases presented below.
 
@@ -158,7 +158,7 @@ Operator & Name & Signature\\
 \caption{Unary operators\label{tab:unop}}
 \end{table}
 
-The binary and unary operators supported are listed in table \ref{tab:binop} and \ref{tab:unop} respectively. Associated with them is their signature, indicating for which values they are defined. The operators are generalized to values by using the coercion function from the previous section. E.g. given values $x$ and $y$
+The binary and unary operators supported are listed in table \ref{tab:binop} and \ref{tab:unop} respectively. Associated with them is their signature, indicating for which values they are defined. The operators are generalized to values by using the coercion function from the previous section. E.g.\ given values $x$ and $y$
 \begin{align*}
     x \oplus y =  c_{\beta, \text{Value}}(c_{\text{Value}, \alpha}(x) \oplus c_{\text{Value},\alpha}(y))
 \end{align*}
@@ -166,7 +166,7 @@ where $\oplus : \alpha \times \alpha \rightarrow \beta$. Likewise the unary oper
 \begin{align*}
     \circ x = c_{\alpha, \text{Value}}(\circ (c_{\text{Value}, \alpha}(x)))
 \end{align*}
-where $\circ : \alpha \rightarrow \alpha $. E.g., performing addition \texttt{41 + true} first coerces the right side to \texttt{1} yielding \texttt{42} as result of the addition. 
+where $\circ : \alpha \rightarrow \alpha $. For example performing addition \texttt{41 + true} coerces the right-hand side to \texttt{1} yielding \texttt{42} as result of the addition. 
 
 \begin{comment}
 Notice how the signature of the decrement is different from increment. This follows from the \emph{feature} that decrementing a variable containing \texttt{null} is not coerced to 0 and then decremented, but instead leaves the variable unchanged. This leads to the abstract decrement operation $\texttt{- -}: \text{Value}\rightarrow\text{Value}$.
@@ -197,7 +197,7 @@ In table \ref{tab:binop} logical \texttt{AND} and \texttt{OR} operators have two
 For numeric operators the variables $x$, $y$, $a$, and $b$ are used. The variables $x$ and $y$ denote an integer larger than zero ($x, y \in \mathbb{Z} \wedge x, y > 0$) and the variables $a$, $b$ denotes a double smaller than zero or not an integer, $a, b \in \mathbb{R} \wedge (a, b < 0 \vee a, b \notin \mathbb{Z})$. Rephrased; $x$ and $y$ are uInt numbers and $a$ and $b$ are notUInt numbers, e.g.\ with this notation the addition $x+a$ would be an addition of a uInt number ($x$) and a notUInt number ($a$).
 
 
-Table \ref{tab:abstract_subtraction1} defines abstract subtraction. Numbers in uInt are split into 0 and all other numbers, while numbers in notUInt are split into negative and positive numbers. These splits are made to heighten the precision of the operator. The right-identity of subtraction is 0 which is used in the 0-column of table \ref{tab:abstract_subtraction1} to get uInt instead of $\top$. Subtracting negative numbers correspond to adding the absolute value of the number, e.g. $5 - (-3) = 5 + 3$. For uInt this means that adding negative integers results in uInt instead of $\top$.
+Table \ref{tab:abstract_subtraction1} defines abstract subtraction. Numbers in uInt are split into 0 and all other numbers, while numbers in notUInt are split into negative and positive numbers. These splits are made to improve the precision of the operator. The right-identity of subtraction is 0 which is used in the 0-column of table \ref{tab:abstract_subtraction1} to get uInt instead of $\top$. Subtracting negative numbers correspond to adding the absolute value of the number, e.g.\ $5 - (-3) = 5 + 3$. For uInt this means that adding negative integers results in uInt instead of $\top$.
 
 \begin{table}[htbp]
 \centering
@@ -240,7 +240,7 @@ $\top$   & $\bot$ & $f$    & $\top$   & $\top \sqcup f$          & $\top\sqcup f
 \label{tab:abstract_modulus1}
 \end{table}
 
-Comparison operators are defined directly on values, since different types can be compared with each other courtesy of type translation. PHP has a non-complete ordered definition of how values are compared depending on their type, which can be seen in table \ref{tab:comparisons}. Any combination of operators not present in the table are considered unspecified and yields a boolean $\top$ value. 
+Comparison operators are defined directly on values, since different types can be compared with each other courtesy of type translation. PHP has a non-complete ordered definition of how values are compared depending on their type, which can be seen in table \ref{tab:comparisons}. Any combination of operators not present in the table is considered unspecified and yields a boolean $\top$ value. 
 
 For performance reasons, the analysis does not try to compare all different combinations of possible types when performing abstract comparison operators. If either value has multiple possible types the result is the boolean $\top$-element. Otherwise the comparison operators follow the order of table \ref{tab:comparisons} for coercion of values and comparison of specific types are specified in the tables in appendix \ref{app:abstract_operators}.
 

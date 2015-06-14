@@ -6,24 +6,24 @@ When running a plug-in on a given program, an AST and type-information is availa
 
 The lattices are defined by interfaces and the elements are implemented as immutable data structures of these interfaces. In the name of efficiency the domain of map-lattice elements (\texttt{MapLatticeElement}) are defined as the indices of modified entries, not including the values defaulted to Value(Null($\top$)) in the initial array. Comparing two map elements is then done by comparing the values corresponding to the joint domain of the elements, which in turn allows comparisons to be done in finite time. This shortcut also ensures that, when updating the entry of a $\top$-array only the variables initialized are effected, which is sound and yields a more precise model.
 
-The transfer functions are implemented notoriously as introduced in section \ref{sec:transferf} with added statements for reporting of suspicious behaviour to the IDE through \texttt{Annotation}s. Reporting does not affect the outcome of the analysis and is made possible by the references to the \texttt{PSIElements} in the nodes of the control-flow graph. The feedback given to the user is in the form of either an error or a warning. An error indicates code that is definitely using an array in a suspicious way. A warning indicates code that might be suspicious, meaning that the analysis has lost some precision. Below is a list of the warnings and errors implemented. Chapter \ref{ch:evaluation} contains screenshots of how the warnings and errors are presented to the user in IntelliJ IDEA.
+The transfer functions are implemented notoriously as introduced in section \ref{sec:transferf} with added statements for reporting of suspicious behaviour to the IDE through \texttt{Annotation}s. Reporting does not affect the outcome of the analysis and is made possible by the references to the \texttt{PSIElements} in the nodes of the control-flow graph. The feedback given to the user is in the form of either an error or a warning. An error indicates code that is definitely using an array in a suspicious way. A warning indicates code that might be suspicious, meaning that the analysis has lost some precision. Table \ref{tab:supportedEandW} lists the warnings and errors currently implemented. Chapter \ref{ch:evaluation} contains screenshots of how the warnings and errors are presented to the user in IntelliJ IDEA.
 {\def\arraystretch{1.5}
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
-\begin{tabularx}{\textwidth}{XcX}
+\begin{tabularx}{\textwidth}{X|c|X}
 Condition                                                                 & Type    & Message\\\hline
 Appending on locations all pointing to maps.                              & E   & Appending on map                             \\
 Appending on locations where one or more are pointing to maps.            & W & Possible appending on map                    \\
 Merging a list with a map in \texttt{array\_merge}.                       & E   & Merging a list with a map                    \\
 Merging a map with a list in \texttt{array\_merge}.                       & E   & Merging a map with a list                    \\
-Writing to a list with a key that definitely is a string.                 & E   & Array write is with string index on list     \\
+Writing to a list with a key that is definitely a string.                 & E   & Array write is with string index on list     \\
 Writing to a list with a key that is not an integer.                      & W & Array write may be with string index on list \\
 Array assigning to a location that might be a boolean, string, or number. & W & Target of write might be non-array           \\
 Array assigning a new scalar/array-type value to an array.                & W & Assigning value to array of different type   \\
 Popping an element of a map.                                                  & E   & array\_pop on map  
 \end{tabularx}
 \caption{Supported errors (E) and warnings (W)}
-\label{my-label}
+\label{tab:supportedEandW}
 \end{table}}
 Solving the data-flow equations of the monotone framework is performed by an implementation of the worklist algorithm (Algorithm \ref{algo:worklist}). Notice that, since $\iota \not\sqsubseteq \bot$, any reachable node is bound to be analysed at least once. 
 
@@ -79,4 +79,4 @@ This transfer function simply joins the arrays of each input value, taking inval
 
 The implementation has been tested against 48 small scripts. While these are not representative of actual PHP programs, neither in size nor feature usage, they do aim to cover as many feature cases as possible.
 
-Library functions have been implemented on a by-need basis for the functional tests and the case studies presented in chapter \ref{ch:evaluation}. Some of the implemented library functions, which do not contain reference-parameters or reference-return, have been naively implemented by returning the $\top$-element value, since the precision was not required for the test in question.
+Library functions have been implemented on a by-need basis for the functional tests and case studies presented in chapter \ref{ch:evaluation}. Some of the implemented library functions, which do not contain reference-parameters or reference-return, have been naively implemented by returning the $\top$-element value, since the precision was not required for the test in question.

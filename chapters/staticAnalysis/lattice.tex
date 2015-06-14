@@ -40,13 +40,13 @@ The heap locations are allocation site abstractions with respect to the context,
 \end{align}
 where $\mathcal{N}$ is the set of nodes in the control-flow graph. 
 
-An abstract value is defined as the product lattice of the five factors defined by the Hasse diagrams shown in figure \ref{fig:hasse_lat}. These lattices were chosen with the hope of better coercion between values, but others might be considered, e.g. by focusing more on coercion from strings to array indices.
+An abstract value is defined as the product lattice of the five factors defined by the Hasse diagrams shown in figure \ref{fig:hasse_lat}. These lattices were chosen with the hope of better coercion between values, but others might be considered, e.g.\ by focusing more on coercion from strings to array indices.
 
 \begin{align}
 \text{Value} = \text{Array} & \times \text{String} \times \text{Number} \times \text{Boolean}  \times \text{Null}
 \end{align}
 
-Following the results of the dynamic analysis in chapter \ref{ch:study}, the array is considered either a set of locations or a map from indices to sets of types, i.e. array-lists or array-maps. The sum-lattice has been chosen, as opposed to a product-lattice, since the dynamic analysis indicated that arrays seldom change from lists to maps or vice versa. Top array elements are then predictors for suspicious behavior. Furthermore the array lattice has an element for the empty array which can become either a list or a map.  
+Following the results of the dynamic analysis in chapter \ref{ch:study}, the array is considered either a set of locations or a map from indices to sets of types, i.e.\ array-lists or array-maps. The sum-lattice has been chosen, as opposed to a product-lattice, since the dynamic analysis indicated that arrays seldom change from lists to maps or vice versa. Top array elements are then predictors for suspicious behavior. Furthermore the array lattice has an element for the empty array which can become either a list or a map.  
 \begin{align}
 \text{ArrayList}= \mathcal{P}( L )
 \end{align}
